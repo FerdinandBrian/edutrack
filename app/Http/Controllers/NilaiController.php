@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Presensi;
 use Illuminate\Http\Request;
 
-class NilaiController extends Controller
+class PresensiController extends Controller
 {
     public function index()
     {
-        $nilai = Nilai::with('mahasiswa')->get();
-        return view('nilai.index', compact('nilai'));
+        $data = Presensi::with('mahasiswa')->get();
+        return view('presensi.index', compact('data'));
+    }
+
+    public function store(Request $request)
+    {
+        Presensi::create($request->all());
+        return back()->with('success','Presensi tersimpan');
     }
 }
-

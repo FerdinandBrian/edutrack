@@ -2,17 +2,34 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Dosen extends Model
+class Dosen extends Authenticatable
 {
     protected $table = 'dosen';
-    protected $primaryKey = 'nidn';
+    protected $primaryKey = 'nidn'; // bisa disesuaikan primary key
     public $incrementing = false;
+    protected $keyType = 'string';
 
-    public function jadwal()
+    // kolom yang bisa diisi massal
+    protected $fillable = [
+        'nip',
+        'nama',
+        'jenis_kelamin',
+        'tanggal_lahir',
+        'email',
+        'no_telepon',
+        'fakultas',
+        'id_role',
+        'password',
+    ];
+
+    // kolom yang disembunyikan
+    protected $hidden = ['password'];
+
+    // relasi ke tabel users
+    public function user()
     {
-        return $this->hasMany(Jadwal::class, 'nidn');
+        return $this->belongsTo(User::class);
     }
 }
-

@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title','Dashboard Admin')</title>
+    <title>@yield('title','Dashboard Dosen')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,31 +13,31 @@
 <div class="flex min-h-screen">
 
     <!-- SIDEBAR -->
-    <aside class="w-64 bg-gradient-to-b from-red-600 to-red-400 shadow-lg flex flex-col text-white">
+    <aside class="w-64 bg-gradient-to-b from-green-600 to-green-400 shadow-lg flex flex-col text-white">
         <!-- LOGO -->
         <div class="px-6 py-5 flex items-center gap-3 border-b border-white/20">
             <div class="w-10 h-10 bg-white/20 text-white rounded-lg flex items-center justify-center font-bold">
-                AD
+                DS
             </div>
             <div>
                 <p class="font-semibold text-white">Sistem Akademik</p>
-                <p class="text-xs text-white/80">Admin</p>
+                <p class="text-xs text-white/80">Dosen</p>
             </div>
         </div>
 
         <!-- MENU -->
         <nav class="flex-1 px-4 py-6 space-y-1 text-sm">
-            <a href="/dashboard/admin" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/20 text-white font-medium">
+            <a href="/dashboard/dosen" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/20 text-white font-medium">
                 📊 Dashboard
             </a>
             <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
-                👥 Kelola User
+                ⏱ Presensi
             </a>
             <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
-                📂 Data Akademik
+                📈 Nilai
             </a>
             <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
-                ⚙️ Pengaturan
+                📅 Jadwal
             </a>
         </nav>
 
@@ -58,14 +58,14 @@
         <!-- TOPBAR -->
         <header class="bg-white shadow px-8 py-4 flex items-center justify-between">
             <h1 class="font-semibold text-slate-800">
-                Dashboard Admin
+                Dashboard Dosen
             </h1>
             <div class="flex items-center gap-3">
                 <div class="text-right text-sm">
                     <p class="font-medium">{{ auth()->user()->nrp }}</p>
-                    <p class="text-slate-500">Admin</p>
+                    <p class="text-slate-500">Dosen</p>
                 </div>
-                <div class="w-9 h-9 rounded-full bg-red-600 text-white flex items-center justify-center font-semibold">
+                <div class="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center font-semibold">
                     {{ substr(auth()->user()->nama,0,1) }}
                 </div>
             </div>
@@ -73,7 +73,8 @@
 
         <!-- CONTENT -->
         <main class="p-8">
-            <div class="mb-8 bg-gradient-to-r from-red-600 to-red-400 text-white rounded-2xl p-6 shadow">
+            <!-- WELCOME BANNER -->
+            <div class="mb-8 bg-gradient-to-r from-green-600 to-green-400 text-white rounded-2xl p-6 shadow">
                 <h2 class="text-lg font-semibold">
                     Selamat datang, {{ auth()->user()->nama }}!
                 </h2>
@@ -81,6 +82,7 @@
                     Semoga aktivitas akademikmu hari ini berjalan lancar.
                 </p>
             </div>
+
             @yield('content')
         </main>
 

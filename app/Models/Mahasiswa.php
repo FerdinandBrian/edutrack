@@ -2,27 +2,32 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class Mahasiswa extends Model
+class Mahasiswa extends Authenticatable
 {
     protected $table = 'mahasiswa';
-    protected $primaryKey = 'npr';
+    protected $primaryKey = 'nrp';
     public $incrementing = false;
     protected $keyType = 'string';
 
-    public function presensi()
-    {
-        return $this->hasMany(Presensi::class, 'npr');
-    }
+    protected $fillable = [
+        'nrp',
+        'nama',
+        'jurusan',
+        'email',
+        'jenis_kelamin',
+        'tanggal_lahir',
+        'alamat',
+        'no_telepon',
+        'password',
+        'id_role',
+    ];
 
-    public function nilai()
-    {
-        return $this->hasMany(Nilai::class, 'npr');
-    }
+    protected $hidden = ['password'];
 
-    public function tagihan()
+    public function user()
     {
-        return $this->hasMany(Tagihan::class, 'npr');
+        return $this->belongsTo(User::class);
     }
 }
