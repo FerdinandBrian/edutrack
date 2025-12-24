@@ -17,10 +17,10 @@
         <!-- LOGO -->
         <div class="px-6 py-5 flex items-center gap-3 border-b border-white/20">
             <div class="w-10 h-10 bg-white/20 text-white rounded-lg flex items-center justify-center font-bold">
-                SA
+                ET
             </div>
             <div>
-                <p class="font-semibold text-white">Sistem Akademik</p>
+                <p class="font-semibold text-white">EduTrack</p>
                 <p class="text-xs text-white/80">Mahasiswa</p>
             </div>
         </div>
