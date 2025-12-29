@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 29 Des 2025 pada 10.30
+-- Waktu pembuatan: 29 Des 2025 pada 13.04
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -20,6 +20,24 @@ SET time_zone = "+00:00";
 --
 -- Database: `edutrack`
 --
+
+DELIMITER $$
+--
+-- Prosedur
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_nilai_akhir` ()   BEGIN
+    UPDATE nilai
+    SET nilai_akhir = CASE
+        WHEN (kt * 0.6 + uts * 0.2 + uas * 0.2) >= 81 THEN 'A'
+        WHEN (kt * 0.6 + uts * 0.2 + uas * 0.2) >= 71 THEN 'B+'
+        WHEN (kt * 0.6 + uts * 0.2 + uas * 0.2) >= 61 THEN 'B'
+        WHEN (kt * 0.6 + uts * 0.2 + uas * 0.2) >= 51 THEN 'C+'
+        WHEN (kt * 0.6 + uts * 0.2 + uas * 0.2) >= 41 THEN 'C'
+        ELSE 'D'
+    END;
+END$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -94,12 +112,13 @@ CREATE TABLE `dkbs` (
 --
 
 INSERT INTO `dkbs` (`id`, `nrp`, `kode_mk`, `id_perkuliahan`, `semester`, `status`, `created_at`, `updated_at`, `tahun_ajaran`) VALUES
-(8, '2472021', 'MK001P', NULL, '3', 'Terdaftar', '2025-12-29 00:26:41', '2025-12-29 00:29:16', 'Ganjil 2025/2026'),
-(9, '2472021', 'MK001T', NULL, '3', 'Terdaftar', '2025-12-29 00:27:00', '2025-12-29 00:29:23', 'Ganjil 2025/2026'),
-(10, '2472021', 'MK002P', NULL, '3', 'Terdaftar', '2025-12-29 00:27:18', '2025-12-29 00:29:28', 'Ganjil 2025/2026'),
-(11, '2472021', 'MK002T', NULL, '3', 'Terdaftar', '2025-12-29 00:27:31', '2025-12-29 00:29:39', 'Ganjil 2025/2026'),
-(12, '2472021', 'MK003', NULL, '3', 'Terdaftar', '2025-12-29 00:27:44', '2025-12-29 00:29:45', 'Ganjil 2025/2026'),
-(13, '2472022', 'MK001P', NULL, '3', 'Terdaftar', '2025-12-29 00:35:40', '2025-12-29 00:35:40', '2025/2026 - Ganjil');
+(8, '2472021', 'MK004', 4, '3', 'Terdaftar', '2025-12-29 00:26:41', '2025-12-29 04:32:28', '2025/2026 - Ganjil'),
+(9, '2472021', 'MK001T', 10, '3', 'Terdaftar', '2025-12-29 00:27:00', '2025-12-29 04:39:23', '2025/2026 - Ganjil'),
+(10, '2472021', 'MK001P', 11, '3', 'Terdaftar', '2025-12-29 00:27:18', '2025-12-29 04:39:34', '2025/2026 - Ganjil'),
+(11, '2472021', 'MK002T', 6, '3', 'Terdaftar', '2025-12-29 00:27:31', '2025-12-29 04:39:45', '2025/2026 - Ganjil'),
+(12, '2472021', 'MK002P', 7, '3', 'Terdaftar', '2025-12-29 00:27:44', '2025-12-29 04:40:06', '2025/2026 - Ganjil'),
+(13, '2472022', 'MK001P', 11, '3', 'Terdaftar', '2025-12-29 00:35:40', '2025-12-29 04:40:15', '2025/2026 - Ganjil'),
+(14, '2472021', 'MK005', 5, '3', 'Terdaftar', '2025-12-29 04:40:40', '2025-12-29 04:40:40', '2025/2026 - Ganjil');
 
 -- --------------------------------------------------------
 
@@ -126,7 +145,7 @@ CREATE TABLE `dosen` (
 --
 
 INSERT INTO `dosen` (`nip`, `user_id`, `nama`, `tanggal_lahir`, `jenis_kelamin`, `email`, `no_telepon`, `alamat`, `fakultas`, `created_at`, `updated_at`) VALUES
-('0072201', 2, 'Tjatur Kandaga, S.Si., M.T.', '1985-05-20', 'Laki-laki', '0072201@edutrack.com', '08987654321', 'Jl. Melati No. 12', 'Teknologi Rekayasa Cerdas', '2025-12-28 22:47:57', '2025-12-29 02:18:46'),
+('0072201', 2, 'Tjatur Kandaga, S.Si., M.T.', '1985-05-20', 'Laki-laki', '0072201@edutrack.com', '08987654321', 'Jl. Melati No. 12', 'Teknologi Rekayasa Cerdas', '2025-12-28 22:47:57', '2025-12-29 04:51:07'),
 ('0072202', 9, 'Ir. Teddy Marcus Zakaria, M.T.', '1986-11-05', 'Laki-laki', '0072202@edutrack.com', '081234567890', 'Jl. Kenanga Raya No. 45', 'Teknologi Rekayasa Cerdas', '2025-12-29 01:41:28', '2025-12-29 02:19:07'),
 ('0072203', 8, 'Erico Darmawan Handoyo, S. Kom., M.T.', '1990-01-09', 'Laki-laki', '0072203@edutrack.com', '087656728372', 'Jl. Mawar Indah No. 7', 'Teknologi Rekayasa Cerdas', '2025-12-29 01:37:49', '2025-12-29 02:19:17'),
 ('0072204', 10, 'Andreas Widjaja, S.Si., M.Sc., Ph.D', '1980-10-20', 'Laki-laki', '0072204@edutrack.com', '083822334455', 'Jl. Anggrek Lestari No. 88', 'Teknologi Rekayasa Cerdas', '2025-12-29 02:22:52', '2025-12-29 02:22:52'),
@@ -226,7 +245,7 @@ CREATE TABLE `mahasiswa` (
 --
 
 INSERT INTO `mahasiswa` (`nrp`, `user_id`, `nama`, `jurusan`, `email`, `jenis_kelamin`, `tanggal_lahir`, `alamat`, `no_telepon`, `created_at`, `updated_at`) VALUES
-('2472021', 3, 'Ferdinand Brian', 'Teknik Informatika', '2472021@edutrack.com', 'Laki-laki', '2004-10-15', 'Jl. Kebon Jeruk No. 12', '087712345678', '2025-12-28 22:47:57', '2025-12-28 22:47:57'),
+('2472021', 3, 'Ferdinand Brian', 'Teknik Informatika', '2472021@edutrack.com', 'Laki-laki', '2004-10-15', 'Jl. Kebon Jeruk No. 12', '087712345678', '2025-12-28 22:47:57', '2025-12-29 04:29:01'),
 ('2472022', 4, 'Bryan Christian', 'Teknik Informatika', '2472022@edutrack.com', 'Laki-laki', '2006-07-28', 'Kopo', '089626312738', '2025-12-28 23:07:50', '2025-12-28 23:07:50');
 
 -- --------------------------------------------------------
@@ -286,7 +305,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (7, '2025_12_29_061613_create_mata_kuliahs_table', 2),
 (8, '2025_12_29_075654_add_details_to_mata_kuliah_table', 3),
 (9, '2025_12_29_081043_add_id_perkuliahan_to_dkbs', 4),
-(10, '2025_12_29_084255_add_alamat_to_admin_and_dosen_tables', 5);
+(10, '2025_12_29_084255_add_alamat_to_admin_and_dosen_tables', 5),
+(11, '2025_12_29_115615_add_meeting_scores_to_nilai_table', 6);
 
 -- --------------------------------------------------------
 
@@ -298,7 +318,24 @@ CREATE TABLE `nilai` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `nrp` varchar(255) NOT NULL,
   `kode_mk` varchar(255) NOT NULL,
-  `nilai` decimal(5,2) NOT NULL,
+  `p1` double NOT NULL DEFAULT 0,
+  `p2` double NOT NULL DEFAULT 0,
+  `p3` double NOT NULL DEFAULT 0,
+  `p4` double NOT NULL DEFAULT 0,
+  `p5` double NOT NULL DEFAULT 0,
+  `p6` double NOT NULL DEFAULT 0,
+  `p7` double NOT NULL DEFAULT 0,
+  `uts` double NOT NULL DEFAULT 0,
+  `p9` double NOT NULL DEFAULT 0,
+  `p10` double NOT NULL DEFAULT 0,
+  `p11` double NOT NULL DEFAULT 0,
+  `p12` double NOT NULL DEFAULT 0,
+  `p13` double NOT NULL DEFAULT 0,
+  `p14` double NOT NULL DEFAULT 0,
+  `p15` double NOT NULL DEFAULT 0,
+  `uas` double NOT NULL DEFAULT 0,
+  `nilai_total` double NOT NULL DEFAULT 0,
+  `nilai_akhir` varchar(2) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -315,12 +352,29 @@ CREATE TABLE `perkuliahan` (
   `nip_dosen` varchar(50) NOT NULL,
   `kode_mk` varchar(255) NOT NULL,
   `kelas` varchar(10) NOT NULL,
+  `hari` varchar(10) NOT NULL,
   `jam_mulai` time NOT NULL,
   `jam_berakhir` time NOT NULL,
   `tahun_ajaran` varchar(50) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `perkuliahan`
+--
+
+INSERT INTO `perkuliahan` (`id_perkuliahan`, `kode_ruangan`, `nip_dosen`, `kode_mk`, `kelas`, `hari`, `jam_mulai`, `jam_berakhir`, `tahun_ajaran`, `created_at`, `updated_at`) VALUES
+(2, 'L8002', '0072206', 'MK006T', 'B', 'Selasa', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2025-12-29 04:03:46', '2025-12-29 11:05:24'),
+(3, 'L8002', '0072206', 'MK006P', 'B', 'Selasa', '12:30:00', '14:30:00', '2025/2026 - Ganjil', '2025-12-29 04:22:39', '2025-12-29 04:22:39'),
+(4, 'L8001', '0072203', 'MK004', 'B', 'Senin', '09:30:00', '11:10:00', '2025/2026 - Ganjil', '2025-12-29 04:24:07', '2025-12-29 04:24:07'),
+(5, 'L8005', '0072204', 'MK005', 'C', 'Senin', '12:30:00', '15:00:00', '2025/2026 - Ganjil', '2025-12-29 04:24:47', '2025-12-29 04:24:47'),
+(6, 'L8003', '0072202', 'MK002T', 'C', 'Senin', '17:30:00', '19:30:00', '2025/2026 - Ganjil', '2025-12-29 04:25:18', '2025-12-29 04:25:18'),
+(7, 'L8003', '0072202', 'MK002P', 'C', 'Rabu', '17:30:00', '19:30:00', '2025/2026 - Ganjil', '2025-12-29 04:26:12', '2025-12-29 04:26:12'),
+(8, 'L8005', '0072205', 'MK003', 'B', 'Selasa', '15:00:00', '17:30:00', '2025/2026 - Ganjil', '2025-12-29 04:26:50', '2025-12-29 04:26:50'),
+(9, 'L8006', '0072207', 'MK007', 'A', 'Jumat', '13:00:00', '14:40:00', '2025/2026 - Ganjil', '2025-12-29 04:27:21', '2025-12-29 04:27:21'),
+(10, 'L8004', '0072201', 'MK001T', 'A', 'Kamis', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2025-12-29 04:37:14', '2025-12-29 04:37:14'),
+(11, 'L8004', '0072201', 'MK001P', 'A', 'Kamis', '12:30:00', '14:30:00', '2025/2026 - Ganjil', '2025-12-29 04:37:48', '2025-12-29 04:37:48');
 
 -- --------------------------------------------------------
 
@@ -423,8 +477,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `nama`, `email`, `password`, `role`, `created_at`, `updated_at`) VALUES
 (1, 'Super Admin', 'admin@edutrack.com', '$2y$12$u7ulJYN1pJyUv5QE.bpe.uOvPdLrDICmoBptA4f/HChpPVQIfL5z6', 'admin', '2025-12-28 22:47:56', '2025-12-29 02:24:07'),
-(2, 'Tjatur Kandaga, S.Si., M.T.', '0072201@edutrack.com', '$2y$12$m2Mmc/ZZN35Zlox.eQiiX.dinR.EjgBQzDOj/nJ3wGgnFdYM4aHAy', 'dosen', '2025-12-28 22:47:56', '2025-12-28 22:47:56'),
-(3, 'Ferdinand Brian', '2472021@edutrack.com', '$2y$12$yPHdO8geB5M93ZHgsooQ5eR0ZRUUwjNBt1sKddO643JG12HrAVRxu', 'mahasiswa', '2025-12-28 22:47:57', '2025-12-28 22:47:57'),
+(2, 'Tjatur Kandaga, S.Si., M.T.', '0072201@edutrack.com', '$2y$12$e5Kaw4D55V36Rw.wdMcQ1e/E5hCdPMrcnmpIm11dVKj/uRov3sdlu', 'dosen', '2025-12-28 22:47:56', '2025-12-29 04:51:07'),
+(3, 'Ferdinand Brian', '2472021@edutrack.com', '$2y$12$/ktDUMf/NA/DodKRUSfS4OV/0B4sXdJ0fj0KmtOm35m5So4wOnMQS', 'mahasiswa', '2025-12-28 22:47:57', '2025-12-29 04:29:01'),
 (4, 'Bryan Christian', '2472022@edutrack.com', '$2y$12$TBxLGZmNmf7.HOPmgOv/bOyM31ciRQVgDGFZaTRxdtCZw0NsoFSzq', 'mahasiswa', '2025-12-28 23:07:49', '2025-12-28 23:07:49'),
 (8, 'Erico Darmawan Handoyo, S. Kom., M.T.', '0072203@edutrack.com', '$2y$12$ZkhJeKnn8uk1r47keAw8Iu.LSTozgsMR71tcdmzzWfHj7nEpuK1RO', 'dosen', '2025-12-29 01:37:49', '2025-12-29 01:37:49'),
 (9, 'Ir. Teddy Marcus Zakaria, M.T.', '0072202@edutrack.com', '$2y$12$hWI4nORCg218JJJvBq5sL.jM8YO7sUcczMLtO8cmMgGeXoI/a4ofG', 'dosen', '2025-12-29 01:41:28', '2025-12-29 01:41:28'),
@@ -578,7 +632,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT untuk tabel `dkbs`
 --
 ALTER TABLE `dkbs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT untuk tabel `failed_jobs`
@@ -602,7 +656,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT untuk tabel `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT untuk tabel `nilai`
@@ -614,7 +668,7 @@ ALTER TABLE `nilai`
 -- AUTO_INCREMENT untuk tabel `perkuliahan`
 --
 ALTER TABLE `perkuliahan`
-  MODIFY `id_perkuliahan` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_perkuliahan` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT untuk tabel `presensi`
