@@ -46,32 +46,19 @@ class AuthController extends Controller
         ]);
 
         DB::transaction(function() use ($request) {
-            // Ambil id_role dari tabel role
-            $roleRecord = DB::table('role')->where('nama_role', $request->role)->first();
-
-            if (!$roleRecord) {
-                throw new \Exception("Role tidak ditemukan di database");
-            }
-
             // 1️⃣ Simpan ke users
             $user = User::create([
-                'nrp' => match($request->role) {
-                    'mahasiswa' => $request->nrp,
-                    'dosen' => $request->nip,
-                    'admin' => $request->kode_admin,
-                    default => null,
-                },
                 'nama' => $request->nama,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'id_role' => $roleRecord->id,
+                'role' => $request->role,
             ]);
 
             // 2️⃣ Simpan ke tabel role-specific
             if ($request->role === 'mahasiswa') {
                 Mahasiswa::create([
-                    'user_id'       => $user->id,
                     'nrp'           => $request->nrp,
+                    'user_id'       => $user->id,
                     'nama'          => $request->nama,
                     'jenis_kelamin' => $request->jenis_kelamin,
                     'tanggal_lahir' => $request->tanggal_lahir,
@@ -79,32 +66,29 @@ class AuthController extends Controller
                     'no_telepon'    => $request->no_telepon,
                     'email'         => $request->email,
                     'jurusan'       => $request->jurusan ?? null,
-                    'DosenWali'     => null,
-                    'PoinPortopolio'=> 0,
-                    'id_role'       => $roleRecord->id,
+                    'password'      => Hash::make($request->password),
                 ]);
             } elseif ($request->role === 'dosen') {
                 Dosen::create([
-                    'user_id'       => $user->id,
                     'nip'           => $request->nip,
+                    'user_id'       => $user->id,
                     'nama'          => $request->nama,
                     'jenis_kelamin' => $request->jenis_kelamin,
                     'tanggal_lahir' => $request->tanggal_lahir,
                     'email'         => $request->email,
                     'no_telepon'    => $request->no_telepon,
-                    'id_role'       => $roleRecord->id,
+                    'password'      => Hash::make($request->password),
                 ]);
             } elseif ($request->role === 'admin') {
                 Admin::create([
+                    'kode_admin' => $request->kode_admin ?? $request->nip ?? str_replace(' ','',$request->nama),
                     'user_id' => $user->id,
-                    'kode_admin' => $request->kode_admin ?? null,
                     'nama'    => $request->nama,
                     'email'   => $request->email,
                     'tanggal_lahir' => $request->tanggal_lahir,
                     'no_telepon'    => $request->no_telepon,
                     'password'=> Hash::make($request->password),
                     'jenis_kelamin' => $request->jenis_kelamin,
-                    'id_role' => $roleRecord->id,
                 ]);
             }
         });
@@ -123,14 +107,30 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $col = \Illuminate\Support\Facades\Schema::hasColumn((new User)->getTable(), 'nrp') ? 'nrp' : 'npr';
-        $user = User::where('email', $request->nrp) // bisa juga pake nrp/nip/email sesuai kebutuhan
-                    ->orWhere($col, $request->nrp)
-                    ->first();
+        $loginField = $request->nrp; // input bisa email/nip/nrp
+        
+        // 1. Coba cari langsung di email users
+        $user = User::where('email', $loginField)->first();
+
+        // 2. Jika tidak ketemu, cari di tabel detail (mahasiswa/dosen/admin)
+        if (!$user) {
+            $mhs = Mahasiswa::where('nrp', $loginField)->first();
+            if ($mhs) $user = User::find($mhs->user_id);
+            
+            if (!$user) {
+                $dsn = Dosen::where('nip', $loginField)->first();
+                if ($dsn) $user = User::find($dsn->user_id);
+            }
+            
+            if (!$user) {
+                $adm = Admin::where('kode_admin', $loginField)->first();
+                if ($adm) $user = User::find($adm->user_id);
+            }
+        }
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return back()->withErrors([
-                'nrp' => 'NRP / NIP / Email atau password salah',
+                'nrp' => 'Email / ID atau password salah',
             ]);
         }
 
@@ -158,10 +158,10 @@ class AuthController extends Controller
     private function redirectDashboard(User $user)
     {
         return match ($user->role) {
-            'admin'     => redirect('/dashboard/admin'),
-            'dosen'     => redirect('/dashboard/dosen'),
-            'mahasiswa' => redirect('/dashboard/mahasiswa'),
-            default     => redirect('/login'),
+            'admin'     => redirect('/admin/dashboard'),
+            'dosen'     => redirect('/dosen/dashboard'),
+            'mahasiswa' => redirect('/mahasiswa/dashboard'),
+            default => redirect('/login'),
         };
     }
 }

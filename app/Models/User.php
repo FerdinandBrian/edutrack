@@ -11,26 +11,24 @@ class User extends Authenticatable
 
     protected $table = 'users';
 
-    protected $primaryKey = 'nrp'; // kalau pk kamu nrp
-    public $incrementing = false;
-    protected $keyType = 'string';
+    protected $primaryKey = 'id';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
-        'nrp',
         'nama',
         'email',
         'password',
-        'id_role'
+        'role'
     ];
 
     protected $hidden = [
         'password'
     ];
 
-    // User.php
     public function mahasiswa()
     {
-        return $this->hasOne(Mahasiswa::class, 'user_id', 'id'); // user_id di mahasiswa -> id di users
+        return $this->hasOne(Mahasiswa::class, 'user_id', 'id');
     }
 
     public function dosen()
@@ -41,6 +39,16 @@ class User extends Authenticatable
     public function admin()
     {
         return $this->hasOne(Admin::class, 'user_id', 'id');
+    }
+
+    public function getIdentifierAttribute()
+    {
+        return match($this->role) {
+            'mahasiswa' => $this->mahasiswa?->nrp,
+            'dosen' => $this->dosen?->nip,
+            'admin' => $this->admin?->kode_admin,
+            default => 'N/A'
+        };
     }
 
 }

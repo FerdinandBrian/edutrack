@@ -7,28 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 class Dkbs extends Model
 {
     protected $table = 'dkbs';
-    protected $fillable = ['nrp','kode_mk','semester','status'];
+    protected $fillable = ['nrp', 'kode_mk', 'id_perkuliahan', 'semester', 'status', 'tahun_ajaran'];
 
     public function mahasiswa()
     {
-        // support both column names (nrp or legacy npr)
-        if (\Illuminate\Support\Facades\Schema::hasColumn($this->getTable(), 'nrp')) {
-            return $this->belongsTo(Mahasiswa::class, 'nrp', 'nrp');
-        }
-        return $this->belongsTo(Mahasiswa::class, 'npr', 'nrp');
+        return $this->belongsTo(Mahasiswa::class, 'nrp', 'nrp');
     }
 
-    public function getNrpAttribute()
+    public function mataKuliah()
     {
-        return $this->attributes['nrp'] ?? ($this->attributes['npr'] ?? null);
+        return $this->belongsTo(MataKuliah::class, 'kode_mk', 'kode_mk');
     }
 
-    public function setNrpAttribute($value)
+    public function perkuliahan()
     {
-        if (\Illuminate\Support\Facades\Schema::hasColumn($this->getTable(), 'nrp')) {
-            $this->attributes['nrp'] = $value;
-        } else {
-            $this->attributes['npr'] = $value;
-        }
+        return $this->belongsTo(Perkuliahan::class, 'id_perkuliahan', 'id_perkuliahan');
     }
 }

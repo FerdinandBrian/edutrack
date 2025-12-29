@@ -11,7 +11,7 @@ class DashboardMahasiswaController extends Controller
         $user = auth()->user();
         $mahasiswa = $user->mahasiswa; // relasi
 
-        return view('dashboard.mahasiswa', [
+        return view('mahasiswa.dashboard', [
             'user' => $user,
             'mahasiswa' => $mahasiswa,
         ]);

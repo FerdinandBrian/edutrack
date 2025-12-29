@@ -13,21 +13,20 @@ class Mahasiswa extends Authenticatable
 
     protected $fillable = [
         'nrp',
+        'user_id',
         'nama',
         'jurusan',
         'email',
         'jenis_kelamin',
         'tanggal_lahir',
         'alamat',
-        'no_telepon',
-        'password',
-        'id_role',
+        'no_telepon'
     ];
 
-    protected $hidden = ['password'];
+    protected $hidden = [];
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

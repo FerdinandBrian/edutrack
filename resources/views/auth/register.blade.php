@@ -52,17 +52,8 @@
             <form method="POST" action="{{ url('/register') }}" class="space-y-5">
                 @csrf
 
-                <!-- Role -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Role</label>
-                    <select name="role" id="role" required
-                        class="w-full border border-slate-300 rounded-xl px-4 py-3">
-                        <option value="">-- Pilih Role --</option>
-                        <option value="mahasiswa" {{ old('role')=='mahasiswa'?'selected':'' }}>Mahasiswa</option>
-                        <option value="dosen" {{ old('role')=='dosen'?'selected':'' }}>Dosen</option>
-                        <option value="admin" {{ old('role')=='admin'?'selected':'' }}>Admin</option>
-                    </select>
-                </div>
+                <!-- Role (Fixed to Mahasiswa for Public Register) -->
+                <input type="hidden" name="role" value="mahasiswa">
 
                 <!-- Nama -->
                 <div>
@@ -86,36 +77,21 @@
                 <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Lahir</label>
                     <input type="date" name="tanggal_lahir" placeholder="Tanggal Lahir" value="{{ old('tanggal_lahir') }}" class="w-full border border-slate-300 rounded-xl px-4 py-3">
 
-                <!-- Mahasiswa Fields -->
-                <div id="mahasiswa-fields" class="hidden space-y-3">
+                <!-- Mahasiswa Fields (Auto Show) -->
+                <div id="mahasiswa-fields" class="space-y-3">
                     <label class="block text-sm font-medium text-slate-700 mb-1">NRP</label>
-                    <input name="nrp" placeholder="NRP" value="{{ old('nrp') }}" class="w-full border border-slate-300 rounded-xl px-4 py-3">
+                    <input name="nrp" placeholder="NRP" value="{{ old('nrp') }}" required class="w-full border border-slate-300 rounded-xl px-4 py-3">
 
                     <label class="block text-sm font-medium text-slate-700 mb-1">Alamat</label>
-                    <input name="alamat" placeholder="Alamat" value="{{ old('alamat') }}" class="w-full border border-slate-300 rounded-xl px-4 py-3">
+                    <input name="alamat" placeholder="Alamat" value="{{ old('alamat') }}" required class="w-full border border-slate-300 rounded-xl px-4 py-3">
 
                     <label class="block text-sm font-medium text-slate-700 mb-1">Jurusan</label>
-                    <input name="jurusan" placeholder="Jurusan" value="{{ old('jurusan') }}" class="w-full border border-slate-300 rounded-xl px-4 py-3">
-                </div>
-
-                <!-- Dosen Fields -->
-                <div id="dosen-fields" class="hidden space-y-3">
-                    <label class="block text-sm font-medium text-slate-700 mb-1">NIP</label>
-                    <input name="nip" placeholder="NIP" value="{{ old('nip') }}" class="w-full border border-slate-300 rounded-xl px-4 py-3">
-
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Fakultas</label>
-                    <input name="fakultas" placeholder="Fakultas" value="{{ old('fakultas') }}" class="w-full border border-slate-300 rounded-xl px-4 py-3">
-                </div>
-
-                <!-- Admin Fields -->
-                <div id="admin-fields" class="hidden space-y-3">
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Kode Admin</label>
-                    <input name="kode_admin" placeholder="Kode Admin" value="{{ old('kode_admin') }}" class="w-full border border-slate-300 rounded-xl px-4 py-3">
+                    <input name="jurusan" placeholder="Jurusan" value="{{ old('jurusan') }}" required class="w-full border border-slate-300 rounded-xl px-4 py-3">
                 </div>
 
                 <label class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label>
                     <input type="text" name="jenis_kelamin" placeholder="Laki-laki / Perempuan"
-                        value="{{ old('jenis_kelamin') }}"
+                        value="{{ old('jenis_kelamin') }}" required
                         class="w-full border border-slate-300 rounded-xl px-4 py-3">
 
                 <!-- Password -->
@@ -132,8 +108,8 @@
                 <!-- Button -->
                 <button id="registerBtn" type="submit"
                         class="register-btn w-full bg-gradient-to-br from-blue-600 to-cyan-500
-                               text-white font-semibold py-3 rounded-xl shadow-lg
-                               flex items-center justify-center gap-2 transition text-base">
+                                text-white font-semibold py-3 rounded-xl shadow-lg
+                                flex items-center justify-center gap-2 transition text-base">
                     <span>Daftar</span>
                 </button>
             </form>
@@ -148,30 +124,11 @@
     </div>
 
     <p class="text-center text-sm text-slate-500 mt-6">
-        © 2024 Sistem Akademik
+        © 2025 Sistem Akademik
     </p>
 </div>
 
 <script>
-const roleSelect = document.getElementById('role');
-const mahasiswaFields = document.getElementById('mahasiswa-fields');
-const dosenFields = document.getElementById('dosen-fields');
-const adminFields = document.getElementById('admin-fields');
-
-function toggleFields() {
-    const role = roleSelect.value;
-    mahasiswaFields.classList.add('hidden');
-    dosenFields.classList.add('hidden');
-    adminFields.classList.add('hidden');
-
-    if(role === 'mahasiswa') mahasiswaFields.classList.remove('hidden');
-    if(role === 'dosen') dosenFields.classList.remove('hidden');
-    if(role === 'admin') adminFields.classList.remove('hidden');
-}
-
-roleSelect.addEventListener('change', toggleFields);
-window.addEventListener('load', toggleFields);
-
 // Spinner on submit
 const form = document.querySelector('form');
 const btn = document.getElementById('registerBtn');

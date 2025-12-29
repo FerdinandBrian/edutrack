@@ -17,27 +17,33 @@
         <!-- LOGO -->
         <div class="px-6 py-5 flex items-center gap-3 border-b border-white/20">
             <div class="w-10 h-10 bg-white/20 text-white rounded-lg flex items-center justify-center font-bold">
-                AD
+                ET
             </div>
             <div>
-                <p class="font-semibold text-white">Sistem Akademik</p>
+                <p class="font-semibold text-white">EduTrack</p>
                 <p class="text-xs text-white/80">Admin</p>
             </div>
         </div>
 
         <!-- MENU -->
         <nav class="flex-1 px-4 py-6 space-y-1 text-sm">
-            <a href="/dashboard/admin" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/20 text-white font-medium">
+            <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/dashboard') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10' }}">
                 📊 Dashboard
             </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
-                👥 Kelola User
+            <a href="/admin/users" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/users*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10' }}">
+                👥 Manajemen User
             </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
-                📂 Data Akademik
+            <a href="/admin/dkbs" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+                📘 Kelola DKBS
             </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
-                ⚙️ Pengaturan
+            <a href="/admin/pembayaran" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+                💳 Pembayaran
+            </a>
+            <a href="/admin/mata-kuliah" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/mata-kuliah*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10' }}">
+                📚 Mata Kuliah
+            </a>
+            <a href="/admin/perkuliahan" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/perkuliahan*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10' }}">
+                🗓️ Jadwal Kelas
             </a>
         </nav>
 
@@ -73,14 +79,6 @@
 
         <!-- CONTENT -->
         <main class="p-8">
-            <div class="mb-8 bg-gradient-to-r from-red-600 to-red-400 text-white rounded-2xl p-6 shadow">
-                <h2 class="text-lg font-semibold">
-                    Selamat datang, {{ auth()->user()->nama }}!
-                </h2>
-                <p class="text-sm text-white/90 mt-1">
-                    Semoga aktivitas akademikmu hari ini berjalan lancar.
-                </p>
-            </div>
             @if(session('success'))
                 <div class="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded">
                     {{ session('success') }}

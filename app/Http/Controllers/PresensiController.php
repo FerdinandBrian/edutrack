@@ -6,27 +6,28 @@ use App\Models\Presensi;
 use App\Models\Mahasiswa;
 use App\Models\Jadwal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class PresensiController extends Controller
 {
     public function index()
     {
-        // If mahasiswa, show only their records. Otherwise show all.
-        if (auth()->user()->id_role == 3) {
-            $col = \Illuminate\Support\Facades\Schema::hasColumn((new Presensi)->getTable(), 'nrp') ? 'nrp' : 'npr';
-            $data = Presensi::with(['mahasiswa','jadwal'])->where($col, auth()->user()->nrp)->get();
+        $user = auth()->user();
+        if ($user->role === 'mahasiswa') {
+            $col = Schema::hasColumn((new Presensi)->getTable(), 'nrp') ? 'nrp' : 'npr';
+            $data = Presensi::with(['mahasiswa','jadwal'])->where($col, $user->identifier)->get();
         } else {
             $data = Presensi::with(['mahasiswa','jadwal'])->get();
         }
 
-        return view('presensi.index', compact('data'));
+        return view($user->role . '.presensi.index', compact('data'));
     }
 
     public function create()
     {
         $mahasiswas = Mahasiswa::orderBy('nama')->get();
         $jadwals = Jadwal::orderBy('hari')->get();
-        return view('presensi.create', compact('mahasiswas','jadwals'));
+        return view('dosen.presensi.create', compact('mahasiswas','jadwals'));
     }
 
     public function store(Request $request)
@@ -40,14 +41,16 @@ class PresensiController extends Controller
         ]);
 
         Presensi::create($validated);
-        return redirect('/presensi')->with('success','Presensi tersimpan');
+        
+        $user = auth()->user();
+        return redirect('/' . $user->role . '/presensi')->with('success','Presensi tersimpan');
     }
 
     public function edit(Presensi $presensi)
     {
         $mahasiswas = Mahasiswa::orderBy('nama')->get();
         $jadwals = Jadwal::orderBy('hari')->get();
-        return view('presensi.edit', compact('presensi','mahasiswas','jadwals'));
+        return view('dosen.presensi.edit', compact('presensi','mahasiswas','jadwals'));
     }
 
     public function update(Request $request, Presensi $presensi)
@@ -61,7 +64,9 @@ class PresensiController extends Controller
         ]);
 
         $presensi->update($validated);
-        return redirect('/presensi')->with('success','Presensi diperbarui');
+        
+        $user = auth()->user();
+        return redirect('/' . $user->role . '/presensi')->with('success','Presensi diperbarui');
     }
 
     public function destroy(Presensi $presensi)
@@ -72,6 +77,7 @@ class PresensiController extends Controller
 
     public function show(Presensi $presensi)
     {
-        return view('presensi.show', compact('presensi'));
+        $user = auth()->user();
+        return view($user->role . '.presensi.show', compact('presensi'));
     }
 }

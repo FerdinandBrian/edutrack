@@ -17,26 +17,26 @@
         <!-- LOGO -->
         <div class="px-6 py-5 flex items-center gap-3 border-b border-white/20">
             <div class="w-10 h-10 bg-white/20 text-white rounded-lg flex items-center justify-center font-bold">
-                DS
+                ET
             </div>
             <div>
-                <p class="font-semibold text-white">Sistem Akademik</p>
+                <p class="font-semibold text-white">EduTrack</p>
                 <p class="text-xs text-white/80">Dosen</p>
             </div>
         </div>
 
         <!-- MENU -->
         <nav class="flex-1 px-4 py-6 space-y-1 text-sm">
-            <a href="/dashboard/dosen" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/20 text-white font-medium">
+            <a href="/dosen/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/20 text-white font-medium">
                 📊 Dashboard
             </a>
-            <a href="/presensi" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/dosen/presensi" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
                 ⏱ Presensi
             </a>
-            <a href="/nilai" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/dosen/nilai" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
                 📈 Nilai
             </a>
-            <a href="/jadwal" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/dosen/jadwal" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
                 📅 Jadwal
             </a>
         </nav>

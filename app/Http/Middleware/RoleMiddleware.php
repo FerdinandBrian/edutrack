@@ -13,7 +13,7 @@ class RoleMiddleware
             return redirect('/login');
         }
 
-        if (auth()->user()->id_role != $role) {
+        if (auth()->user()->role != $role) {
             abort(403, 'ANDA TIDAK MEMILIKI AKSES');
         }
 

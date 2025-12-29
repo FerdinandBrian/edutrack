@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Jadwal;
 use App\Models\Dosen;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class JadwalController extends Controller
 {
@@ -13,18 +14,19 @@ class JadwalController extends Controller
         try {
             $data = Jadwal::with('dosen')->get();
         } catch (\Exception $e) {
-            \Log::error('Jadwal index error: '. $e->getMessage());
+            Log::error('Jadwal index error: '. $e->getMessage());
             session()->flash('error', 'Terjadi masalah saat memuat jadwal. Cek log.');
             $data = collect();
         }
 
-        return view('jadwal.index', compact('data'));
+        $user = auth()->user();
+        return view($user->role . '.jadwal.index', compact('data'));
     }
 
     public function create()
     {
         $dosens = Dosen::orderBy('nama')->get();
-        return view('jadwal.create', compact('dosens'));
+        return view('dosen.jadwal.create', compact('dosens'));
     }
 
     public function store(Request $request)
@@ -37,25 +39,28 @@ class JadwalController extends Controller
         ]);
 
         Jadwal::create($validated);
-        return redirect('/jadwal')->with('success','Jadwal tersimpan');
+        
+        $user = auth()->user();
+        return redirect('/' . $user->role . '/jadwal')->with('success','Jadwal tersimpan');
     }
 
     public function show($id)
     {
+        $user = auth()->user();
         try {
             $row = Jadwal::with('dosen')->findOrFail($id);
         } catch (\Exception $e) {
-            \Log::error('Jadwal show error: '. $e->getMessage());
-            return redirect('/jadwal')->with('error','Data jadwal tidak ditemukan atau terjadi masalah.');
+            Log::error('Jadwal show error: '. $e->getMessage());
+            return redirect('/' . $user->role . '/jadwal')->with('error','Data jadwal tidak ditemukan atau terjadi masalah.');
         }
 
-        return view('jadwal.show', compact('row'));
+        return view($user->role . '.jadwal.show', compact('row'));
     }
 
     public function edit(Jadwal $jadwal)
     {
         $dosens = Dosen::orderBy('nama')->get();
-        return view('jadwal.edit', compact('jadwal','dosens'));
+        return view('dosen.jadwal.edit', compact('jadwal','dosens'));
     }
 
     public function update(Request $request, Jadwal $jadwal)
@@ -68,7 +73,9 @@ class JadwalController extends Controller
         ]);
 
         $jadwal->update($validated);
-        return redirect('/jadwal')->with('success','Jadwal diperbarui');
+        
+        $user = auth()->user();
+        return redirect('/' . $user->role . '/jadwal')->with('success','Jadwal diperbarui');
     }
 
     public function destroy(Jadwal $jadwal)

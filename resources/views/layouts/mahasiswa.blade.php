@@ -27,25 +27,25 @@
 
         <!-- MENU -->
         <nav class="flex-1 px-4 py-6 space-y-1 text-sm">
-            <a href="/dashboard/mahasiswa" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/20 text-white font-medium">
+            <a href="/mahasiswa/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/20 text-white font-medium">
                 📊 Dashboard
             </a>
-            <a href="/presensi" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/mahasiswa/presensi" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
                 ⏱ Presensi
             </a>
-            <a href="/dkbs" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/mahasiswa/dkbs" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
                 📘 DKBS
             </a>
-            <a href="/jadwal" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/mahasiswa/jadwal" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
                 📅 Jadwal Kuliah
             </a>
-            <a href="/mata-kuliah" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/mahasiswa/mata-kuliah" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
                 📚 Mata Kuliah
             </a>
-            <a href="/nilai" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/mahasiswa/nilai" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
                 📈 Nilai
             </a>
-            <a href="/pembayaran" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/mahasiswa/pembayaran" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
                 💳 Pembayaran
             </a>
             <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">

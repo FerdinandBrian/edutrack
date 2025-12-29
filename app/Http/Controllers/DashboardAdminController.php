@@ -11,7 +11,7 @@ class DashboardAdminController extends Controller
         $user = auth()->user();
         $admin = $user->admin; // relasi
 
-        return view('dashboard.admin', [
+        return view('admin.dashboard', [
             'user' => $user,
             'admin' => $admin,
         ]);

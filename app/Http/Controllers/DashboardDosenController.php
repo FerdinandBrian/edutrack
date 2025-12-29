@@ -11,7 +11,7 @@ class DashboardDosenController extends Controller
         $user = auth()->user();
         $dosen = $user->dosen; // relasi
 
-        return view('dashboard.dosen', [
+        return view('dosen.dashboard', [
             'user' => $user,
             'dosen' => $dosen,
         ]);

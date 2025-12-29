@@ -7,28 +7,27 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Admin extends Authenticatable
 {
     protected $table = 'admin';
-    protected $primaryKey = 'id'; // gunakan 'id' jika auto increment
-    public $incrementing = true;  // true jika pakai auto increment
-    protected $keyType = 'int';
+    protected $primaryKey = 'kode_admin'; 
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     // kolom yang bisa diisi massal
     protected $fillable = [
         'kode_admin',
+        'user_id',
         'nama',
         'email',
-        'password',
         'jenis_kelamin',
         'tanggal_lahir',
         'no_telepon',
-        'id_role',
+        'alamat',
     ];
 
     // kolom yang disembunyikan
-    protected $hidden = ['password'];
+    protected $hidden = [];
 
-    // relasi ke tabel users
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }
