@@ -18,6 +18,15 @@
         </a>
     </div>
 
+    @if(session('success'))
+        <div class="mx-8 mt-4 p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-xl text-sm flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {{ session('success') }}
+        </div>
+    @endif
+
     <!-- Table -->
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
@@ -25,8 +34,8 @@
                 <tr class="bg-slate-50/50 text-slate-500 text-[11px] uppercase tracking-widest font-bold border-b border-slate-100">
                     <th class="px-8 py-4">Mata Kuliah & Kelas</th>
                     <th class="px-8 py-4">Dosen Pengampu</th>
-                    <th class="px-8 py-4">Waktu & Ruangan</th>
-                    <th class="px-8 py-4">Tahun Ajaran</th>
+                    <th class="px-8 py-4">Jadwal & Ruangan</th>
+                    <th class="px-8 py-4 text-center">Tahun Ajaran</th>
                     <th class="px-8 py-4 text-center">Aksi</th>
                 </tr>
             </thead>
@@ -50,13 +59,16 @@
                     </td>
                     <td class="px-8 py-5">
                         <div class="space-y-1">
-                            <span class="text-xs text-slate-600 block">{{ \Illuminate\Support\Str::substr($p->jam_mulai, 0, 5) }} - {{ \Illuminate\Support\Str::substr($p->jam_berakhir, 0, 5) }}</span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[11px] font-bold text-slate-700">{{ $p->hari }}</span>
+                                <span class="text-xs text-slate-500 font-medium">{{ \Illuminate\Support\Str::substr($p->jam_mulai, 0, 5) }} - {{ \Illuminate\Support\Str::substr($p->jam_berakhir, 0, 5) }}</span>
+                            </div>
                             <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 uppercase">
                                 {{ $p->kode_ruangan }}
                             </span>
                         </div>
                     </td>
-                    <td class="px-8 py-5">
+                    <td class="px-8 py-5 text-center">
                         <span class="text-xs font-medium text-slate-500">{{ $p->tahun_ajaran }}</span>
                     </td>
                     <td class="px-8 py-5">

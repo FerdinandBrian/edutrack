@@ -139,4 +139,10 @@ class DkbsController extends Controller
             });
         return response()->json($data);
     }
+
+    public function getMataKuliahBySemester($semester)
+    {
+        $courses = MataKuliah::where('semester', $semester)->get();
+        return response()->json($courses);
+    }
 }

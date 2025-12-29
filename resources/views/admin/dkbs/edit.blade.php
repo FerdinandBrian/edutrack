@@ -13,7 +13,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                 </a>
-                <h2 class="text-xl font-bold text-white">Edit Rencana Studi (DKBS)</h2>
+                <h2 class="text-xl font-bold text-white">Edit Pendaftaran Kelas (DKBS)</h2>
             </div>
         </div>
 
@@ -29,102 +29,65 @@
                 @csrf
                 @method('PUT')
 
-                <!-- Section 1: Mahasiswa & Tahun Ajaran -->
-                <div class="space-y-4">
-                    <div class="flex items-center gap-2 text-slate-800 font-bold border-b border-slate-100 pb-2">
-                        <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
-                        <h3>Informasi Dasar</h3>
+                <!-- Section 1: Mahasiswa -->
+                <div>
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <span class="w-8 h-px bg-slate-200"></span>
+                        Mahasiswa
+                    </h3>
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                        <label class="block text-sm font-medium text-slate-600 mb-2">Nama atau NRP Mahasiswa</label>
+                        <select name="nrp" id="nrp-select" required class="w-full">
+                            @foreach($mahasiswas as $m)
+                                <option value="{{ $m->nrp }}" {{ $dkbs->nrp == $m->nrp ? 'selected' : '' }}>
+                                    {{ $m->nrp }} - {{ $m->nama }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-slate-600 mb-1">Cari Nama atau NRP Mahasiswa</label>
-                            <select name="nrp" id="select-mahasiswa" required placeholder="Masukkan Nama atau NRP...">
-                                <option value="">-- Pilih Mahasiswa --</option>
-                                @foreach($mahasiswas as $m)
-                                    <option value="{{ $m->nrp }}" {{ (old('nrp', $dkbs->nrp)) == $m->nrp ? 'selected' : '' }}>
-                                        [{{ $m->nrp }}] {{ $m->nama }} - {{ $m->jurusan }}
-                                    </option>
+                </div>
+
+                <!-- Section 2: Kelas & Jadwal -->
+                <div>
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <span class="w-8 h-px bg-slate-200"></span>
+                        Perkuliahan & Jadwal
+                    </h3>
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-2">Tahun Ajaran</label>
+                            <select id="ta-select" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 transition outline-none bg-white">
+                                <option value="">-- Pilih Periode --</option>
+                                @foreach(['2024/2025 - Ganjil', '2024/2025 - Genap', '2025/2026 - Ganjil', '2025/2026 - Genap', '2026/2027 - Ganjil', '2026/2027 - Genap', '2027/2028 - Ganjil', '2027/2028 - Genap'] as $ta)
+                                    <option value="{{ $ta }}" {{ $dkbs->tahun_ajaran == $ta ? 'selected' : '' }}>{{ $ta }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-slate-600 mb-2">Tahun Ajaran</label>
-                            <select name="tahun_ajaran" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition outline-none bg-slate-50">
-                                <option value="">-- Pilih Tahun Ajaran --</option>
-                                <option value="2024/2025 - Ganjil" {{ (old('tahun_ajaran', $dkbs->tahun_ajaran)) == '2024/2025 - Ganjil' ? 'selected' : '' }}>2024/2025 - Ganjil</option>
-                                <option value="2024/2025 - Genap" {{ (old('tahun_ajaran', $dkbs->tahun_ajaran)) == '2024/2025 - Genap' ? 'selected' : '' }}>2024/2025 - Genap</option>
-                                <option value="2025/2026 - Ganjil" {{ (old('tahun_ajaran', $dkbs->tahun_ajaran)) == '2025/2026 - Ganjil' ? 'selected' : '' }}>2025/2026 - Ganjil</option>
-                                <option value="2025/2026 - Genap" {{ (old('tahun_ajaran', $dkbs->tahun_ajaran)) == '2025/2026 - Genap' ? 'selected' : '' }}>2025/2026 - Genap</option>
-                                <option value="2026/2027 - Ganjil" {{ (old('tahun_ajaran', $dkbs->tahun_ajaran)) == '2026/2027 - Ganjil' ? 'selected' : '' }}>2026/2027 - Ganjil</option>
-                                <option value="2026/2027 - Genap" {{ (old('tahun_ajaran', $dkbs->tahun_ajaran)) == '2026/2027 - Genap' ? 'selected' : '' }}>2026/2027 - Genap</option>
-                                <option value="2027/2028 - Ganjil" {{ (old('tahun_ajaran', $dkbs->tahun_ajaran)) == '2027/2028 - Ganjil' ? 'selected' : '' }}>2027/2028 - Ganjil</option>
-                                <option value="2027/2028 - Genap" {{ (old('tahun_ajaran', $dkbs->tahun_ajaran)) == '2027/2028 - Genap' ? 'selected' : '' }}>2027/2028 - Genap</option>
-                            </select>
-                        </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-slate-600 mb-2">Semester</label>
-                            <select name="semester" id="select-semester" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition outline-none bg-slate-50">
-                                <option value="">-- Pilih Semester --</option>
-                                @for($i=1; $i<=8; $i++)
-                                    <option value="{{ $i }}" {{ (old('semester', $dkbs->semester)) == $i ? 'selected' : '' }}>Semester {{ $i }}</option>
-                                @endfor
+                            <label class="block text-sm font-medium text-slate-600 mb-2">Pilih Kelas Perkuliahan</label>
+                            <select name="id_perkuliahan" id="perkuliahan-select" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 transition outline-none bg-white">
+                                <option value="">-- Pilih Tahun Ajaran Dahulu --</option>
                             </select>
+                            <p class="text-[10px] text-slate-400 mt-2 italic font-medium">* Menampilkan daftar kelas yang aktif pada periode terpilih.</p>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Section 2: Mata Kuliah -->
-                <div class="space-y-4">
-                    <div class="flex items-center gap-2 text-slate-800 font-bold border-b border-slate-100 pb-2">
-                        <span class="bg-purple-100 text-purple-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
-                        <h3>Pilih Mata Kuliah</h3>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-600 mb-2">Mata Kuliah</label>
-                            <select name="kode_mk" id="select-mk" required disabled class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition outline-none bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                                <option value="">-- Pilih Semester Dahulu --</option>
-                            </select>
-                            <div id="mk-loading" class="hidden mt-2 text-xs text-blue-600 animate-pulse">
-                                Memuat daftar mata kuliah berdasarkan semester...
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 3: Status -->
-                <div class="space-y-4">
-                    <div class="flex items-center gap-2 text-slate-800 font-bold border-b border-slate-100 pb-2">
-                        <span class="bg-emerald-100 text-emerald-600 w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
-                        <h3>Konfirmasi Pendaftaran</h3>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-slate-600 mb-2">Status Pendaftaran</label>
-                            <div class="flex gap-4 py-3">
-                                <label class="flex items-center gap-2 cursor-pointer group">
-                                    <input type="radio" name="status" value="Terdaftar" {{ (old('status', $dkbs->status)) == 'Terdaftar' ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
-                                    <span class="text-slate-700 group-hover:text-blue-600 transition text-sm">Terdaftar</span>
+                            <div class="flex gap-6 py-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="status" value="Terdaftar" {{ $dkbs->status == 'Terdaftar' ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
+                                    <span class="text-sm font-medium text-slate-700">Terdaftar</span>
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer group">
-                                    <input type="radio" name="status" value="Menunggu Antrean" {{ (old('status', $dkbs->status)) == 'Menunggu Antrean' ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
-                                    <span class="text-slate-700 group-hover:text-blue-600 transition text-sm">Antrean</span>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="status" value="Menunggu Antrean" {{ $dkbs->status == 'Menunggu Antrean' ? 'checked' : '' }} class="w-4 h-4 text-amber-600">
+                                    <span class="text-sm font-medium text-slate-700">Antrean</span>
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer group">
-                                    <input type="radio" name="status" value="Drop" {{ (old('status', $dkbs->status)) == 'Drop' ? 'checked' : '' }} class="w-4 h-4 text-red-600">
-                                    <span class="text-slate-700 group-hover:text-red-600 transition text-sm">Drop</span>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="radio" name="status" value="Drop" {{ $dkbs->status == 'Drop' ? 'checked' : '' }} class="w-4 h-4 text-red-600">
+                                    <span class="text-sm font-medium text-slate-700">Drop</span>
                                 </label>
                             </div>
-                        </div>
-                        <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-100">
-                            <p class="text-[11px] text-amber-700 leading-relaxed font-medium">
-                                <span class="font-bold">Info:</span> Ruangan dan kapasitas akan diperbarui otomatis jika Anda mengubah Mata Kuliah.
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -140,85 +103,58 @@
     </div>
 </div>
 
-<!-- Scripts for Dynamic Behavior -->
+<!-- Scripts for Dynamic Loading -->
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
-
 <script>
-    // Initialize Tom Select for Mahasiswa
-    new TomSelect("#select-mahasiswa", {
+    new TomSelect("#nrp-select", {
         create: false,
-        sortField: {
-            field: "text",
-            direction: "asc"
-        }
+        sortField: { field: "text", direction: "asc" }
     });
 
-    const semesterSelect = document.getElementById('select-semester');
-    const mkSelect = document.getElementById('select-mk');
-    const loadingEl = document.getElementById('mk-loading');
-    const initialMk = "{{ old('kode_mk', $dkbs->kode_mk) }}";
+    const taSelect = document.getElementById('ta-select');
+    const perkuliahanSelect = document.getElementById('perkuliahan-select');
+    const currentIdPerkuliahan = "{{ $dkbs->id_perkuliahan }}";
 
-    async function loadCourses(semester, selectedMk = null) {
-        if (!semester) {
-            mkSelect.innerHTML = '<option value="">-- Pilih Semester Dahulu --</option>';
-            mkSelect.disabled = true;
+    async function updatePerkuliahanOptions(ta, selectedId = null) {
+        if (!ta) {
+            perkuliahanSelect.innerHTML = '<option value="">-- Pilih Tahun Ajaran Dahulu --</option>';
+            perkuliahanSelect.disabled = true;
+            perkuliahanSelect.classList.add('opacity-50');
             return;
         }
 
-        // Reset and show loading
-        mkSelect.innerHTML = '<option value="">-- Memuat Mata Kuliah... --</option>';
-        mkSelect.disabled = true;
-        loadingEl.classList.remove('hidden');
+        perkuliahanSelect.innerHTML = '<option value="">-- Memuat Kelas... --</option>';
+        perkuliahanSelect.disabled = true;
 
         try {
-            const response = await fetch(`/admin/api/mata-kuliah/${semester}`);
-            const courses = await response.json();
-            
-            mkSelect.innerHTML = '<option value="">-- Pilih Mata Kuliah --</option>';
-            if (courses.length > 0) {
-                courses.forEach(course => {
-                    const option = document.createElement('option');
-                    option.value = course.kode_mk;
-                    option.textContent = `[${course.kode_mk}] ${course.nama_mk} (${course.sks} SKS)`;
-                    if (selectedMk && course.kode_mk === selectedMk) {
-                        option.selected = true;
-                    }
-                    mkSelect.appendChild(option);
-                });
-                mkSelect.disabled = false;
-            } else {
-                mkSelect.innerHTML = '<option value="">-- Tidak ada mata kuliah di semester ini --</option>';
-            }
+            const response = await fetch(`/admin/api/perkuliahan-by-ta?tahun_ajaran=${encodeURIComponent(ta)}`);
+            const data = await response.json();
+
+            let options = '<option value="">-- Pilih Kelas --</option>';
+            data.forEach(p => {
+                const isSelected = selectedId && p.id == selectedId ? 'selected' : '';
+                options += `<option value="${p.id}" ${isSelected}>${p.label}</option>`;
+            });
+
+            perkuliahanSelect.innerHTML = options;
+            perkuliahanSelect.disabled = false;
+            perkuliahanSelect.classList.remove('opacity-50');
         } catch (error) {
-            console.error('Error fetching courses:', error);
-            mkSelect.innerHTML = '<option value="">-- Gagal memuat data --</option>';
-        } finally {
-            loadingEl.classList.add('hidden');
+            console.error('Error fetching perkuliahan:', error);
+            perkuliahanSelect.innerHTML = '<option value="">Error memuat data</option>';
         }
     }
 
-    semesterSelect.addEventListener('change', function() {
-        loadCourses(this.value);
+    taSelect.addEventListener('change', function() {
+        updatePerkuliahanOptions(this.value);
     });
 
-    // Initial load for Edit
+    // Initial load for edit page
     window.addEventListener('DOMContentLoaded', () => {
-        if (semesterSelect.value) {
-            loadCourses(semesterSelect.value, initialMk);
+        if (taSelect.value) {
+            updatePerkuliahanOptions(taSelect.value, currentIdPerkuliahan);
         }
     });
 </script>
-
-<style>
-    .ts-control {
-        border-radius: 0.75rem !important;
-        padding: 0.75rem 1rem !important;
-        border-color: #e2e8f0 !important;
-        background-color: #f8fafc !important;
-    }
-    .ts-wrapper.focus .ts-control {
-        box-shadow: 0 0 0 2px #3b82f6 !important;
-    }
-</style>
 @endsection

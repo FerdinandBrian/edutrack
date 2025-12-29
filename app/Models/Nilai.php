@@ -7,28 +7,36 @@ use Illuminate\Database\Eloquent\Model;
 class Nilai extends Model
 {
     protected $table = 'nilai';
-    protected $fillable = ['nrp','kode_mk','nilai'];
+    protected $fillable = [
+        'nrp',
+        'kode_mk',
+        'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7',
+        'uts',
+        'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15',
+        'uas',
+        'nilai_total',
+        'nilai_akhir'
+    ];
 
     public function mahasiswa()
     {
-        // support both column names (nrp or legacy npr)
-        if (\Illuminate\Support\Facades\Schema::hasColumn($this->getTable(), 'nrp')) {
-            return $this->belongsTo(Mahasiswa::class, 'nrp', 'nrp');
-        }
-        return $this->belongsTo(Mahasiswa::class, 'npr', 'nrp');
+        return $this->belongsTo(Mahasiswa::class, 'nrp', 'nrp');
     }
 
-    public function getNrpAttribute()
+    public function mataKuliah()
     {
-        return $this->attributes['nrp'] ?? ($this->attributes['npr'] ?? null);
+        return $this->belongsTo(MataKuliah::class, 'kode_mk', 'kode_mk');
     }
 
-    public function setNrpAttribute($value)
+    /**
+     * Logic to calculate Grade (A, B, C, etc) from total score
+     */
+    public static function calculateGrade($total)
     {
-        if (\Illuminate\Support\Facades\Schema::hasColumn($this->getTable(), 'nrp')) {
-            $this->attributes['nrp'] = $value;
-        } else {
-            $this->attributes['npr'] = $value;
-        }
+        if ($total >= 85) return 'A';
+        if ($total >= 75) return 'B';
+        if ($total >= 60) return 'C';
+        if ($total >= 45) return 'D';
+        return 'E';
     }
 }

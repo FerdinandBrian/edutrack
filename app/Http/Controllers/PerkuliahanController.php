@@ -31,10 +31,39 @@ class PerkuliahanController extends Controller
             'nip_dosen' => 'required|string|exists:dosen,nip',
             'kode_ruangan' => 'required|string|exists:ruangan,kode_ruangan',
             'kelas' => 'required|string|max:10',
+            'hari' => 'required|string',
             'jam_mulai' => 'required',
             'jam_berakhir' => 'required',
             'tahun_ajaran' => 'required|string',
         ]);
+
+        // Check for Room Collision
+        $collision = Perkuliahan::where('kode_ruangan', $request->kode_ruangan)
+            ->where('hari', $request->hari)
+            ->where('tahun_ajaran', $request->tahun_ajaran)
+            ->where(function($q) use ($request) {
+                $q->where(function($inner) use ($request) {
+                    $inner->where('jam_mulai', '<', $request->jam_berakhir)
+                          ->where('jam_berakhir', '>', $request->jam_mulai);
+                });
+            })->first();
+
+        if ($collision) {
+            return back()->withInput()->withErrors(['msg' => "Bentrok! Ruangan {$request->kode_ruangan} sudah digunakan di hari {$request->hari} pada jam tersebut."]);
+        }
+
+        // Check for Dosen Collision
+        $dosenCollision = Perkuliahan::where('nip_dosen', $request->nip_dosen)
+            ->where('hari', $request->hari)
+            ->where('tahun_ajaran', $request->tahun_ajaran)
+            ->where(function($q) use ($request) {
+                $q->where('jam_mulai', '<', $request->jam_berakhir)
+                  ->where('jam_berakhir', '>', $request->jam_mulai);
+            })->first();
+
+        if ($dosenCollision) {
+            return back()->withInput()->withErrors(['msg' => "Bentrok! Dosen tersebut sudah memiliki jadwal mengajar di jam tersebut."]);
+        }
 
         Perkuliahan::create($validated);
         return redirect('/admin/perkuliahan')->with('success', 'Jadwal perkuliahan berhasil dibuat.');
@@ -58,10 +87,25 @@ class PerkuliahanController extends Controller
             'nip_dosen' => 'required|string|exists:dosen,nip',
             'kode_ruangan' => 'required|string|exists:ruangan,kode_ruangan',
             'kelas' => 'required|string|max:10',
+            'hari' => 'required|string',
             'jam_mulai' => 'required',
             'jam_berakhir' => 'required',
             'tahun_ajaran' => 'required|string',
         ]);
+
+        // Check for Room Collision (excluding current record)
+        $collision = Perkuliahan::where('kode_ruangan', $request->kode_ruangan)
+            ->where('hari', $request->hari)
+            ->where('tahun_ajaran', $request->tahun_ajaran)
+            ->where('id_perkuliahan', '!=', $id)
+            ->where(function($q) use ($request) {
+                $q->where('jam_mulai', '<', $request->jam_berakhir)
+                  ->where('jam_berakhir', '>', $request->jam_mulai);
+            })->first();
+
+        if ($collision) {
+            return back()->withInput()->withErrors(['msg' => "Bentrok! Ruangan {$request->kode_ruangan} sudah digunakan."]);
+        }
 
         $perkuliahan->update($validated);
         return redirect('/admin/perkuliahan')->with('success', 'Jadwal perkuliahan berhasil diperbarui.');

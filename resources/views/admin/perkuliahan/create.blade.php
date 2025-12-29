@@ -18,6 +18,13 @@
         </div>
 
         <div class="p-8">
+            @if($errors->any())
+                <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-lg flex items-center gap-3">
+                    <span class="text-xl">⚠️</span>
+                    <p>{{ $errors->first('msg') ?: $errors->first() }}</p>
+                </div>
+            @endif
+
             <form action="/admin/perkuliahan" method="POST" class="space-y-6">
                 @csrf
 
@@ -54,6 +61,17 @@
                         <input type="text" name="kelas" required placeholder="Contoh: A, B, atau IF-44-01" value="{{ old('kelas') }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50">
                     </div>
 
+                    <!-- Hari -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-2">Hari</label>
+                        <select name="hari" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50">
+                            <option value="">-- Pilih Hari --</option>
+                            @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'] as $h)
+                                <option value="{{ $h }}" {{ old('hari') == $h ? 'selected' : '' }}>{{ $h }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <!-- Ruangan -->
                     <div>
                         <label class="block text-sm font-medium text-slate-600 mb-2">Ruangan</label>
@@ -72,10 +90,9 @@
                         <label class="block text-sm font-medium text-slate-600 mb-2">Tahun Ajaran</label>
                         <select name="tahun_ajaran" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50">
                             <option value="">-- Pilih Periode --</option>
-                            <option value="2024/2025 - Ganjil">2024/2025 - Ganjil</option>
-                            <option value="2024/2025 - Genap">2024/2025 - Genap</option>
-                            <option value="2025/2026 - Ganjil">2025/2026 - Ganjil</option>
-                            <option value="2025/2026 - Genap">2025/2026 - Genap</option>
+                            @foreach(['2024/2025 - Ganjil', '2024/2025 - Genap', '2025/2026 - Ganjil', '2025/2026 - Genap', '2026/2027 - Ganjil', '2026/2027 - Genap', '2027/2028 - Ganjil', '2027/2028 - Genap'] as $ta)
+                                <option value="{{ $ta }}" {{ old('tahun_ajaran') == $ta ? 'selected' : '' }}>{{ $ta }}</option>
+                            @endforeach
                         </select>
                     </div>
 

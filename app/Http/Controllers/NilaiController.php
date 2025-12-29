@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Nilai;
 use App\Models\Mahasiswa;
+use App\Models\MataKuliah;
+use App\Models\Dosen;
+use App\Models\Perkuliahan;
+use App\Models\Dkbs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -15,14 +19,12 @@ class NilaiController extends Controller
         $user = auth()->user();
         try {
             if ($user->role === 'mahasiswa') {
-                $col = Schema::hasColumn((new Nilai)->getTable(), 'nrp') ? 'nrp' : 'npr';
-                $data = Nilai::with('mahasiswa')->where($col, $user->identifier)->get();
+                $data = Nilai::with(['mahasiswa', 'mataKuliah'])->where('nrp', $user->identifier)->get();
             } else {
-                $data = Nilai::with('mahasiswa')->get();
+                $data = Nilai::with(['mahasiswa', 'mataKuliah'])->get();
             }
         } catch (\Exception $e) {
             Log::error('Nilai index error: '. $e->getMessage());
-            session()->flash('error', 'Terjadi masalah saat memuat nilai. Cek log.');
             $data = collect();
         }
 
@@ -31,8 +33,33 @@ class NilaiController extends Controller
 
     public function create()
     {
-        $mahasiswas = Mahasiswa::orderBy('nama')->get();
-        return view('dosen.nilai.create', compact('mahasiswas'));
+        $user = auth()->user();
+
+        if ($user->role === 'dosen') {
+            $dosen = Dosen::where('user_id', $user->id)->first();
+            
+            if ($dosen) {
+                // Get Courses taught by this Dosen
+                $perkuliahanQuery = Perkuliahan::where('nip_dosen', $dosen->nip);
+                
+                $assignedMkCodes = $perkuliahanQuery->pluck('kode_mk')->unique();
+                $mataKuliahs = MataKuliah::whereIn('kode_mk', $assignedMkCodes)->get();
+
+                // Get Students enrolled in these classes
+                $perkuliahanIds = $perkuliahanQuery->pluck('id_perkuliahan');
+                $nrps = Dkbs::whereIn('id_perkuliahan', $perkuliahanIds)->pluck('nrp')->unique();
+                $mahasiswas = Mahasiswa::whereIn('nrp', $nrps)->orderBy('nama')->get();
+            } else {
+                $mataKuliahs = collect();
+                $mahasiswas = collect();
+            }
+        } else {
+            // Admin or others see all
+            $mahasiswas = Mahasiswa::orderBy('nama')->get();
+            $mataKuliahs = MataKuliah::all();
+        }
+
+        return view('dosen.nilai.create', compact('mahasiswas', 'mataKuliahs'));
     }
 
     public function store(Request $request)
@@ -40,51 +67,97 @@ class NilaiController extends Controller
         $validated = $request->validate([
             'nrp' => 'required|string',
             'kode_mk' => 'required|string',
-            'nilai' => 'required|numeric',
+            'p1' => 'nullable|numeric|min:0|max:100',
+            'p2' => 'nullable|numeric|min:0|max:100',
+            'p3' => 'nullable|numeric|min:0|max:100',
+            'p4' => 'nullable|numeric|min:0|max:100',
+            'p5' => 'nullable|numeric|min:0|max:100',
+            'p6' => 'nullable|numeric|min:0|max:100',
+            'p7' => 'nullable|numeric|min:0|max:100',
+            'uts' => 'nullable|numeric|min:0|max:100',
+            'p9' => 'nullable|numeric|min:0|max:100',
+            'p10' => 'nullable|numeric|min:0|max:100',
+            'p11' => 'nullable|numeric|min:0|max:100',
+            'p12' => 'nullable|numeric|min:0|max:100',
+            'p13' => 'nullable|numeric|min:0|max:100',
+            'p14' => 'nullable|numeric|min:0|max:100',
+            'p15' => 'nullable|numeric|min:0|max:100',
+            'uas' => 'nullable|numeric|min:0|max:100',
         ]);
 
-        Nilai::create($validated);
+        // Calculate Total & Final Grade
+        $scores = $request->only(['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15']);
+        $kat_avg = collect($scores)->avg() ?: 0;
         
-        $user = auth()->user();
-        return redirect('/' . $user->role . '/nilai')->with('success','Nilai tersimpan');
+        $uts = $request->uts ?: 0;
+        $uas = $request->uas ?: 0;
+
+        // NEW WEIGHTS: Tasks 60%, UTS 20%, UAS 20%
+        $total = ($kat_avg * 0.6) + ($uts * 0.2) + ($uas * 0.2);
+        
+        $data = $request->all();
+        $data['nilai_total'] = round($total, 2);
+        $data['nilai_akhir'] = Nilai::calculateGrade($total);
+
+        Nilai::create($data);
+        
+        return redirect('/dosen/nilai')->with('success','Nilai berhasil disimpan');
     }
 
-    public function show($id)
+    public function edit($id)
     {
-        $user = auth()->user();
-        try {
-            $row = Nilai::with('mahasiswa')->findOrFail($id);
-        } catch (\Exception $e) {
-            Log::error('Nilai show error: '. $e->getMessage());
-            return redirect('/' . $user->role . '/nilai')->with('error','Data nilai tidak ditemukan atau terjadi masalah.');
-        }
-
-        return view($user->role . '.nilai.show', compact('row'));
-    }
-
-    public function edit(Nilai $nilai)
-    {
+        $nilai = Nilai::findOrFail($id);
         $mahasiswas = Mahasiswa::orderBy('nama')->get();
-        return view('dosen.nilai.edit', compact('nilai','mahasiswas'));
+        $mataKuliahs = MataKuliah::all();
+        return view('dosen.nilai.edit', compact('nilai','mahasiswas', 'mataKuliahs'));
     }
 
-    public function update(Request $request, Nilai $nilai)
+    public function update(Request $request, $id)
     {
+        $nilai = Nilai::findOrFail($id);
+        
         $validated = $request->validate([
             'nrp' => 'required|string',
             'kode_mk' => 'required|string',
-            'nilai' => 'required|numeric',
+            'p1' => 'nullable|numeric|min:0|max:100',
+            'p2' => 'nullable|numeric|min:0|max:100',
+            'p3' => 'nullable|numeric|min:0|max:100',
+            'p4' => 'nullable|numeric|min:0|max:100',
+            'p5' => 'nullable|numeric|min:0|max:100',
+            'p6' => 'nullable|numeric|min:0|max:100',
+            'p7' => 'nullable|numeric|min:0|max:100',
+            'uts' => 'nullable|numeric|min:0|max:100',
+            'p9' => 'nullable|numeric|min:0|max:100',
+            'p10' => 'nullable|numeric|min:0|max:100',
+            'p11' => 'nullable|numeric|min:0|max:100',
+            'p12' => 'nullable|numeric|min:0|max:100',
+            'p13' => 'nullable|numeric|min:0|max:100',
+            'p14' => 'nullable|numeric|min:0|max:100',
+            'p15' => 'nullable|numeric|min:0|max:100',
+            'uas' => 'nullable|numeric|min:0|max:100',
         ]);
 
-        $nilai->update($validated);
+        $scores = $request->only(['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15']);
+        $kat_avg = collect($scores)->avg() ?: 0;
         
-        $user = auth()->user();
-        return redirect('/' . $user->role . '/nilai')->with('success','Nilai diperbarui');
+        $uts = $request->uts ?: 0;
+        $uas = $request->uas ?: 0;
+
+        // NEW WEIGHTS: Tasks 60%, UTS 20%, UAS 20%
+        $total = ($kat_avg * 0.6) + ($uts * 0.2) + ($uas * 0.2);
+        
+        $data = $request->all();
+        $data['nilai_total'] = round($total, 2);
+        $data['nilai_akhir'] = Nilai::calculateGrade($total);
+
+        $nilai->update($data);
+        
+        return redirect('/dosen/nilai')->with('success','Nilai berhasil diperbarui');
     }
 
-    public function destroy(Nilai $nilai)
+    public function destroy($id)
     {
-        $nilai->delete();
+        Nilai::destroy($id);
         return back()->with('success','Nilai dihapus');
     }
 }

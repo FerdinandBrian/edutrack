@@ -14,6 +14,7 @@ class Perkuliahan extends Model
         'nip_dosen',
         'kode_mk',
         'kelas',
+        'hari',
         'jam_mulai',
         'jam_berakhir',
         'tahun_ajaran'
