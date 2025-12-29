@@ -123,8 +123,9 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
+        $col = \Illuminate\Support\Facades\Schema::hasColumn((new User)->getTable(), 'nrp') ? 'nrp' : 'npr';
         $user = User::where('email', $request->nrp) // bisa juga pake nrp/nip/email sesuai kebutuhan
-                    ->orWhere('nrp', $request->nrp)
+                    ->orWhere($col, $request->nrp)
                     ->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {

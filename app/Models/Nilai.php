@@ -7,10 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 class Nilai extends Model
 {
     protected $table = 'nilai';
-    protected $fillable = ['npr','kode_mk','nilai'];
+    protected $fillable = ['nrp','kode_mk','nilai'];
 
     public function mahasiswa()
     {
-        return $this->belongsTo(Mahasiswa::class, 'npr');
+        // support both column names (nrp or legacy npr)
+        if (\Illuminate\Support\Facades\Schema::hasColumn($this->getTable(), 'nrp')) {
+            return $this->belongsTo(Mahasiswa::class, 'nrp', 'nrp');
+        }
+        return $this->belongsTo(Mahasiswa::class, 'npr', 'nrp');
+    }
+
+    public function getNrpAttribute()
+    {
+        return $this->attributes['nrp'] ?? ($this->attributes['npr'] ?? null);
+    }
+
+    public function setNrpAttribute($value)
+    {
+        if (\Illuminate\Support\Facades\Schema::hasColumn($this->getTable(), 'nrp')) {
+            $this->attributes['nrp'] = $value;
+        } else {
+            $this->attributes['npr'] = $value;
+        }
     }
 }

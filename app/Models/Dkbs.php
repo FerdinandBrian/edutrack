@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Presensi extends Model
+class Dkbs extends Model
 {
-    protected $table = 'presensi';
-    protected $fillable = ['nrp','jadwal_id','tanggal','status','keterangan'];
+    protected $table = 'dkbs';
+    protected $fillable = ['nrp','kode_mk','semester','status'];
 
     public function mahasiswa()
     {
-        // support both possible column names (nrp or legacy npr)
+        // support both column names (nrp or legacy npr)
         if (\Illuminate\Support\Facades\Schema::hasColumn($this->getTable(), 'nrp')) {
             return $this->belongsTo(Mahasiswa::class, 'nrp', 'nrp');
         }
@@ -30,11 +30,5 @@ class Presensi extends Model
         } else {
             $this->attributes['npr'] = $value;
         }
-    }
-
-    public function jadwal()
-    {
-        // presensi.jadwal_id -> jadwal.id
-        return $this->belongsTo(Jadwal::class, 'jadwal_id', 'id');
     }
 }
