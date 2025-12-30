@@ -11,13 +11,13 @@
     <div class="bg-white rounded-xl shadow p-6">
         <h3 class="font-semibold text-slate-800">Presensi</h3>
         <p class="text-sm text-slate-500 mt-1">Lihat daftar kehadiran mahasiswa</p>
-        <a href="/presensi" class="text-blue-600 text-sm font-medium inline-block mt-4">
+        <a href="/dosen/presensi" class="text-blue-600 text-sm font-medium inline-block mt-4">
             Lihat presensi → 
         </a>
-        <a href="/nilai" class="text-blue-600 text-sm font-medium inline-block mt-4">
+        <a href="/dosen/nilai" class="text-blue-600 text-sm font-medium inline-block mt-4">
             Lihat semua nilai → 
         </a>
-        <a href="/jadwal" class="text-blue-600 text-sm font-medium inline-block mt-4">
+        <a href="/dosen/jadwal" class="text-blue-600 text-sm font-medium inline-block mt-4">
             Lihat jadwal → 
         </a>
     </div>
@@ -26,7 +26,7 @@
     <div class="bg-white rounded-xl shadow p-6">
         <h3 class="font-semibold text-slate-800">Nilai Mahasiswa</h3>
         <p class="text-sm text-slate-500 mt-1">Rekap nilai mahasiswa</p>
-        <a href="#" class="text-blue-600 text-sm font-medium inline-block mt-4">
+        <a href="/dosen/nilai" class="text-blue-600 text-sm font-medium inline-block mt-4">
             Lihat nilai → 
         </a>
     </div>
@@ -35,7 +35,7 @@
     <div class="bg-white rounded-xl shadow p-6">
         <h3 class="font-semibold text-slate-800">Jadwal Mengajar</h3>
         <p class="text-sm text-slate-500 mt-1">Jadwal perkuliahan yang diampu</p>
-        <a href="#" class="text-blue-600 text-sm font-medium inline-block mt-4">
+        <a href="/dosen/jadwal" class="text-blue-600 text-sm font-medium inline-block mt-4">
             Lihat jadwal → 
         </a>
     </div>

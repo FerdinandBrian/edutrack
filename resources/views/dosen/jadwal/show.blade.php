@@ -14,7 +14,7 @@
     </div>
 
     <div class="pt-4">
-        <a href="/jadwal" class="text-sm text-slate-600">Kembali</a>
+        <a href="/dosen/jadwal" class="text-sm text-slate-600">Kembali</a>
     </div>
 </div>
 @endsection

@@ -13,7 +13,7 @@
 <div class="flex min-h-screen">
 
     <!-- SIDEBAR -->
-    <aside class="w-64 bg-gradient-to-b from-blue-600 to-cyan-500 shadow-lg flex flex-col text-white">
+    <aside class="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-blue-600 to-cyan-500 shadow-lg flex flex-col text-white h-screen overflow-y-auto">
         <!-- LOGO -->
         <div class="px-6 py-5 flex items-center gap-3 border-b border-white/20">
             <div class="w-10 h-10 bg-white/20 text-white rounded-lg flex items-center justify-center font-bold">
@@ -48,9 +48,6 @@
             <a href="/mahasiswa/pembayaran" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
                 💳 Pembayaran
             </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
-                📂 Dokumen Akademik
-            </a>
         </nav>
 
         <!-- LOGOUT -->
@@ -65,7 +62,7 @@
     </aside>
 
     <!-- MAIN -->
-    <div class="flex-1 flex flex-col">
+    <div class="flex-1 flex flex-col ml-64">
 
         <!-- TOPBAR -->
         <header class="bg-white shadow px-8 py-4 flex items-center justify-between">

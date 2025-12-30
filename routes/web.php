@@ -10,6 +10,7 @@ use App\Http\Controllers\NilaiController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\DkbsController;
 use App\Http\Controllers\TagihanController;
+use App\Http\Controllers\DokumenController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\PerkuliahanController;
@@ -138,6 +139,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/pembayaran/{id}', [TagihanController::class, 'show']);
         Route::get('/presensi', [PresensiController::class, 'index']);
         Route::get('/presensi/{presensi}', [PresensiController::class, 'show']);
+        Route::get('/dokumen', [DokumenController::class, 'index']);
         
         Route::get('/mata-kuliah', function(){
             $data = \App\Models\Jadwal::select('kode_mk')->distinct()->get()->pluck('kode_mk');

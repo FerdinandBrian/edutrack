@@ -11,7 +11,7 @@
     <div class="bg-white rounded-xl shadow p-6">
         <h3 class="font-semibold text-slate-800">Presensi</h3>
         <p class="text-sm text-slate-500 mt-1">Cek kehadiran perkuliahan</p>
-        <a href="/presensi" class="text-blue-600 text-sm font-medium inline-block mt-4">
+        <a href="/mahasiswa/presensi" class="text-blue-600 text-sm font-medium inline-block mt-4">
             Lihat presensi →
         </a>
     </div>
@@ -20,7 +20,7 @@
     <div class="bg-white rounded-xl shadow p-6">
         <h3 class="font-semibold text-slate-800">DKBS</h3>
         <p class="text-sm text-slate-500 mt-1">Daftar kelas & beban studi</p>
-        <a href="/dkbs" class="text-blue-600 text-sm font-medium inline-block mt-4">
+        <a href="/mahasiswa/dkbs" class="text-blue-600 text-sm font-medium inline-block mt-4">
             Lihat DKBS →
         </a>
     </div>
@@ -29,7 +29,7 @@
     <div class="bg-white rounded-xl shadow p-6">
         <h3 class="font-semibold text-slate-800">Jadwal Kuliah</h3>
         <p class="text-sm text-slate-500 mt-1">Jadwal perkuliahan aktif</p>
-        <a href="/jadwal" class="text-blue-600 text-sm font-medium inline-block mt-4">
+        <a href="/mahasiswa/jadwal" class="text-blue-600 text-sm font-medium inline-block mt-4">
             Lihat jadwal →
         </a>
     </div>
@@ -38,7 +38,7 @@
     <div class="bg-white rounded-xl shadow p-6">
         <h3 class="font-semibold text-slate-800">Nilai</h3>
         <p class="text-sm text-slate-500 mt-1">Rekap nilai per semester</p>
-        <a href="/nilai" class="text-blue-600 text-sm font-medium inline-block mt-4">
+        <a href="/mahasiswa/nilai" class="text-blue-600 text-sm font-medium inline-block mt-4">
             Lihat nilai →
         </a>
     </div>
@@ -51,16 +51,6 @@
             Lihat pembayaran →
         </a>
     </div>
-
-    <!-- DOKUMEN -->
-    <div class="bg-white rounded-xl shadow p-6">
-        <h3 class="font-semibold text-slate-800">Dokumen Akademik</h3>
-        <p class="text-sm text-slate-500 mt-1">KRS, KHS, transkrip</p>
-        <a href="#" class="text-blue-600 text-sm font-medium inline-block mt-4">
-            Lihat dokumen →
-        </a>
-    </div>
-
 </div>
 
 @endsection

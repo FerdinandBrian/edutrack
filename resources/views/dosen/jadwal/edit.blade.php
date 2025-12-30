@@ -12,7 +12,7 @@
         </div>
     @endif
 
-    <form action="/jadwal/{{ $jadwal->id }}" method="POST" class="mt-4 space-y-4">
+    <form action="/dosen/jadwal/{{ $jadwal->id }}" method="POST" class="mt-4 space-y-4">
         @csrf
         @method('PUT')
         <div>
@@ -42,7 +42,7 @@
 
         <div class="pt-4">
             <button class="bg-blue-600 text-white px-4 py-2 rounded">Perbarui</button>
-            <a href="/jadwal" class="ml-3 text-sm text-slate-600">Batal</a>
+            <a href="/dosen/jadwal" class="ml-3 text-sm text-slate-600">Batal</a>
         </div>
     </form>
 </div>

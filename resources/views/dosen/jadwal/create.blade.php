@@ -12,7 +12,7 @@
         </div>
     @endif
 
-    <form action="/jadwal" method="POST" class="mt-4 space-y-4">
+    <form action="/dosen/jadwal" method="POST" class="mt-4 space-y-4">
         @csrf
         <div>
             <label class="block text-sm text-slate-700 mb-1">Kode Mata Kuliah</label>
@@ -41,7 +41,7 @@
 
         <div class="pt-4">
             <button class="bg-blue-600 text-white px-4 py-2 rounded">Simpan</button>
-            <a href="/jadwal" class="ml-3 text-sm text-slate-600">Batal</a>
+            <a href="/dosen/jadwal" class="ml-3 text-sm text-slate-600">Batal</a>
         </div>
     </form>
 </div>
