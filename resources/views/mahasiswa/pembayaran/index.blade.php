@@ -31,7 +31,7 @@
                         <div class="flex flex-col">
                             <span class="text-sm font-bold text-slate-800">{{ $row->jenis }}</span>
                             <!-- Assuming we can display date created if available, else just nrp for debugging or nothing -->
-                            <span class="text-[10px] text-slate-400 font-mono mt-0.5">{{ $row->created_at ? $row->created_at->format('d M Y') : 'Semester Ganjil 2024' }}</span>
+                            <span class="text-[10px] text-slate-400 font-mono mt-0.5">{{ optional($row->created_at)->format('d M Y') ?? 'Semester Ganjil 2024' }}</span>
                         </div>
                     </td>
                     <td class="px-8 py-5">
@@ -39,7 +39,8 @@
                     </td>
                     <td class="px-8 py-5 text-center">
                         @php
-                            $statusClass = match(strtolower($row->status)) {
+                            $status = $row->status ?? 'pending';
+                            $statusClass = match(strtolower($status)) {
                                 'lunas' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
                                 'pending' => 'bg-amber-50 text-amber-700 border-amber-100',
                                 default => 'bg-slate-50 text-slate-600 border-slate-100',
@@ -50,11 +51,15 @@
                         </div>
                     </td>
                     <td class="px-8 py-5 text-right">
-                        <a href="/mahasiswa/pembayaran/{{ $row->id }}" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </a>
+                        @if(strtolower($row->status) == 'lunas')
+                            <button disabled class="px-4 py-2 bg-slate-100 text-slate-400 rounded-lg text-xs font-bold uppercase tracking-wide cursor-not-allowed">
+                                Lunas
+                            </button>
+                        @else
+                            <a href="/mahasiswa/pembayaran/{{ $row->id }}" class="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200">
+                                Bayar
+                            </a>
+                        @endif
                     </td>
                 </tr>
                 @empty

@@ -27,23 +27,26 @@
 
         <!-- MENU -->
         <nav class="flex-1 px-4 py-6 space-y-1 text-sm">
-            <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/dashboard') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10' }}">
+            <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/dashboard') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📊 Dashboard
             </a>
-            <a href="/admin/users" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/users*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10' }}">
+            <a href="/admin/users" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/users*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 👥 Manajemen User
             </a>
-            <a href="/admin/dkbs" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/admin/dkbs" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/dkbs*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📘 Kelola DKBS
             </a>
-            <a href="/admin/pembayaran" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/admin/pembayaran" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/pembayaran*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 💳 Pembayaran
             </a>
-            <a href="/admin/mata-kuliah" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/mata-kuliah*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10' }}">
+            <a href="/admin/mata-kuliah" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/mata-kuliah*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📚 Mata Kuliah
             </a>
-            <a href="/admin/perkuliahan" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/perkuliahan*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10' }}">
+            <a href="/admin/perkuliahan" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/perkuliahan*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 🗓️ Jadwal Kelas
+            </a>
+            <a href="/admin/profile" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/profile*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
+                👤 Profil Saya
             </a>
         </nav>
 
@@ -71,9 +74,9 @@
                     <p class="font-medium">{{ auth()->user()->nrp }}</p>
                     <p class="text-slate-500">Admin</p>
                 </div>
-                <div class="w-9 h-9 rounded-full bg-red-600 text-white flex items-center justify-center font-semibold">
+                <a href="/admin/profile" class="w-9 h-9 rounded-full bg-red-600 text-white flex items-center justify-center font-semibold hover:bg-red-700 transition-colors cursor-pointer">
                     {{ substr(auth()->user()->nama,0,1) }}
-                </div>
+                </a>
             </div>
         </header>
 

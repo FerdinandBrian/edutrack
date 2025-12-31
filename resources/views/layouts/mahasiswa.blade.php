@@ -27,26 +27,29 @@
 
         <!-- MENU -->
         <nav class="flex-1 px-4 py-6 space-y-1 text-sm">
-            <a href="/mahasiswa/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/20 text-white font-medium">
+            <a href="/mahasiswa/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('mahasiswa/dashboard') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📊 Dashboard
             </a>
-            <a href="/mahasiswa/presensi" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/mahasiswa/presensi" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('mahasiswa/presensi*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 ⏱ Presensi
             </a>
-            <a href="/mahasiswa/dkbs" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/mahasiswa/dkbs" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('mahasiswa/dkbs*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📘 DKBS
             </a>
-            <a href="/mahasiswa/jadwal" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/mahasiswa/jadwal" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('mahasiswa/jadwal*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📅 Jadwal Kuliah
             </a>
-            <a href="/mahasiswa/mata-kuliah" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/mahasiswa/mata-kuliah" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('mahasiswa/mata-kuliah*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📚 Mata Kuliah
             </a>
-            <a href="/mahasiswa/nilai" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/mahasiswa/nilai" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('mahasiswa/nilai*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📈 Nilai
             </a>
-            <a href="/mahasiswa/pembayaran" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/mahasiswa/pembayaran" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('mahasiswa/pembayaran*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 💳 Pembayaran
+            </a>
+            <a href="/mahasiswa/profile" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('mahasiswa/profile*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
+                👤 Profil Saya
             </a>
         </nav>
 
@@ -74,9 +77,9 @@
                     <p class="font-medium">{{ auth()->user()->nrp }}</p>
                     <p class="text-slate-500">Mahasiswa</p>
                 </div>
-                <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold">
+                <a href="/mahasiswa/profile" class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold hover:bg-blue-700 transition-colors cursor-pointer">
                     {{ substr(auth()->user()->nama,0,1) }}
-                </div>
+                </a>
             </div>
         </header>
 

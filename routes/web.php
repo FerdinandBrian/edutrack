@@ -10,6 +10,7 @@ use App\Http\Controllers\NilaiController;
 use App\Http\Controllers\JadwalController;
 use App\Http\Controllers\DkbsController;
 use App\Http\Controllers\TagihanController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DokumenController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MataKuliahController;
@@ -47,6 +48,9 @@ Route::middleware('auth')->group(function () {
     // ADMIN ROUTES (Strict)
     // ============================
     Route::middleware('role:admin')->prefix('admin')->group(function () {
+        Route::get('/profile', [ProfileController::class, 'index']);
+        Route::get('/profile/edit', [ProfileController::class, 'edit']);
+        Route::put('/profile', [ProfileController::class, 'update']);
         Route::get('/dashboard', [DashboardAdminController::class, 'index']);
         
         // User Management
@@ -94,6 +98,9 @@ Route::middleware('auth')->group(function () {
     // DOSEN ROUTES (Strict)
     // ============================
     Route::middleware('role:dosen')->prefix('dosen')->group(function () {
+        Route::get('/profile', [ProfileController::class, 'index']);
+        Route::get('/profile/edit', [ProfileController::class, 'edit']);
+        Route::put('/profile', [ProfileController::class, 'update']);
         Route::get('/dashboard', [DashboardDosenController::class, 'index']);
 
         // Nilai Dosen
@@ -128,6 +135,9 @@ Route::middleware('auth')->group(function () {
     // MAHASISWA ROUTES (Strict)
     // ============================
     Route::middleware('role:mahasiswa')->prefix('mahasiswa')->group(function () {
+        Route::get('/profile', [ProfileController::class, 'index']);
+        Route::get('/profile/edit', [ProfileController::class, 'edit']);
+        Route::put('/profile', [ProfileController::class, 'update']);
         Route::get('/dashboard', [DashboardMahasiswaController::class, 'index']);
         
         Route::get('/dkbs', [DkbsController::class, 'index']);
@@ -139,6 +149,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/pembayaran/{id}', [TagihanController::class, 'show']);
         Route::get('/presensi', [PresensiController::class, 'index']);
         Route::get('/presensi/{presensi}', [PresensiController::class, 'show']);
+        
+        // Payment Flow
+        Route::get('/pembayaran/{id}/checkout', [TagihanController::class, 'checkout']);
+        Route::post('/pembayaran/{id}/checkout', [TagihanController::class, 'processCheckout']);
+        Route::get('/pembayaran/{id}/instruction', [TagihanController::class, 'instruction']);
+        Route::post('/pembayaran/{id}/confirm', [TagihanController::class, 'confirmPayment']);
+        
+        Route::post('/pembayaran/{id}/bayar', [TagihanController::class, 'bayar']); // Legacy/Quick Pay if needed
+        
         Route::get('/dokumen', [DokumenController::class, 'index']);
         
         Route::get('/mata-kuliah', function(){

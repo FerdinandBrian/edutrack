@@ -45,11 +45,75 @@ class TagihanController extends Controller
 
     }
 
+    public function checkout($id)
+    {
+        $tagihan = Tagihan::findOrFail($id);
+        if (auth()->user()->role !== 'mahasiswa' || $tagihan->nrp !== auth()->user()->identifier) abort(403);
+        
+        return view('mahasiswa.pembayaran.checkout', compact('tagihan'));
+    }
+
+    public function processCheckout(Request $request, $id)
+    {
+        $tagihan = Tagihan::findOrFail($id);
+        
+        $request->validate(['payment_method' => 'required']);
+        
+        // Store simulated payment data in session
+        session([
+            'payment_tagihan_id' => $id,
+            'payment_method' => $request->payment_method,
+            'payment_va' => '8800' . str_pad($tagihan->id, 8, '0', STR_PAD_LEFT)
+        ]);
+
+        return redirect('/mahasiswa/pembayaran/' . $id . '/instruction');
+    }
+
+    public function instruction($id)
+    {
+        $tagihan = Tagihan::findOrFail($id);
+        
+        if (session('payment_tagihan_id') != $id) {
+            return redirect('/mahasiswa/pembayaran/' . $id . '/checkout');
+        }
+
+        $paymentData = [
+            'method' => session('payment_method'),
+            'va' => session('payment_va')
+        ];
+
+        return view('mahasiswa.pembayaran.instruction', compact('tagihan', 'paymentData'));
+    }
+
+    public function confirmPayment($id)
+    {
+        $tagihan = Tagihan::findOrFail($id);
+        
+        // Basic auth check
+        if (auth()->user()->role === 'mahasiswa' && $tagihan->nrp !== auth()->user()->identifier) {
+             abort(403);
+        }
+
+        $tagihan->update(['status' => 'Lunas']);
+        
+        // Clear session
+        session()->forget(['payment_tagihan_id', 'payment_method', 'payment_va']);
+
+        return redirect('/mahasiswa/pembayaran/' . $id)->with('success', 'Pembayaran berhasil dikonfirmasi');
+    }
+
+    // Legacy method - keeping it just in case, but redirecting to checkout
+    public function bayar($id)
+    {
+        return redirect('/mahasiswa/pembayaran/' . $id . '/checkout');
+    }
+
     // Admin Methods (Stubs/Basic Implementation)
     public function create()
     {
         if (auth()->user()->role !== 'admin') abort(403);
-        return view('admin.pembayaran.create');
+        $mahasiswas = \App\Models\Mahasiswa::all();
+        return view('admin.pembayaran.create', compact('mahasiswas'));
     }
 
     public function store(Request $request)
@@ -71,7 +135,8 @@ class TagihanController extends Controller
     {
         if (auth()->user()->role !== 'admin') abort(403);
         $tagihan = Tagihan::findOrFail($id);
-        return view('admin.pembayaran.edit', compact('tagihan'));
+        $mahasiswas = \App\Models\Mahasiswa::all();
+        return view('admin.pembayaran.edit', compact('tagihan', 'mahasiswas'));
     }
 
     public function update(Request $request, $id)

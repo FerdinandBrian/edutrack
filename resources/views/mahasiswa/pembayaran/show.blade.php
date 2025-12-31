@@ -22,7 +22,8 @@
             </div>
             
             @php
-                $statusColor = match(strtolower($tagihan->status)) {
+                $status = $tagihan->status ?? 'pending';
+                $statusColor = match(strtolower($status)) {
                     'lunas' => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
                     'pending' => 'bg-amber-50 text-amber-700 ring-amber-600/20',
                     default => 'bg-slate-50 text-slate-600 ring-slate-600/20',
@@ -59,11 +60,11 @@
                 </div>
             </div>
 
-            @if(strtolower($tagihan->status) != 'lunas')
+            @if(strtolower($tagihan->status ?? '') != 'lunas')
                 <div class="flex flex-col md:flex-row gap-4 justify-end items-center">
-                   <button type="button" class="w-full md:w-auto px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
+                   <a href="/mahasiswa/pembayaran/{{ $tagihan->id }}/checkout" class="w-full md:w-auto px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 text-center">
                         Bayar Sekarang
-                   </button>
+                   </a>
                    <p class="text-xs text-slate-400 md:order-first">
                        *Konfirmasi pembayaran otomatis dicek dalam 1x24 jam
                    </p>

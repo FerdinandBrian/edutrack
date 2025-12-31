@@ -1,4 +1,4 @@
-@extends('layouts.mahasiswa')
+@extends('layouts.admin')
 
 @section('title','Detail Pembayaran')
 
@@ -7,14 +7,15 @@
     <h2 class="text-lg font-semibold">Detail Pembayaran</h2>
 
     <div class="mt-4 space-y-2">
-        <div><strong>NRP:</strong> {{ $row->nrp }}</div>
-        <div><strong>Nama:</strong> {{ optional($row->mahasiswa)->nama }}</div>
-        <div><strong>Jumlah:</strong> {{ $row->jumlah ?? '-' }}</div>
-        <div><strong>Status:</strong> {{ $row->status ?? '-' }}</div>
+        <div><strong>NRP:</strong> {{ $tagihan->nrp }}</div>
+        <div><strong>Nama:</strong> {{ optional($tagihan->mahasiswa)->nama }}</div>
+        <div><strong>Jenis:</strong> {{ $tagihan->jenis }}</div>
+        <div><strong>Jumlah:</strong> Rp {{ number_format($tagihan->jumlah, 0, ',', '.') }}</div>
+        <div><strong>Status:</strong> {{ $tagihan->status ?? '-' }}</div>
     </div>
 
     <div class="pt-4">
-        <a href="/pembayaran" class="text-sm text-slate-600">Kembali</a>
+        <a href="/admin/pembayaran" class="text-sm text-slate-600">Kembali</a>
     </div>
 </div>
 @endsection

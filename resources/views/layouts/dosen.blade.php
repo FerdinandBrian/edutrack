@@ -27,17 +27,20 @@
 
         <!-- MENU -->
         <nav class="flex-1 px-4 py-6 space-y-1 text-sm">
-            <a href="/dosen/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg bg-white/20 text-white font-medium">
+            <a href="/dosen/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('dosen/dashboard') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📊 Dashboard
             </a>
-            <a href="/dosen/presensi" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/dosen/presensi" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('dosen/presensi*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 ⏱ Presensi
             </a>
-            <a href="/dosen/nilai" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/dosen/nilai" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('dosen/nilai*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📈 Nilai
             </a>
-            <a href="/dosen/jadwal" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/10">
+            <a href="/dosen/jadwal" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('dosen/jadwal*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📅 Jadwal
+            </a>
+            <a href="/dosen/profile" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('dosen/profile*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
+                👤 Profil Saya
             </a>
         </nav>
 
@@ -65,9 +68,9 @@
                     <p class="font-medium">{{ auth()->user()->nrp }}</p>
                     <p class="text-slate-500">Dosen</p>
                 </div>
-                <div class="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center font-semibold">
+                <a href="/dosen/profile" class="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center font-semibold hover:bg-green-700 transition-colors cursor-pointer">
                     {{ substr(auth()->user()->nama,0,1) }}
-                </div>
+                </a>
             </div>
         </header>
 

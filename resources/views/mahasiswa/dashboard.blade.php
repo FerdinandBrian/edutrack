@@ -47,7 +47,7 @@
     <div class="bg-white rounded-xl shadow p-6">
         <h3 class="font-semibold text-slate-800">Pembayaran</h3>
         <p class="text-sm text-slate-500 mt-1">Status pembayaran kuliah</p>
-        <a href="/pembayaran" class="text-blue-600 text-sm font-medium inline-block mt-4">
+        <a href="/mahasiswa/pembayaran" class="text-blue-600 text-sm font-medium inline-block mt-4">
             Lihat pembayaran →
         </a>
     </div>
