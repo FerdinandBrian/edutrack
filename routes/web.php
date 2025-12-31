@@ -85,6 +85,9 @@ Route::middleware('auth')->group(function () {
         Route::put('/pembayaran/{tagihan}', [TagihanController::class, 'update']);
         Route::delete('/pembayaran/{tagihan}', [TagihanController::class, 'destroy']);
 
+        // Pengumuman Admin
+        Route::resource('pengumuman', \App\Http\Controllers\PengumumanController::class);
+
         // Manajemen Mata Kuliah (CRUD)
         Route::get('/mata-kuliah', [MataKuliahController::class, 'index']);
         Route::get('/mata-kuliah/create', [MataKuliahController::class, 'create']);
@@ -102,6 +105,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/profile/edit', [ProfileController::class, 'edit']);
         Route::put('/profile', [ProfileController::class, 'update']);
         Route::get('/dashboard', [DashboardDosenController::class, 'index']);
+        
+        Route::get('/pengumuman', [\App\Http\Controllers\PengumumanController::class, 'index']);
 
         // Nilai Dosen
         Route::get('/nilai', [NilaiController::class, 'index']);
@@ -140,6 +145,8 @@ Route::middleware('auth')->group(function () {
         Route::put('/profile', [ProfileController::class, 'update']);
         Route::get('/dashboard', [DashboardMahasiswaController::class, 'index']);
         
+        Route::get('/pengumuman', [\App\Http\Controllers\PengumumanController::class, 'index']);
+        
         Route::get('/dkbs', [DkbsController::class, 'index']);
         Route::get('/nilai', [NilaiController::class, 'index']);
         Route::get('/nilai/{id}', [NilaiController::class, 'show']);
@@ -161,7 +168,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/dokumen', [DokumenController::class, 'index']);
         
         Route::get('/mata-kuliah', function(){
-            $data = \App\Models\Jadwal::select('kode_mk')->distinct()->get()->pluck('kode_mk');
+            $user = auth()->user();
+            $data = \App\Models\Dkbs::with('mataKuliah')
+                ->where('nrp', $user->identifier)
+                ->get();
             return view('mahasiswa.mata_kuliah.index', compact('data'));
         });
     });

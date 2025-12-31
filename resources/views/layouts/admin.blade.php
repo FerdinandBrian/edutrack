@@ -30,6 +30,9 @@
             <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/dashboard') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📊 Dashboard
             </a>
+            <a href="/admin/pengumuman" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/pengumuman*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
+                📢 Pengumuman
+            </a>
             <a href="/admin/users" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('admin/users*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 👥 Manajemen User
             </a>

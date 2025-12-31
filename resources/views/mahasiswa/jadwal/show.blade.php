@@ -8,9 +8,18 @@
 
     <div class="mt-4 space-y-2">
         <div><strong>Kode MK:</strong> {{ $row->kode_mk }}</div>
-        <div><strong>Dosen:</strong> {{ optional($row->dosen)->nama ?? $row->nidn }}</div>
-        <div><strong>Hari:</strong> {{ $row->hari }}</div>
-        <div><strong>Jam:</strong> {{ $row->jam }}</div>
+        <div><strong>Mata Kuliah:</strong> {{ optional($row->perkuliahan->mataKuliah)->nama_mk }}</div>
+        <div><strong>Dosen:</strong> {{ optional($row->perkuliahan->dosen)->nama ?? '-' }}</div>
+        <div><strong>Hari:</strong> {{ optional($row->perkuliahan)->hari ?? '-' }}</div>
+        <div><strong>Jam:</strong> 
+            @if($row->perkuliahan)
+                {{ \Carbon\Carbon::parse($row->perkuliahan->jam_mulai)->format('H:i') }} - 
+                {{ \Carbon\Carbon::parse($row->perkuliahan->jam_berakhir)->format('H:i') }}
+            @else
+                -
+            @endif
+        </div>
+        <div><strong>Ruangan:</strong> {{ optional($row->perkuliahan->ruangan)->nama_ruangan ?? '-' }} ({{ optional($row->perkuliahan)->kode_ruangan ?? '' }})</div>
     </div>
 
     <div class="pt-4">

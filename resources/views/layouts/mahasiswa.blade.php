@@ -30,6 +30,9 @@
             <a href="/mahasiswa/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('mahasiswa/dashboard') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📊 Dashboard
             </a>
+            <a href="/mahasiswa/pengumuman" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('mahasiswa/pengumuman*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
+                📢 Pengumuman
+            </a>
             <a href="/mahasiswa/presensi" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('mahasiswa/presensi*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 ⏱ Presensi
             </a>

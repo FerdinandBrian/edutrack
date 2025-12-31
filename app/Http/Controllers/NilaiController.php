@@ -19,7 +19,19 @@ class NilaiController extends Controller
         $user = auth()->user();
         try {
             if ($user->role === 'mahasiswa') {
-                $data = Nilai::with(['mahasiswa', 'mataKuliah'])->where('nrp', $user->identifier)->get();
+                // Fetch DKBS (Enrolled Courses)
+                $dkbs = Dkbs::with(['mataKuliah'])->where('nrp', $user->identifier)->get();
+                
+                // Fetch existing Grades
+                $nilaiRecords = Nilai::where('nrp', $user->identifier)->get()->keyBy('kode_mk');
+
+                // Merge Data
+                $data = $dkbs->map(function($item) use ($nilaiRecords) {
+                    $nilai = $nilaiRecords->get($item->kode_mk);
+                    $item->nilai = $nilai; // Attach nilai object to dkbs item
+                    return $item;
+                });
+
             } else {
                 $data = Nilai::with(['mahasiswa', 'mataKuliah'])->get();
             }

@@ -34,20 +34,28 @@
                         <span class="text-sm font-medium text-slate-600">{{ $row->mataKuliah->sks ?? '-' }}</span>
                     </td>
                     <td class="px-8 py-5 text-center">
-                        <div class="inline-block px-4 py-1.5 rounded-lg bg-indigo-50 border border-indigo-100">
-                            <span class="text-sm font-bold text-indigo-700">{{ $row->nilai_akhir }} <span class="text-xs font-normal text-slate-400">({{ $row->nilai_total }})</span></span>
-                        </div>
+                         @if(optional($row->nilai)->nilai_akhir)
+                            <div class="inline-block px-4 py-1.5 rounded-lg bg-indigo-50 border border-indigo-100">
+                                <span class="text-sm font-bold text-indigo-700">{{ $row->nilai->nilai_akhir }} <span class="text-xs font-normal text-slate-400">({{ $row->nilai->nilai_total }})</span></span>
+                            </div>
+                        @else
+                             <span class="text-xs text-slate-400 italic">Belum ada nilai</span>
+                        @endif
                     </td>
                     <td class="px-8 py-5 text-right">
-                        @php
-                            $grade = '';
-                            $color = 'text-slate-400';
-                            if($row->nilai_total >= 85) { $grade = 'Sangat Memuaskan'; $color = 'text-emerald-600'; }
-                            elseif($row->nilai_total >= 75) { $grade = 'Memuaskan'; $color = 'text-blue-600'; }
-                            elseif($row->nilai_total >= 60) { $grade = 'Cukup'; $color = 'text-amber-600'; }
-                            else { $grade = 'Perlu Perbaikan'; $color = 'text-rose-600'; }
-                        @endphp
-                        <span class="text-[10px] font-bold {{ $color }} uppercase tracking-tighter">{{ $grade }}</span>
+                        @if($row->nilai)
+                            @php
+                                $grade = '';
+                                $color = 'text-slate-400';
+                                if($row->nilai->nilai_total >= 85) { $grade = 'Sangat Memuaskan'; $color = 'text-emerald-600'; }
+                                elseif($row->nilai->nilai_total >= 75) { $grade = 'Memuaskan'; $color = 'text-blue-600'; }
+                                elseif($row->nilai->nilai_total >= 60) { $grade = 'Cukup'; $color = 'text-amber-600'; }
+                                else { $grade = 'Perlu Perbaikan'; $color = 'text-rose-600'; }
+                            @endphp
+                            <span class="text-[10px] font-bold {{ $color }} uppercase tracking-tighter">{{ $grade }}</span>
+                        @else
+                            -
+                        @endif
                     </td>
                 </tr>
                 @empty

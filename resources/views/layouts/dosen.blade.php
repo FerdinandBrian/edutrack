@@ -30,6 +30,9 @@
             <a href="/dosen/dashboard" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('dosen/dashboard') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 📊 Dashboard
             </a>
+            <a href="/dosen/pengumuman" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('dosen/pengumuman*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
+                📢 Pengumuman
+            </a>
             <a href="/dosen/presensi" class="flex items-center gap-3 px-4 py-2 rounded-lg {{ Request::is('dosen/presensi*') ? 'bg-white/20 text-white font-medium' : 'hover:bg-white/10 text-white/80' }}">
                 ⏱ Presensi
             </a>
