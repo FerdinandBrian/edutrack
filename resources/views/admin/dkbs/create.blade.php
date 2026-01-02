@@ -49,7 +49,7 @@
                             <label class="block text-sm font-medium text-slate-600 mb-2">Tahun Ajaran</label>
                             <select id="ta-select" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition outline-none bg-white">
                                 <option value="">-- Pilih Periode --</option>
-                                @foreach(['2024/2025 - Ganjil', '2024/2025 - Genap', '2025/2026 - Ganjil', '2025/2026 - Genap', '2026/2027 - Ganjil', '2026/2027 - Genap', '2027/2028 - Ganjil', '2027/2028 - Genap'] as $ta)
+                                @foreach($periods as $ta)
                                     <option value="{{ $ta }}">{{ $ta }}</option>
                                 @endforeach
                             </select>

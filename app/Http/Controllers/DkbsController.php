@@ -45,7 +45,8 @@ class DkbsController extends Controller
     public function create()
     {
         $mahasiswas = Mahasiswa::orderBy('nama')->get();
-        return view('admin.dkbs.create', compact('mahasiswas'));
+        $periods = Perkuliahan::distinct()->pluck('tahun_ajaran');
+        return view('admin.dkbs.create', compact('mahasiswas', 'periods'));
     }
 
     public function store(Request $request)
@@ -83,7 +84,8 @@ class DkbsController extends Controller
     public function edit(Dkbs $dkbs)
     {
         $mahasiswas = Mahasiswa::orderBy('nama')->get();
-        return view('admin.dkbs.edit', compact('dkbs','mahasiswas'));
+        $periods = Perkuliahan::distinct()->pluck('tahun_ajaran');
+        return view('admin.dkbs.edit', compact('dkbs','mahasiswas', 'periods'));
     }
 
     public function update(Request $request, Dkbs $dkbs)
