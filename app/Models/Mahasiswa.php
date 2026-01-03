@@ -29,4 +29,9 @@ class Mahasiswa extends Authenticatable
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    public function dkbs()
+    {
+        return $this->hasMany(Dkbs::class, 'nrp', 'nrp');
+    }
 }

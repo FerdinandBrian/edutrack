@@ -36,7 +36,7 @@
         </div>
         <div>
             <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Status Dosen</p>
-            <p class="text-lg font-bold text-slate-700">Aktif Mengajar</p>
+            <p class="text-lg font-bold text-slate-700">Aktif - {{ $activeYear }}</p>
         </div>
     </div>
     
@@ -46,7 +46,7 @@
         </div>
         <div>
             <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Kelas Diampu</p>
-            <p class="text-lg font-bold text-slate-700">{{ \App\Models\Perkuliahan::where('nip_dosen', auth()->user()->identifier)->where('tahun_ajaran','2025/2026 - Genap')->count() }} Kelas</p>
+            <p class="text-lg font-bold text-slate-700">{{ $totalKelas }} Kelas</p>
         </div>
     </div>
 
@@ -56,7 +56,7 @@
         </div>
         <div>
             <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Total Mahasiswa</p>
-            <p class="text-lg font-bold text-slate-700">Checking...</p>
+            <p class="text-lg font-bold text-slate-700">{{ $totalMahasiswa }} Mahasiswa</p>
         </div>
     </div>
 </div>

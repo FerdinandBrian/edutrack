@@ -2,141 +2,150 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Register | Sistem Akademik</title>
+    <title>Daftar | EduTrack</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
-        input:focus, select:focus {
-            border-color: transparent !important;
-            box-shadow: 0 0 0 3px rgba(37,99,235,.1), 0 0 0 2px #2563eb !important;
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0f172a;
         }
-        .register-btn:hover:not(:disabled) {
-            box-shadow: 0 15px 35px rgba(37,99,235,.4);
+        
+        .bg-login {
+            background-image: url('/assets/login-bg.png');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.7) blur(2px);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .custom-input {
+            background: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .custom-input:focus {
+            background: white;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+            transition: all 0.4s ease;
+        }
+
+        .btn-gradient:hover {
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
             transform: translateY(-2px);
         }
-        .register-btn:active:not(:disabled) { transform: translateY(0); }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes shake {
-            0%,100%{transform:translateX(0)}
-            25%{transform:translateX(-8px)}
-            75%{transform:translateX(8px)}
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .spinner { animation: spin .8s linear infinite }
-        .alert { animation: shake .3s ease-in-out }
+
+        .animate-fade-in {
+            animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
     </style>
 </head>
-<body class="min-h-screen bg-white flex items-center justify-center px-6">
 
-<div class="w-full max-w-lg">
-    <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+<body class="min-h-screen relative flex items-center justify-center p-6 overflow-hidden">
+    
+    <!-- Background Layer -->
+    <div class="absolute inset-0 bg-login z-0"></div>
+    <div class="absolute inset-0 bg-gradient-to-tr from-indigo-900/40 to-transparent z-0"></div>
 
-        <!-- Header -->
-        <div class="bg-gradient-to-br from-blue-600 to-cyan-500 px-10 py-8 text-center text-white">
-            <h1 class="text-2xl font-bold">Registrasi Akun</h1>
-            <p class="text-sm text-white/90">Silakan daftar untuk melanjutkan</p>
-        </div>
+    <!-- WRAPPER -->
+    <div class="w-full max-w-lg z-10 animate-fade-in">
+        
+        <!-- CARD -->
+        <div class="glass-card rounded-[2.5rem] shadow-2xl overflow-hidden p-8 md:p-12 relative">
+            
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Buat Akun Baru</h1>
+                <p class="text-slate-500 font-medium">Bergabung dengan ekosistem EduTrack</p>
+            </div>
 
-        <!-- Body -->
-        <div class="p-10">
-            <!-- Error -->
+            <!-- Validation Errors -->
             @if ($errors->any())
-                <div class="alert mb-6 flex gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-                    <svg class="w-5 h-5 stroke-red-700 fill-none stroke-2 mt-0.5" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 8v4M12 16h.01"/>
-                    </svg>
-                    {{ $errors->first() }}
+                <div class="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 rounded-2xl flex items-center gap-3">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <p class="text-xs font-bold uppercase tracking-wider">{{ $errors->first() }}</p>
                 </div>
             @endif
 
-            <form method="POST" action="{{ url('/register') }}" class="space-y-5">
+            <form method="POST" action="{{ url('/register') }}" id="regForm" class="space-y-5">
                 @csrf
 
-                <!-- Role (Fixed to Mahasiswa for Public Register) -->
-                <input type="hidden" name="role" value="mahasiswa">
-
-                <!-- Nama -->
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap</label>
-                    <input name="nama" value="{{ old('nama') }}" required
-                           class="w-full border border-slate-300 rounded-xl px-4 py-3">
-                </div>
-
-                <!-- Email -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                    <input type="email" name="email" value="{{ old('email') }}"
-                           class="w-full border border-slate-300 rounded-xl px-4 py-3">
-                </div>
-
-                <!-- Nomor Telepon -->
-                <label class="block text-sm font-medium text-slate-700 mb-1">No Telepon</label>
-                    <input name="no_telepon" placeholder="No Telepon" value="{{ old('no_telepon') }}" class="w-full border border-slate-300 rounded-xl px-4 py-3">
-
-                <!-- Tanggal Lahir -->
-                <label class="block text-sm font-medium text-slate-700 mb-1">Tanggal Lahir</label>
-                    <input type="date" name="tanggal_lahir" placeholder="Tanggal Lahir" value="{{ old('tanggal_lahir') }}" class="w-full border border-slate-300 rounded-xl px-4 py-3">
-
-                <!-- Mahasiswa Fields (Auto Show) -->
-                <div id="mahasiswa-fields" class="space-y-3">
-                    <label class="block text-sm font-medium text-slate-700 mb-1">NRP</label>
-                    <input name="nrp" placeholder="NRP" value="{{ old('nrp') }}" required class="w-full border border-slate-300 rounded-xl px-4 py-3">
-
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Alamat</label>
-                    <input name="alamat" placeholder="Alamat" value="{{ old('alamat') }}" required class="w-full border border-slate-300 rounded-xl px-4 py-3">
-
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Jurusan</label>
-                    <input name="jurusan" placeholder="Jurusan" value="{{ old('jurusan') }}" required class="w-full border border-slate-300 rounded-xl px-4 py-3">
-                </div>
-
-                <label class="block text-sm font-medium text-slate-700 mb-1">Jenis Kelamin</label>
-                    <input type="text" name="jenis_kelamin" placeholder="Laki-laki / Perempuan"
-                        value="{{ old('jenis_kelamin') }}" required
-                        class="w-full border border-slate-300 rounded-xl px-4 py-3">
-
-                <!-- Password -->
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                    <input type="password" name="password" required class="w-full border border-slate-300 rounded-xl px-4 py-3">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Nama Lengkap</label>
+                    <input type="text" name="nama" value="{{ old('nama') }}" required placeholder="Masukkan nama Anda"
+                        class="custom-input w-full border border-slate-200 rounded-2xl py-3.5 px-6 text-slate-800 font-semibold outline-none focus:border-blue-500">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Konfirmasi Password</label>
-                    <input type="password" name="password_confirmation" required class="w-full border border-slate-300 rounded-xl px-4 py-3">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Email</label>
+                    <input type="email" name="email" value="{{ old('email') }}" required placeholder="email@contoh.com"
+                        class="custom-input w-full border border-slate-200 rounded-2xl py-3.5 px-6 text-slate-800 font-semibold outline-none focus:border-blue-500">
                 </div>
 
-                <!-- Button -->
-                <button id="registerBtn" type="submit"
-                        class="register-btn w-full bg-gradient-to-br from-blue-600 to-cyan-500
-                                text-white font-semibold py-3 rounded-xl shadow-lg
-                                flex items-center justify-center gap-2 transition text-base">
-                    <span>Daftar</span>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">ID (NRP/NIP)</label>
+                        <input type="text" name="nrp" value="{{ old('nrp') }}" required placeholder="ID"
+                            class="custom-input w-full border border-slate-200 rounded-2xl py-3.5 px-6 text-slate-800 font-semibold outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Role</label>
+                        <select name="role" required class="custom-input w-full border border-slate-200 rounded-2xl py-3.5 px-4 text-slate-800 font-semibold outline-none focus:border-blue-500 appearance-none bg-no-repeat bg-[right_1rem_center]">
+                            <option value="mahasiswa">Mahasiswa</option>
+                            <option value="dosen">Dosen</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Kata Sandi</label>
+                    <input type="password" name="password" required placeholder="••••••••"
+                        class="custom-input w-full border border-slate-200 rounded-2xl py-3.5 px-6 text-slate-800 font-semibold outline-none focus:border-blue-500">
+                </div>
+
+                <button id="regBtn" class="btn-gradient w-full py-4 rounded-[1.25rem] text-white font-bold text-lg shadow-xl shadow-blue-200 flex items-center justify-center gap-3 active:scale-95 transition-all mt-6">
+                    Daftar Sekarang
                 </button>
             </form>
 
-            <div class="mt-8 pt-6 border-t text-center text-sm text-slate-600">
-                Sudah punya akun?
-                <a href="{{ url('/login') }}" class="text-blue-600 font-semibold hover:underline">
-                    Login
-                </a>
+            <div class="mt-8 text-center">
+                <p class="text-sm text-slate-400 font-medium tracking-wide">
+                    Sudah punya akun? 
+                    <a href="{{ url('/login') }}" class="text-blue-600 font-bold hover:underline underline-offset-4 decoration-2">Masuk di sini</a>
+                </p>
             </div>
         </div>
     </div>
 
-    <p class="text-center text-sm text-slate-500 mt-6">
-        © 2025 Sistem Akademik
-    </p>
-</div>
+    <script>
+        const form = document.getElementById('regForm');
+        const btn = document.getElementById('regBtn');
 
-<script>
-// Spinner on submit
-const form = document.querySelector('form');
-const btn = document.getElementById('registerBtn');
-form.addEventListener('submit', () => {
-    btn.disabled = true;
-    btn.querySelector('span').textContent = 'Memproses...';
-});
-</script>
-
+        form.addEventListener('submit', () => {
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...`;
+        });
+    </script>
 </body>
 </html>

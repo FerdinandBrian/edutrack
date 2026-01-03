@@ -15,6 +15,7 @@ use App\Http\Controllers\DokumenController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\PerkuliahanController;
+use App\Http\Controllers\PengumumanController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -86,7 +87,12 @@ Route::middleware('auth')->group(function () {
         Route::delete('/pembayaran/{tagihan}', [TagihanController::class, 'destroy']);
 
         // Pengumuman Admin
-        Route::resource('pengumuman', \App\Http\Controllers\PengumumanController::class);
+        Route::get('/pengumuman', [PengumumanController::class, 'index']);
+        Route::get('/pengumuman/create', [PengumumanController::class, 'create']);
+        Route::post('/pengumuman', [PengumumanController::class, 'store']);
+        Route::get('/pengumuman/{pengumuman}/edit', [PengumumanController::class, 'edit']);
+        Route::put('/pengumuman/{pengumuman}', [PengumumanController::class, 'update']);
+        Route::delete('/pengumuman/{pengumuman}', [PengumumanController::class, 'destroy']);
 
         // Manajemen Mata Kuliah (CRUD)
         Route::get('/mata-kuliah', [MataKuliahController::class, 'index']);
@@ -106,7 +112,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/profile', [ProfileController::class, 'update']);
         Route::get('/dashboard', [DashboardDosenController::class, 'index']);
         
-        Route::get('/pengumuman', [\App\Http\Controllers\PengumumanController::class, 'index']);
+        Route::get('/pengumuman', [PengumumanController::class, 'index']);
 
         // Nilai Dosen
         Route::get('/nilai', [NilaiController::class, 'index']);
@@ -145,7 +151,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/profile', [ProfileController::class, 'update']);
         Route::get('/dashboard', [DashboardMahasiswaController::class, 'index']);
         
-        Route::get('/pengumuman', [\App\Http\Controllers\PengumumanController::class, 'index']);
+        Route::get('/pengumuman', [PengumumanController::class, 'index']);
         
         Route::get('/dkbs', [DkbsController::class, 'index']);
         Route::get('/nilai', [NilaiController::class, 'index']);

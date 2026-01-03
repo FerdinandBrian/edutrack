@@ -36,7 +36,7 @@
         </div>
         <div>
             <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Status Akademik</p>
-            <p class="text-lg font-bold text-slate-700">Aktif - 2024/2025</p>
+            <p class="text-lg font-bold text-slate-700">{{ $statusAkademik }}</p>
         </div>
     </div>
     
@@ -46,7 +46,7 @@
         </div>
         <div>
             <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Total SKS Diambil</p>
-            <p class="text-lg font-bold text-slate-700">84 SKS</p>
+            <p class="text-lg font-bold text-slate-700">{{ $totalSks ?? 0 }} SKS</p>
         </div>
     </div>
 

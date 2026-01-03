@@ -37,9 +37,43 @@ class PresensiController extends Controller
             return view('dosen.presensi.index', compact('sessions'));
 
         } elseif ($user->role === 'mahasiswa') {
-            $col = Schema::hasColumn((new Presensi)->getTable(), 'nrp') ? 'nrp' : 'npr';
-            $data = Presensi::with(['mahasiswa','jadwal.mataKuliah'])->where($col, $user->identifier)->orderBy('tanggal', 'desc')->get();
-            return view('mahasiswa.presensi.index', compact('data'));
+            // Summary per course for Mahasiswa (Image 1)
+            $nrp = $user->identifier;
+            
+            // Get enrolled courses via DKBS
+            $enrolledCourses = \App\Models\Dkbs::with(['mataKuliah', 'perkuliahan'])
+                ->where('nrp', $nrp)
+                ->get();
+            
+            $summary = $enrolledCourses->map(function($dkbs) use ($nrp) {
+                // Count attendance for this specific perkuliahan/course session
+                $attendance = Presensi::where('nrp', $nrp)
+                    ->where('jadwal_id', $dkbs->id_perkuliahan)
+                    ->get();
+                
+                $hadir = $attendance->where('status', 'Hadir')->count();
+                $alpha = $attendance->where('status', 'Absen')->count();
+                $izin = $attendance->where('status', 'Izin')->count();
+                $totalPertemuan = $attendance->count();
+                
+                $persentase = $totalPertemuan > 0 
+                    ? round(($hadir / $totalPertemuan) * 100, 2) 
+                    : 0;
+
+                return (object)[
+                    'jadwal_id' => $dkbs->id_perkuliahan,
+                    'kode_mk' => $dkbs->mataKuliah->kode_mk ?? '-',
+                    'nama_mk' => $dkbs->mataKuliah->nama_mk ?? '-',
+                    'sks' => $dkbs->mataKuliah->sks ?? 0,
+                    'alpha' => $alpha,
+                    'hadir' => $hadir,
+                    'izin' => $izin,
+                    'total_pertemuan' => $totalPertemuan,
+                    'persentase' => $persentase
+                ];
+            });
+
+            return view('mahasiswa.presensi.index', compact('summary'));
         } else {
             // Admin View
              $sessions = Presensi::with(['jadwal.mataKuliah'])
@@ -184,9 +218,27 @@ class PresensiController extends Controller
         return back()->with('success','Presensi dihapus');
     }
 
-    public function show(Presensi $presensi)
+    public function show($id)
     {
         $user = auth()->user();
+        
+        if ($user->role === 'mahasiswa') {
+            // Detailed attendance for a specific course (Image 2)
+            $nrp = $user->identifier;
+            $jadwalId = $id;
+            
+            $perkuliahan = \App\Models\Perkuliahan::with('mataKuliah')->find($jadwalId);
+            $data = Presensi::with(['mahasiswa'])
+                ->where('nrp', $nrp)
+                ->where('jadwal_id', $jadwalId)
+                ->orderBy('tanggal', 'desc')
+                ->get();
+                
+            return view('mahasiswa.presensi.show', compact('data', 'perkuliahan'));
+        }
+
+        // Default behavior for other roles
+        $presensi = Presensi::findOrFail($id);
         return view($user->role . '.presensi.show', compact('presensi'));
     }
 }

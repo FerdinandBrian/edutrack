@@ -119,10 +119,22 @@
             <h2 class="text-xl font-bold text-slate-800 tracking-tight">@yield('title')</h2>
             
             <div class="flex items-center gap-4">
-                 <!-- Search (Visual Only) -->
-                <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-full text-slate-400 text-sm">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                    <span>Pencarian Cepat...</span>
+                <!-- Search (Functional with Dropdown) -->
+                <div class="relative hidden md:block" id="search-container">
+                    <div class="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-full text-slate-400 text-sm focus-within:ring-2 focus-within:ring-emerald-100 transition-all">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <input type="text" id="global-search" placeholder="Pencarian Cepat..." class="bg-transparent border-none outline-none text-slate-600 placeholder:text-slate-400 w-48 focus:w-64 transition-all" autocomplete="off">
+                    </div>
+                    
+                    <!-- Search Results Dropdown -->
+                    <div id="search-results-dropdown" class="absolute top-full right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-slate-100 hidden z-50 overflow-hidden animate-fade-in-up">
+                        <div class="p-3 border-b border-slate-50 bg-slate-50/50">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hasil Pencarian Menu</span>
+                        </div>
+                        <div id="dropdown-items-container" class="max-h-64 overflow-y-auto no-scrollbar">
+                            <!-- Dynamic items -->
+                        </div>
+                    </div>
                 </div>
 
                 <div class="w-px h-8 bg-slate-200 mx-2"></div>
@@ -159,6 +171,84 @@
 
     </div>
 </div>
+
+<script>
+    const globalSearch = document.getElementById('global-search');
+    const dropdown = document.getElementById('search-results-dropdown');
+    const dropdownItems = document.getElementById('dropdown-items-container');
+
+    globalSearch?.addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase();
+        
+        // 1. Filter Table Rows (Existing Functionality)
+        const rows = document.querySelectorAll('tbody tr:not(.no-results-msg)');
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            row.style.display = text.includes(query) ? '' : 'none';
+        });
+
+        // 2. Populate Dropdown with Menu Matches
+        if (query.length > 0) {
+            const menuLinks = document.querySelectorAll('aside nav a');
+            let resultsHTML = '';
+            let count = 0;
+
+            menuLinks.forEach(link => {
+                const text = link.innerText.trim();
+                if (text.toLowerCase().includes(query)) {
+                    const icon = link.querySelector('svg').outerHTML;
+                    resultsHTML += `
+                        <a href="${link.getAttribute('href')}" class="flex items-center gap-3 px-4 py-3 hover:bg-emerald-50 transition-colors group border-b border-slate-50 last:border-0">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                                ${icon.replace('w-5 h-5', 'w-4 h-4')}
+                            </div>
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-emerald-700">${text}</span>
+                        </a>
+                    `;
+                    count++;
+                }
+            });
+
+            if (count > 0) {
+                dropdownItems.innerHTML = resultsHTML;
+                dropdown.classList.remove('hidden');
+            } else {
+                dropdownItems.innerHTML = `
+                    <div class="p-8 text-center text-slate-400">
+                        <p class="text-xs italic">Menu tidak ditemukan</p>
+                    </div>
+                `;
+                dropdown.classList.remove('hidden');
+            }
+        } else {
+            dropdown.classList.add('hidden');
+        }
+
+        // Handle Table Empty State
+        document.querySelectorAll('tbody').forEach(tbody => {
+            let noResults = tbody.querySelector('#search-no-results');
+            const visibleRows = tbody.querySelectorAll('tr:not(.no-results-msg):not([style*="display: none"])');
+            if (visibleRows.length === 0 && query !== '') {
+                if (!noResults) {
+                    noResults = document.createElement('tr');
+                    noResults.id = 'search-no-results';
+                    noResults.className = 'no-results-msg';
+                    noResults.innerHTML = `<td colspan="100%" class="py-12 text-center text-slate-400 italic">Data tidak ditemukan</td>`;
+                    tbody.appendChild(noResults);
+                }
+            } else if (noResults) {
+                noResults.remove();
+            }
+        });
+    });
+
+    // Close dropdown on click outside
+    document.addEventListener('click', (e) => {
+        if (!document.getElementById('search-container')?.contains(e.target)) {
+            dropdown?.classList.add('hidden');
+        }
+    });
+</script>
 
 </body>
 </html>
