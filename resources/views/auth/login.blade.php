@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Login | Sistem Akademik</title>
+    <title>Login | EduTrack</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Tailwind -->
@@ -47,7 +47,7 @@
                     <path d="M9 9h6M9 13h6"/>
                 </svg>
             </div>
-            <h1 class="text-2xl font-bold">Sistem Akademik</h1>
+            <h1 class="text-2xl font-bold">EduTrack</h1>
             <p class="text-sm text-white/90">Silakan login untuk melanjutkan</p>
         </div>
 
@@ -133,7 +133,7 @@
 
     <!-- FOOTER -->
     <p class="text-center text-sm text-slate-500 mt-6">
-        © 2025 Sistem Akademik
+        © 2025 EduTrack
     </p>
 </div>
 

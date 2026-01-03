@@ -12,7 +12,7 @@
         </div>
     @endif
 
-    <form action="/presensi/{{ $presensi->id }}" method="POST" class="mt-4 space-y-4">
+    <form action="/dosen/presensi/{{ $presensi->id }}" method="POST" class="mt-4 space-y-4">
         @csrf
         @method('PUT')
 
@@ -31,7 +31,9 @@
             <select name="jadwal_id" class="w-full border rounded px-3 py-2">
                 <option value="">-- Pilih Jadwal --</option>
                 @foreach($jadwals as $j)
-                    <option value="{{ $j->id }}" {{ $j->id == $presensi->jadwal_id ? 'selected' : '' }}>{{ $j->hari }} - {{ $j->waktu ?? '' }} - {{ $j->mata_kuliah ?? '' }}</option>
+                    <option value="{{ $j->id_perkuliahan }}" {{ $j->id_perkuliahan == $presensi->jadwal_id ? 'selected' : '' }}>
+                        {{ $j->hari }}, {{ \Carbon\Carbon::parse($j->jam_mulai)->format('H:i') }} - {{ optional($j->mataKuliah)->nama_mk }} (Kelas {{ $j->kelas }})
+                    </option>
                 @endforeach
             </select>
         </div>
@@ -57,7 +59,7 @@
 
         <div class="pt-4">
             <button class="bg-blue-600 text-white px-4 py-2 rounded">Perbarui</button>
-            <a href="/presensi" class="ml-3 text-sm text-slate-600">Batal</a>
+            <a href="/dosen/presensi" class="ml-3 text-sm text-slate-600">Batal</a>
         </div>
     </form>
 </div>

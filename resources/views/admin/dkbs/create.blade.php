@@ -107,14 +107,20 @@
                 const response = await fetch(`/admin/api/perkuliahan-by-ta?tahun_ajaran=${encodeURIComponent(ta)}`);
                 const data = await response.json();
 
-                let options = '<option value="">-- Pilih Kelas --</option>';
-                data.forEach(p => {
-                    options += `<option value="${p.id}">${p.label}</option>`;
-                });
+                if (data.length === 0) {
+                    perkuliahanSelect.innerHTML = '<option value="">Tidak ada kelas untuk periode ini</option>';
+                    perkuliahanSelect.disabled = true;
+                    perkuliahanSelect.classList.add('opacity-50');
+                } else {
+                    let options = '<option value="">-- Pilih Kelas --</option>';
+                    data.forEach(p => {
+                        options += `<option value="${p.id}">${p.label}</option>`;
+                    });
 
-                perkuliahanSelect.innerHTML = options;
-                perkuliahanSelect.disabled = false;
-                perkuliahanSelect.classList.remove('opacity-50');
+                    perkuliahanSelect.innerHTML = options;
+                    perkuliahanSelect.disabled = false;
+                    perkuliahanSelect.classList.remove('opacity-50');
+                }
             } catch (error) {
                 console.error('Error fetching perkuliahan:', error);
                 perkuliahanSelect.innerHTML = '<option value="">Error memuat data</option>';

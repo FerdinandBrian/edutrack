@@ -32,6 +32,20 @@ class NilaiController extends Controller
                     return $item;
                 });
 
+            } elseif ($user->role === 'dosen') {
+                $dosen = \App\Models\Dosen::where('user_id', $user->id)->first();
+                if ($dosen) {
+                    // Get Subject Codes taught by this dosen
+                    $myMkCodes = \App\Models\Perkuliahan::where('nip_dosen', $dosen->nip)
+                        ->pluck('kode_mk')
+                        ->unique();
+
+                    $data = Nilai::with(['mahasiswa', 'mataKuliah'])
+                        ->whereIn('kode_mk', $myMkCodes)
+                        ->get();
+                } else {
+                    $data = collect();
+                }
             } else {
                 $data = Nilai::with(['mahasiswa', 'mataKuliah'])->get();
             }
@@ -108,6 +122,12 @@ class NilaiController extends Controller
         $total = ($kat_avg * 0.6) + ($uts * 0.2) + ($uas * 0.2);
         
         $data = $request->all();
+
+        // Sanitize inputs: Convert nulls to 0
+        foreach(['p1','p2','p3','p4','p5','p6','p7','uts','p9','p10','p11','p12','p13','p14','p15','uas'] as $field) {
+            $data[$field] = $data[$field] ?? 0;
+        }
+
         $data['nilai_total'] = round($total, 2);
         $data['nilai_akhir'] = Nilai::calculateGrade($total);
 
@@ -159,6 +179,12 @@ class NilaiController extends Controller
         $total = ($kat_avg * 0.6) + ($uts * 0.2) + ($uas * 0.2);
         
         $data = $request->all();
+
+        // Sanitize inputs: Convert nulls to 0
+        foreach(['p1','p2','p3','p4','p5','p6','p7','uts','p9','p10','p11','p12','p13','p14','p15','uas'] as $field) {
+            $data[$field] = $data[$field] ?? 0;
+        }
+
         $data['nilai_total'] = round($total, 2);
         $data['nilai_akhir'] = Nilai::calculateGrade($total);
 

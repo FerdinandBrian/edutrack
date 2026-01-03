@@ -34,7 +34,8 @@ class Presensi extends Model
 
     public function jadwal()
     {
-        // presensi.jadwal_id -> jadwal.id
-        return $this->belongsTo(Jadwal::class, 'jadwal_id', 'id');
+        // presensi.jadwal_id refers to perkuliahan.id_perkuliahan
+        // We use 'jadwal' name to keep compatibility with existing code calling ->jadwal
+        return $this->belongsTo(Perkuliahan::class, 'jadwal_id', 'id_perkuliahan');
     }
 }

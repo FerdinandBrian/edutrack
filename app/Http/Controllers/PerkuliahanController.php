@@ -12,7 +12,13 @@ class PerkuliahanController extends Controller
 {
     public function index()
     {
-        $data = Perkuliahan::with(['mataKuliah', 'dosen', 'ruangan'])->get();
+        $data = Perkuliahan::join('mata_kuliah', 'perkuliahan.kode_mk', '=', 'mata_kuliah.kode_mk')
+            ->with(['mataKuliah', 'dosen', 'ruangan'])
+            ->select('perkuliahan.*')
+            ->orderBy('mata_kuliah.nama_mk', 'asc')
+            ->orderBy('perkuliahan.kelas', 'asc')
+            ->get();
+
         return view('admin.perkuliahan.index', compact('data'));
     }
 
@@ -107,6 +113,20 @@ class PerkuliahanController extends Controller
             return back()->withInput()->withErrors(['msg' => "Bentrok! Ruangan {$request->kode_ruangan} sudah digunakan."]);
         }
 
+        // Check for Dosen Collision (excluding current record)
+        $dosenCollision = Perkuliahan::where('nip_dosen', $request->nip_dosen)
+            ->where('hari', $request->hari)
+            ->where('tahun_ajaran', $request->tahun_ajaran)
+            ->where('id_perkuliahan', '!=', $id)
+            ->where(function($q) use ($request) {
+                $q->where('jam_mulai', '<', $request->jam_berakhir)
+                  ->where('jam_berakhir', '>', $request->jam_mulai);
+            })->first();
+
+        if ($dosenCollision) {
+            return back()->withInput()->withErrors(['msg' => "Bentrok! Dosen tersebut sudah memiliki jadwal mengajar di jam tersebut."]);
+        }
+        
         $perkuliahan->update($validated);
         return redirect('/admin/perkuliahan')->with('success', 'Jadwal perkuliahan berhasil diperbarui.');
     }

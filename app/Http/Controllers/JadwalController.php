@@ -18,15 +18,58 @@ class JadwalController extends Controller
             $data = \App\Models\Dkbs::with(['perkuliahan.mataKuliah', 'perkuliahan.dosen', 'perkuliahan.ruangan'])
                 ->where('nrp', $user->identifier)
                 ->get();
+
+            // Custom sorting for Days
+            $dayOrder = [
+                'Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4, 'Jumat' => 5, 'Sabtu' => 6, 'Minggu' => 7
+            ];
+
+            $data = $data->sort(function($a, $b) use ($dayOrder) {
+                $dayA = $a->perkuliahan->hari ?? '';
+                $dayB = $b->perkuliahan->hari ?? '';
+                
+                $valA = $dayOrder[$dayA] ?? 99;
+                $valB = $dayOrder[$dayB] ?? 99;
+
+                if ($valA === $valB) {
+                    return strcmp($a->perkuliahan->jam_mulai ?? '', $b->perkuliahan->jam_mulai ?? '');
+                }
+                return $valA <=> $valB;
+            });
         } else {
-            // Existing logic for other roles (admin/dosen uses manual Jadwal entries usually, or generic)
-            try {
-                $data = Jadwal::with('dosen')->get();
-            } catch (\Exception $e) {
-                Log::error('Jadwal index error: '. $e->getMessage());
-                session()->flash('error', 'Terjadi masalah saat memuat jadwal. Cek log.');
-                $data = collect();
+            // For Dosen
+            if ($user->role === 'dosen') {
+                $dosen = \App\Models\Dosen::where('user_id', $user->id)->first();
+                if ($dosen) {
+                    $data = \App\Models\Perkuliahan::with(['mataKuliah', 'ruangan'])
+                        ->where('nip_dosen', $dosen->nip)
+                        ->get();
+                } else {
+                    $data = collect();
+                }
+            } else {
+                // For Admin
+                $data = \App\Models\Perkuliahan::with(['mataKuliah', 'dosen', 'ruangan'])->get();
             }
+
+            // Custom sorting for Days
+            $dayOrder = [
+                'Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4, 'Jumat' => 5, 'Sabtu' => 6, 'Minggu' => 7
+            ];
+
+             $data = $data->sort(function($a, $b) use ($dayOrder) {
+                // sort by day
+                $dayA = $a->hari ?? '';
+                $dayB = $b->hari ?? '';
+                $valA = $dayOrder[$dayA] ?? 99;
+                $valB = $dayOrder[$dayB] ?? 99;
+                
+                if ($valA === $valB) {
+                    // if day same, sort by time
+                    return strcmp($a->jam_mulai, $b->jam_mulai);
+                }
+                return $valA <=> $valB;
+            });
         }
 
         return view($user->role . '.jadwal.index', compact('data'));
@@ -34,22 +77,54 @@ class JadwalController extends Controller
 
     public function create()
     {
+        $user = auth()->user();
+        if ($user->role === 'dosen') {
+            $dosen = Dosen::where('user_id', $user->id)->first();
+            $taughtMkCodes = \App\Models\Perkuliahan::where('nip_dosen', $dosen->nip)->pluck('kode_mk')->unique();
+            $mataKuliahs = \App\Models\MataKuliah::whereIn('kode_mk', $taughtMkCodes)->get();
+            return view('dosen.jadwal.create', compact('mataKuliahs'));
+        }
+        
         $dosens = Dosen::orderBy('nama')->get();
-        return view('dosen.jadwal.create', compact('dosens'));
+        return view('dosen.jadwal.create', compact('dosens')); // Support Admin fallback
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'kode_mk' => 'required|string',
-            'nidn' => 'nullable|string',
-            'hari' => 'required|string',
-            'jam' => 'required|string',
-        ]);
-
-        Jadwal::create($validated);
-        
         $user = auth()->user();
+        
+        if ($user->role === 'dosen') {
+            $dosen = Dosen::where('user_id', $user->id)->first();
+            
+            $validated = $request->validate([
+                'kode_mk' => 'required|string',
+                'hari' => 'required|string',
+                'jam_mulai' => 'required',
+                'jam_berakhir' => 'required',
+            ]);
+
+            // Save to Official Schedule (Perkuliahan)
+            \App\Models\Perkuliahan::create([
+                'kode_mk' => $validated['kode_mk'],
+                'nip_dosen' => $dosen->nip,
+                'hari' => $validated['hari'],
+                'jam_mulai' => $validated['jam_mulai'],
+                'jam_berakhir' => $validated['jam_berakhir'],
+                'kode_ruangan' => 'L8001', // Default
+                'kelas' => 'A', // Default or need input
+                'tahun_ajaran' => '2025/2026 - Ganjil',
+            ]);
+
+            return redirect('/dosen/jadwal')->with('success','Jadwal berhasil ditambahkan');
+        }
+
+        // Fallback for old functionality if needed
+        $validated = $request->validate([
+             'kode_mk' => 'required',
+             'hari' => 'required',
+             'jam' => 'required'
+        ]);
+        Jadwal::create($validated);
         return redirect('/' . $user->role . '/jadwal')->with('success','Jadwal tersimpan');
     }
 
