@@ -55,8 +55,8 @@
             ✨
         </div>
         <div>
-            <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">IPK Terakhir</p>
-            <p class="text-lg font-bold text-slate-700">3.85</p>
+            <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">IPK Saat Ini</p>
+            <p class="text-lg font-bold text-slate-700">{{ number_format($ipk, 2) }}</p>
         </div>
     </div>
 </div>
@@ -91,7 +91,7 @@
         <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors shadow-sm">
             <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         </div>
-        <h4 class="font-bold text-slate-800 text-xl mb-2">DKBS / IRS</h4>
+        <h4 class="font-bold text-slate-800 text-xl mb-2">DKBS</h4>
         <p class="text-slate-500 text-sm leading-relaxed mb-6">Isi rencana studi semester baru dan cetak kartu ujian.</p>
         <span class="text-emerald-600 font-semibold text-sm flex items-center gap-2 group-hover:gap-3 transition-all">
             Isi Rencana Studi <span class="text-lg">→</span>
@@ -146,7 +146,7 @@
     <!-- PENGUMUMAN -->
     <a href="/mahasiswa/pengumuman" class="group relative overflow-hidden bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
         <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-transform group-hover:scale-110">
-            <svg class="w-24 h-24 text-cyan-600" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+            <svg class="w-24 h-24 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
         </div>
         <div class="w-14 h-14 bg-cyan-50 text-cyan-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-cyan-600 group-hover:text-white transition-colors shadow-sm">
             <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>

@@ -33,6 +33,13 @@ class DkbsController extends Controller
 
         if ($user->role === 'mahasiswa') {
             $data = $query->where('nrp', $user->identifier)->get();
+            
+            // Menggunakan DATABASE FUNCTION untuk menghitung total SKS
+            $selectedTa = $request->tahun_ajaran ?? ($data->first()->tahun_ajaran ?? null);
+            $totalSks = 0;
+            if ($selectedTa) {
+                $totalSks = \Illuminate\Support\Facades\DB::select("SELECT get_total_sks(?, ?) AS total", [$user->identifier, $selectedTa])[0]->total;
+            }
 
             // Custom sorting for Days
             $dayOrder = [
@@ -51,13 +58,14 @@ class DkbsController extends Controller
                 }
                 return $valA <=> $valB;
             });
+
+            $tahun_ajarans = Dkbs::distinct()->pluck('tahun_ajaran');
+            return view('mahasiswa.dkbs.index', compact('data', 'tahun_ajarans', 'totalSks'));
         } else {
             $data = $query->get();
+            $tahun_ajarans = Dkbs::distinct()->pluck('tahun_ajaran');
+            return view('admin.dkbs.index', compact('data', 'tahun_ajarans'));
         }
-
-        $tahun_ajarans = Dkbs::distinct()->pluck('tahun_ajaran');
-
-        return view($user->role . '.dkbs.index', compact('data', 'tahun_ajarans'));
     }
 
     public function create()
@@ -88,13 +96,12 @@ class DkbsController extends Controller
 
         $perkuliahan = Perkuliahan::with('ruangan')->findOrFail($request->id_perkuliahan);
 
-        // 1. Capacity Check
-        $currentEnrolled = Dkbs::where('id_perkuliahan', $perkuliahan->id_perkuliahan)->count();
-        $capacity = $perkuliahan->ruangan ? $perkuliahan->ruangan->kapasitas : 40; // Default limit if no room assigned
-
-        if ($currentEnrolled >= $capacity) {
-             return back()->withErrors(['msg' => "Kelas Penuh! Kapasitas ruangan hanya $capacity kursi, dan sudah terisi $currentEnrolled mahasiswa."])->withInput();
-        }
+        // // 1. Capacity Check (Manual check commented out to let DATABASE TRIGGER handle it)
+        // $currentEnrolled = Dkbs::where('id_perkuliahan', $perkuliahan->id_perkuliahan)->count();
+        // $capacity = $perkuliahan->ruangan ? $perkuliahan->ruangan->kapasitas : 40; 
+        // if ($currentEnrolled >= $capacity) {
+        //      return back()->withErrors(['msg' => "Kelas Penuh! Kapasitas ruangan hanya $capacity kursi."])->withInput();
+        // }
 
         // 2. Duplication Check - Check if student already enrolled in THIS specific class
         $exists = Dkbs::where('nrp', $request->nrp)
@@ -105,14 +112,28 @@ class DkbsController extends Controller
             return back()->withErrors(['msg' => 'Mahasiswa sudah terdaftar di kelas ini.'])->withInput();
         }
 
-        Dkbs::create([
-            'nrp' => $request->nrp,
-            'id_perkuliahan' => $request->id_perkuliahan,
-            'kode_mk' => $perkuliahan->kode_mk,
-            'tahun_ajaran' => $perkuliahan->tahun_ajaran,
-            'status' => $request->status ?? 'Terdaftar',
-            'semester' => $perkuliahan->mataKuliah->semester
-        ]);
+        try {
+            Dkbs::create([
+                'nrp' => $request->nrp,
+                'id_perkuliahan' => $request->id_perkuliahan,
+                'kode_mk' => $perkuliahan->kode_mk,
+                'tahun_ajaran' => $perkuliahan->tahun_ajaran,
+                'status' => $request->status ?? 'Terdaftar',
+                'semester' => $perkuliahan->mataKuliah->semester
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Menangkap pesan error dari TRIGGER (SIGNAL SQLSTATE '45000')
+            $errorCode = $e->getCode();
+            if ($errorCode == '45000') {
+                // Return pesan error dari trigger ke user
+                $message = $e->getPrevious() ? $e->getPrevious()->getMessage() : $e->getMessage();
+                // Biasanya formatnya "SQLSTATE[45000]: <<pesan>>"
+                if (str_contains($message, 'Kelas sudah penuh')) {
+                    return back()->withErrors(['msg' => 'Gagal: Kelas sudah penuh (Dibatalkan oleh Database Trigger).'])->withInput();
+                }
+            }
+            throw $e; // Jika error lain, biarkan laravel menanganinya
+        }
 
         // 3. Auto-enroll in paired class (Teori <-> Praktikum)
         $pairedKodeMk = null;

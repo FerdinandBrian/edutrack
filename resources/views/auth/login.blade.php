@@ -22,6 +22,7 @@
             background-size: cover;
             background-position: center;
             filter: brightness(0.7) blur(2px);
+            opacity: 0.5;
         }
 
         .glass-card {
@@ -154,8 +155,7 @@
                 </div>
 
                 <button id="loginBtn" class="btn-gradient w-full py-4 rounded-[1.25rem] text-white font-bold text-lg shadow-xl shadow-blue-200 flex items-center justify-center gap-3 active:scale-95 transition-all">
-                    Masuk ke Portal
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                    Masuk
                 </button>
             </form>
 
@@ -166,19 +166,7 @@
                 </p>
             </div>
         </div>
-
-        <!-- System Status -->
-        <div class="mt-8 flex items-center justify-center gap-6">
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
-                <span class="text-[10px] font-bold text-white/50 uppercase tracking-widest">System Online</span>
-            </div>
-            <div class="h-4 w-px bg-white/10"></div>
-            <span class="text-[10px] items-center flex gap-1 font-bold text-white/50 uppercase tracking-widest">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                Secure SSL 256-bit
-            </span>
-        </div>
+        
     </div>
 
     <script>

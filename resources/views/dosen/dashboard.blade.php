@@ -7,7 +7,7 @@
 <!-- HEADER BANNER -->
 <div class="relative overflow-hidden rounded-3xl bg-emerald-600 px-8 py-12 text-white shadow-xl shadow-emerald-200 mb-10">
     <div class="relative z-10">
-        <h1 class="text-3xl font-bold tracking-tight mb-2">Selamat Datang, Bapak/Ibu {{ auth()->user()->nama }}! 👋</h1>
+        <h1 class="text-3xl font-bold tracking-tight mb-2">Selamat Datang, {{ (auth()->user()->dosen->jenis_kelamin ?? '') == 'Laki-laki' ? 'Bapak' : 'Ibu' }} {{ auth()->user()->nama }}! 👋</h1>
         <p class="text-emerald-100 text-lg opacity-90 max-w-xl">Kelola aktivitas mengajar, penilaian, dan presensi mahasiswa Anda dengan mudah.</p>
         
         <div class="mt-8 flex gap-3">
@@ -116,7 +116,7 @@
     <!-- PENGUMUMAN -->
     <a href="/dosen/pengumuman" class="group relative overflow-hidden bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
         <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-transform group-hover:scale-110">
-            <svg class="w-24 h-24 text-amber-600" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+            <svg class="w-24 h-24 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
         </div>
         <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-amber-600 group-hover:text-white transition-colors shadow-sm">
             <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>

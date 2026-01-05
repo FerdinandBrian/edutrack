@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DashboardMahasiswaController extends Controller
 {
@@ -17,6 +17,9 @@ class DashboardMahasiswaController extends Controller
             ->join('mata_kuliah', 'dkbs.kode_mk', '=', 'mata_kuliah.kode_mk')
             ->sum('mata_kuliah.sks');
 
+        // Menggunakan DATABASE FUNCTION untuk menghitung IPK secara Real-time
+        $ipk = DB::select("SELECT get_ipk(?) as ipk", [$user->identifier])[0]->ipk;
+
         // Fetch status akademik from latest DKBS
         $latestDkbs = \App\Models\Dkbs::where('nrp', $mahasiswa->nrp)
             ->orderBy('id', 'desc')
@@ -28,6 +31,7 @@ class DashboardMahasiswaController extends Controller
             'mahasiswa' => $mahasiswa,
             'totalSks' => $totalSks,
             'statusAkademik' => $statusAkademik,
+            'ipk' => $ipk ?? 0.00
         ]);
     }
 }

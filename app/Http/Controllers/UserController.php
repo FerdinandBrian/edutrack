@@ -14,7 +14,18 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        // Urutan role: admin -> dosen -> mahasiswa
+        $roleOrder = ['admin' => 1, 'dosen' => 2, 'mahasiswa' => 3];
+
+        $users = User::all()->sort(function($a, $b) use ($roleOrder) {
+            // Pertama urutkan berdasarkan role
+            if ($roleOrder[$a->role] !== $roleOrder[$b->role]) {
+                return $roleOrder[$a->role] <=> $roleOrder[$b->role];
+            }
+            // Kedua urutkan berdasarkan identifier secara alfabetis/numerik (asc)
+            return strcmp($a->identifier, $b->identifier);
+        });
+
         return view('admin.users.index', compact('users'));
     }
 
