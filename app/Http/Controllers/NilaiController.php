@@ -35,16 +35,16 @@ class NilaiController extends Controller
             } elseif ($user->role === 'dosen') {
                 $dosen = \App\Models\Dosen::where('user_id', $user->id)->first();
                 if ($dosen) {
-                    // Get Subject Codes taught by this dosen
-                    $myMkCodes = \App\Models\Perkuliahan::where('nip_dosen', $dosen->nip)
-                        ->pluck('kode_mk')
-                        ->unique();
-
-                    $data = Nilai::with(['mahasiswa', 'mataKuliah'])
-                        ->whereIn('kode_mk', $myMkCodes)
+                     // Fetch Classes (Perkuliahan) taught by this lecturer
+                     $classes = \App\Models\Perkuliahan::with(['mataKuliah', 'ruangan'])
+                        ->where('nip_dosen', $dosen->nip)
+                        ->orderBy('hari')
                         ->get();
+                        
+                    return view('dosen.nilai.index', compact('classes'));
                 } else {
-                    $data = collect();
+                    $classes = collect();
+                    return view('dosen.nilai.index', compact('classes'));
                 }
             } else {
                 $data = Nilai::with(['mahasiswa', 'mataKuliah'])->get();
@@ -197,5 +197,25 @@ class NilaiController extends Controller
     {
         Nilai::destroy($id);
         return back()->with('success','Nilai dihapus');
+    }
+    public function showClass($id)
+    {
+        $jadwal = \App\Models\Perkuliahan::with('mataKuliah')->findOrFail($id);
+        
+        // Get students in this class
+        $students = Dkbs::with('mahasiswa')
+            ->where('id_perkuliahan', $id)
+            ->get()
+            ->sortBy(function($dkbs) {
+                return optional($dkbs->mahasiswa)->nama;
+            });
+
+        // Get grades for these students for this subject
+        $grades = Nilai::where('kode_mk', $jadwal->kode_mk)
+            ->whereIn('nrp', $students->pluck('nrp'))
+            ->get()
+            ->keyBy('nrp');
+
+        return view('dosen.nilai.show_class', compact('jadwal', 'students', 'grades'));
     }
 }

@@ -12,12 +12,22 @@ class PerkuliahanController extends Controller
 {
     public function index()
     {
-        $data = Perkuliahan::join('mata_kuliah', 'perkuliahan.kode_mk', '=', 'mata_kuliah.kode_mk')
-            ->with(['mataKuliah', 'dosen', 'ruangan'])
-            ->select('perkuliahan.*')
-            ->orderBy('mata_kuliah.nama_mk', 'asc')
-            ->orderBy('perkuliahan.kelas', 'asc')
-            ->get();
+        $data = Perkuliahan::with(['mataKuliah', 'dosen', 'ruangan'])
+            ->get()
+            ->sortBy(function($item) {
+                // Sorting Logic:
+                // 1. Jurusan
+                // 2. Base Name (Algorithm name without Teori/Praktikum suffix)
+                // 3. Class (A, B, C...)
+                // 4. Type (Teori first, then Praktikum)
+                
+                $jurusan = $item->mataKuliah->jurusan ?? 'Umum';
+                $name = $item->mataKuliah->nama_mk;
+                $baseName = trim(str_replace(['(Teori)', '(Praktikum)'], '', $name));
+                $typeRank = str_contains($name, 'Praktikum') ? 1 : 0; // 0 for Teori, 1 for Praktikum
+                
+                return sprintf('%s|%s|%s|%d', $jurusan, $baseName, $item->kelas, $typeRank);
+            });
 
         return view('admin.perkuliahan.index', compact('data'));
     }
@@ -32,6 +42,16 @@ class PerkuliahanController extends Controller
 
     public function store(Request $request)
     {
+        // Auto-calculate End Time based on SKS (1 SKS = 50 minutes)
+        if ($request->has('kode_mk') && $request->has('jam_mulai')) {
+             $mk = MataKuliah::where('kode_mk', $request->kode_mk)->first();
+             if ($mk) {
+                 $minutes = $mk->sks * 50;
+                 $endTime = \Carbon\Carbon::parse($request->jam_mulai)->addMinutes($minutes)->format('H:i');
+                 $request->merge(['jam_berakhir' => $endTime]);
+             }
+        }
+
         $validated = $request->validate([
             'kode_mk' => 'required|string|exists:mata_kuliah,kode_mk',
             'nip_dosen' => 'required|string|exists:dosen,nip',
@@ -87,6 +107,16 @@ class PerkuliahanController extends Controller
     public function update(Request $request, string $id)
     {
         $perkuliahan = Perkuliahan::findOrFail($id);
+
+        // Auto-calculate End Time based on SKS (1 SKS = 50 minutes)
+        if ($request->has('kode_mk') && $request->has('jam_mulai')) {
+             $mk = MataKuliah::where('kode_mk', $request->kode_mk)->first();
+             if ($mk) {
+                 $minutes = $mk->sks * 50;
+                 $endTime = \Carbon\Carbon::parse($request->jam_mulai)->addMinutes($minutes)->format('H:i');
+                 $request->merge(['jam_berakhir' => $endTime]);
+             }
+        }
 
         $validated = $request->validate([
             'kode_mk' => 'required|string|exists:mata_kuliah,kode_mk',

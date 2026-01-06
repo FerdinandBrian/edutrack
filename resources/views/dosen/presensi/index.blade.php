@@ -30,42 +30,33 @@
             <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
                 <tr>
                     <th class="px-6 py-4 w-12 text-center">No</th>
-                    <th class="px-6 py-4">Tanggal & Waktu</th>
-                    <th class="px-6 py-4">Mata Kuliah & Kelas</th>
-                    <th class="px-6 py-4 text-center">Kehadiran</th>
+                    <th class="px-6 py-4">Mata Kuliah</th>
+                    <th class="px-6 py-4">Kelas</th>
+                    <th class="px-6 py-4">Jadwal</th>
                     <th class="px-6 py-4 text-right">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-                @forelse($sessions as $index => $session)
+                @forelse($classes as $index => $class)
                 <tr class="hover:bg-slate-50/50 transition duration-150">
                     <td class="px-6 py-4 text-center text-slate-500">{{ $index + 1 }}</td>
                     <td class="px-6 py-4">
-                        <div class="font-medium text-slate-800">{{ \Carbon\Carbon::parse($session->tanggal)->translatedFormat('d F Y') }}</div>
-                        <div class="text-xs text-slate-500 mt-1">
-                            {{ \Carbon\Carbon::parse(optional($session->jadwal)->jam_mulai)->format('H:i') }}
-                        </div>
+                        <div class="font-medium text-slate-800">{{ optional($class->mataKuliah)->nama_mk ?? 'Mata Kuliah' }}</div>
+                        <div class="text-xs text-slate-500 mt-1">{{ optional($class->mataKuliah)->kode_mk }} • {{ optional($class->mataKuliah)->sks }} SKS</div>
                     </td>
                     <td class="px-6 py-4">
-                        <div class="font-medium text-slate-800">{{ optional(optional($session->jadwal)->mataKuliah)->nama_mk ?? 'Mata Kuliah' }}</div>
-                        <div class="text-xs text-slate-500 mt-1">Kelas {{ optional($session->jadwal)->kelas ?? '-' }} • Ruang {{ optional(optional($session->jadwal)->ruangan)->kode_ruangan ?? '-' }}</div>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            Kelas {{ $class->kelas }}
+                        </span>
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center justify-center gap-2">
-                            @php
-                                $hadir = \App\Models\Presensi::where('jadwal_id', $session->jadwal_id)->where('tanggal', $session->tanggal)->where('status','Hadir')->count();
-                                $total = $session->total_students;
-                                $persen = $total > 0 ? round(($hadir / $total) * 100) : 0;
-                            @endphp
-                            <div class="w-24 bg-slate-100 rounded-full h-2 overflow-hidden">
-                                <div class="bg-emerald-500 h-2 rounded-full" style="width: {{ $persen }}%"></div>
-                            </div>
-                            <span class="text-xs font-bold text-slate-600">{{ $hadir }}/{{ $total }}</span>
-                        </div>
+                    <td class="px-6 py-4 text-slate-600">
+                        <div>{{ $class->hari }}</div>
+                        <div class="text-xs text-slate-500">{{ \Carbon\Carbon::parse($class->jam_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($class->jam_selesai)->format('H:i') }}</div>
+                        <div class="text-xs text-slate-500">Ruang {{ optional($class->ruangan)->kode_ruangan ?? '-' }}</div>
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <a href="/dosen/presensi/create?jadwal_id={{ $session->jadwal_id }}&tanggal={{ $session->tanggal }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 text-xs font-semibold hover:bg-indigo-100 transition">
-                            Kelola Presensi
+                        <a href="/dosen/presensi/kelas/{{ $class->id_perkuliahan }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition shadow-sm shadow-indigo-200">
+                            Lihat Pertemuan
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                         </a>
                     </td>
@@ -73,7 +64,7 @@
                 @empty
                 <tr>
                     <td colspan="5" class="px-6 py-8 text-center text-slate-500">
-                        Belum ada sesi perkuliahan. Klik "Buka Kelas Baru" untuk memulai.
+                        Belum ada kelas yang diampu.
                     </td>
                 </tr>
                 @endforelse

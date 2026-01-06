@@ -14,8 +14,14 @@
         <div><strong>Status:</strong> {{ $tagihan->status ?? '-' }}</div>
     </div>
 
-    <div class="pt-4">
-        <a href="/admin/pembayaran" class="text-sm text-slate-600">Kembali</a>
+    <div class="pt-4 flex items-center gap-4">
+        <a href="/admin/pembayaran" class="text-sm text-slate-600 hover:underline">Kembali</a>
+        <a href="/admin/pembayaran/{{ $tagihan->id }}/edit" class="text-sm text-yellow-600 hover:underline">Edit</a>
+        <form action="/admin/pembayaran/{{ $tagihan->id }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus tagihan ini?')">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="text-sm text-red-600 hover:underline">Hapus Tagihan</button>
+        </form>
     </div>
 </div>
 @endsection

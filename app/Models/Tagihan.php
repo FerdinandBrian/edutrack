@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Tagihan extends Model
 {
     protected $table = 'tagihan';
-    protected $fillable = ['nrp','jenis','jumlah','status'];
+    protected $fillable = ['nrp','jenis','jumlah','status', 'batas_pembayaran', 'tipe_pembayaran', 'cicilan_ke'];
 
     public function mahasiswa()
     {

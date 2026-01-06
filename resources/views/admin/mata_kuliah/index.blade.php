@@ -30,7 +30,26 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
+                @php $lastJurusan = null; @endphp
                 @forelse($data as $mk)
+                
+                @php $currentJurusan = $mk->jurusan ?? 'Jurusan Belum Diisi'; @endphp
+
+                @if($lastJurusan !== $currentJurusan)
+                    <tr>
+                        <td colspan="4" class="bg-indigo-900 px-8 py-3 border-y border-indigo-100 sticky top-0 backdrop-blur-sm z-10">
+                            <div class="flex items-center gap-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                                <h3 class="font-bold text-white text-sm uppercase tracking-wider">{{ $currentJurusan }}</h3>
+                            </div>
+                        </td>
+                    </tr>
+                @endif
+                
+                @php $lastJurusan = $currentJurusan; @endphp
+
                 <tr class="hover:bg-blue-50/30 transition-colors group">
                     <td class="px-8 py-5">
                         <div class="flex flex-col">

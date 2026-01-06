@@ -30,8 +30,12 @@
                     <td class="px-8 py-5">
                         <div class="flex flex-col">
                             <span class="text-sm font-bold text-slate-800">{{ $row->jenis }}</span>
-                            <!-- Assuming we can display date created if available, else just nrp for debugging or nothing -->
-                            <span class="text-[10px] text-slate-400 font-mono mt-0.5">{{ optional($row->created_at)->format('d M Y') ?? 'Semester Ganjil 2024' }}</span>
+                            <span class="text-[10px] text-slate-400 font-mono mt-0.5">
+                                Deadline: {{ $row->batas_pembayaran ? \Carbon\Carbon::parse($row->batas_pembayaran)->format('d M Y') : '-' }}
+                                @if($row->tipe_pembayaran == 3)
+                                    | Cicilan Ke-{{ $row->cicilan_ke }}
+                                @endif
+                            </span>
                         </div>
                     </td>
                     <td class="px-8 py-5">
@@ -39,11 +43,11 @@
                     </td>
                     <td class="px-8 py-5 text-center">
                         @php
-                            $status = $row->status ?? 'pending';
-                            $statusClass = match(strtolower($status)) {
-                                'lunas' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
-                                'pending' => 'bg-amber-50 text-amber-700 border-amber-100',
-                                default => 'bg-slate-50 text-slate-600 border-slate-100',
+                            $status = strtolower($row->status ?? 'pending');
+                            $statusClass = match($status) {
+                                'lunas' => 'bg-emerald-600 text-white ring-emerald-600',
+                                'pending', 'belum lunas' => 'bg-red-600 text-white ring-red-600',
+                                default => 'bg-slate-500 text-white ring-slate-500',
                             };
                         @endphp
                         <div class="inline-block px-3 py-1 rounded-lg border {{ $statusClass }}">
@@ -55,6 +59,19 @@
                             <button disabled class="px-4 py-2 bg-slate-100 text-slate-400 rounded-lg text-xs font-bold uppercase tracking-wide cursor-not-allowed">
                                 Lunas
                             </button>
+                        @elseif(!$row->tipe_pembayaran)
+                            <div class="flex flex-col items-end gap-2">
+                                <form action="/mahasiswa/pembayaran/{{ $row->id }}/pilih-tipe" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="tipe" value="1">
+                                    <button class="px-4 py-1.5 bg-blue-600 text-white rounded text-[10px] font-bold uppercase">Bayar 1x</button>
+                                </form>
+                                <form action="/mahasiswa/pembayaran/{{ $row->id }}/pilih-tipe" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="tipe" value="3">
+                                    <button class="px-4 py-1.5 bg-orange-500 text-white rounded text-[10px] font-bold uppercase">Bayar 3x</button>
+                                </form>
+                            </div>
                         @else
                             <a href="/mahasiswa/pembayaran/{{ $row->id }}" class="inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold uppercase tracking-wide hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200">
                                 Bayar

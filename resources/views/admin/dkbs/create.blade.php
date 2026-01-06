@@ -35,7 +35,9 @@
                         <select name="nrp" id="nrp-select" required class="w-full">
                             <option value="">-- Cari Nama atau NRP Mahasiswa --</option>
                             @foreach($mahasiswas as $m)
-                                <option value="{{ $m->nrp }}">{{ $m->nrp }} - {{ $m->nama }}</option>
+                                <option value="{{ $m->nrp }}" {{ (isset($selectedNrp) && $selectedNrp == $m->nrp) ? 'selected' : '' }}>
+                                    {{ $m->nrp }} - {{ $m->nama }}
+                                </option>
                             @endforeach
                         </select>
                     </div>

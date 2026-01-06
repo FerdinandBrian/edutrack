@@ -50,20 +50,26 @@ class TagihanController extends Controller
         $tagihan = Tagihan::findOrFail($id);
         if (auth()->user()->role !== 'mahasiswa' || $tagihan->nrp !== auth()->user()->identifier) abort(403);
         
-        return view('mahasiswa.pembayaran.checkout', compact('tagihan'));
+        // Call stored procedure to get VA
+        $result = \Illuminate\Support\Facades\DB::select("CALL sp_get_va(?)", [$tagihan->nrp]);
+        $va = $result[0]->va ?? ('2911' . $tagihan->nrp);
+        
+        return view('mahasiswa.pembayaran.checkout', compact('tagihan', 'va'));
     }
 
     public function processCheckout(Request $request, $id)
     {
         $tagihan = Tagihan::findOrFail($id);
         
-        $request->validate(['payment_method' => 'required']);
+        // Call stored procedure to generate VA
+        $result = \Illuminate\Support\Facades\DB::select("CALL sp_get_va(?)", [$tagihan->nrp]);
+        $va = $result[0]->va ?? ('2911' . $tagihan->nrp);
         
         // Store simulated payment data in session
         session([
             'payment_tagihan_id' => $id,
-            'payment_method' => $request->payment_method,
-            'payment_va' => '8800' . str_pad($tagihan->id, 8, '0', STR_PAD_LEFT)
+            'payment_method' => 'Virtual Account Edutrack',
+            'payment_va' => $va
         ]);
 
         return redirect('/mahasiswa/pembayaran/' . $id . '/instruction');
@@ -94,18 +100,94 @@ class TagihanController extends Controller
              abort(403);
         }
 
-        $tagihan->update(['status' => 'Lunas']);
+        // Call stored procedure to handle payment
+        \Illuminate\Support\Facades\DB::statement("CALL sp_bayar_tagihan(?)", [$id]);
         
         // Clear session
         session()->forget(['payment_tagihan_id', 'payment_method', 'payment_va']);
 
-        return redirect('/mahasiswa/pembayaran/' . $id)->with('success', 'Pembayaran berhasil dikonfirmasi');
+        return redirect('/mahasiswa/pembayaran/' . $id)->with('success', 'Pembayaran berhasil dikonfirmasi (Stored Procedure)');
+    }
+
+    public function pilihTipePembayaran(Request $request, $id)
+    {
+        $tagihan = Tagihan::findOrFail($id);
+        if (auth()->user()->role !== 'mahasiswa' || $tagihan->nrp !== auth()->user()->identifier) abort(403);
+        
+        $tipe = $request->tipe; // 1 or 3
+        
+        if ($tipe == 1) {
+            $tagihan->update([
+                'tipe_pembayaran' => 1,
+                'cicilan_ke' => 1
+            ]);
+        } elseif ($tipe == 3) {
+            $jumlahPerCicilan = $tagihan->jumlah / 3;
+            $baseDeadline = \Carbon\Carbon::parse($tagihan->batas_pembayaran);
+            
+            // Update the current record as the first installment
+            $tagihan->update([
+                'jumlah' => $jumlahPerCicilan,
+                'tipe_pembayaran' => 3,
+                'cicilan_ke' => 1
+            ]);
+            
+            // Create 2 more installments with incrementing deadlines
+            Tagihan::create([
+                'nrp' => $tagihan->nrp,
+                'jenis' => $tagihan->jenis . ' (Cicilan 2)',
+                'jumlah' => $jumlahPerCicilan,
+                'status' => 'Belum Lunas',
+                'batas_pembayaran' => $baseDeadline->copy()->addMonth(),
+                'tipe_pembayaran' => 3,
+                'cicilan_ke' => 2
+            ]);
+            
+            Tagihan::create([
+                'nrp' => $tagihan->nrp,
+                'jenis' => $tagihan->jenis . ' (Cicilan 3)',
+                'jumlah' => $jumlahPerCicilan,
+                'status' => 'Belum Lunas',
+                'batas_pembayaran' => $baseDeadline->copy()->addMonths(2),
+                'tipe_pembayaran' => 3,
+                'cicilan_ke' => 3
+            ]);
+        }
+        
+        return redirect('/mahasiswa/pembayaran')->with('success', 'Tipe pembayaran berhasil dipilih');
     }
 
     // Legacy method - keeping it just in case, but redirecting to checkout
     public function bayar($id)
     {
         return redirect('/mahasiswa/pembayaran/' . $id . '/checkout');
+    }
+
+    public function getStudentAmount($nrp)
+    {
+        // Get the latest semester/year for this student to ensure we bill the correct period
+        $latestRecord = \App\Models\Dkbs::where('nrp', $nrp)
+            ->orderBy('tahun_ajaran', 'desc')
+            ->orderBy('semester', 'desc')
+            ->first();
+
+        if (!$latestRecord) {
+            return response()->json(['sks' => 0, 'amount' => 0, 'period' => 'N/A']);
+        }
+
+        $totalSks = \App\Models\Dkbs::where('dkbs.nrp', $nrp)
+            ->where('dkbs.tahun_ajaran', $latestRecord->tahun_ajaran)
+            ->where('dkbs.semester', $latestRecord->semester)
+            ->join('mata_kuliah', 'dkbs.kode_mk', '=', 'mata_kuliah.kode_mk')
+            ->sum('mata_kuliah.sks');
+            
+        $amount = $totalSks * 300000;
+        
+        return response()->json([
+            'sks' => $totalSks,
+            'amount' => $amount,
+            'period' => $latestRecord->semester . ' ' . $latestRecord->tahun_ajaran
+        ]);
     }
 
     // Admin Methods (Stubs/Basic Implementation)
@@ -119,15 +201,18 @@ class TagihanController extends Controller
     public function store(Request $request)
     {
         if (auth()->user()->role !== 'admin') abort(403);
-        // Basic validation and store logic would go here
+        
         $request->validate([
             'nrp' => 'required',
             'jumlah' => 'required',
-            'status' => 'required',
-            'jenis' => 'required'
+            'jenis' => 'required',
+            'batas_pembayaran' => 'required|date'
         ]);
         
-        Tagihan::create($request->all());
+        $data = $request->all();
+        $data['status'] = 'Belum Lunas';
+        
+        Tagihan::create($data);
         return redirect('/admin/pembayaran')->with('success', 'Tagihan created');
     }
 

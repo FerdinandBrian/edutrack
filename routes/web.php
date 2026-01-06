@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
         
         // DKBS Admin
         Route::get('/dkbs', [DkbsController::class, 'index']);
+        Route::get('/dkbs/student/{nrp}', [DkbsController::class, 'showStudent']);
         Route::get('/dkbs/create', [DkbsController::class, 'create']);
         Route::post('/dkbs', [DkbsController::class, 'store']);
         Route::get('/dkbs/{dkbs}/edit', [DkbsController::class, 'edit']);
@@ -77,6 +78,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/api/mata-kuliah/{semester}', [DkbsController::class, 'getMataKuliahBySemester']);
         Route::get('/api/perkuliahan-by-ta', [DkbsController::class, 'getPerkuliahanByTahunAjaran']);
 
+        Route::get('/api/student-amount/{nrp}', [TagihanController::class, 'getStudentAmount']);
+        
         // Pembayaran Admin
         Route::get('/pembayaran', [TagihanController::class, 'index']);
         Route::get('/pembayaran/create', [TagihanController::class, 'create']);
@@ -101,6 +104,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/mata-kuliah/{id}/edit', [MataKuliahController::class, 'edit']);
         Route::put('/mata-kuliah/{id}', [MataKuliahController::class, 'update']);
         Route::delete('/mata-kuliah/{id}', [MataKuliahController::class, 'destroy']);
+        Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index']);
     });
 
     // ============================
@@ -121,6 +125,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/nilai/{id}', [NilaiController::class, 'show']);
         Route::get('/nilai/{nilai}/edit', [NilaiController::class, 'edit']);
         Route::put('/nilai/{nilai}', [NilaiController::class, 'update']);
+        Route::get('/nilai/kelas/{id}', [NilaiController::class, 'showClass']);
         Route::delete('/nilai/{nilai}', [NilaiController::class, 'destroy']);
 
         // Jadwal Dosen
@@ -139,6 +144,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/presensi/{presensi}', [PresensiController::class, 'show']);
         Route::get('/presensi/{presensi}/edit', [PresensiController::class, 'edit']);
         Route::put('/presensi/{presensi}', [PresensiController::class, 'update']);
+        Route::get('/presensi/kelas/{id}', [PresensiController::class, 'showClass']);
         Route::delete('/presensi/{presensi}', [PresensiController::class, 'destroy']);
     });
 
@@ -169,6 +175,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/pembayaran/{id}/instruction', [TagihanController::class, 'instruction']);
         Route::post('/pembayaran/{id}/confirm', [TagihanController::class, 'confirmPayment']);
         
+        Route::post('/pembayaran/{id}/pilih-tipe', [TagihanController::class, 'pilihTipePembayaran']);
         Route::post('/pembayaran/{id}/bayar', [TagihanController::class, 'bayar']); // Legacy/Quick Pay if needed
         
         Route::get('/dokumen', [DokumenController::class, 'index']);

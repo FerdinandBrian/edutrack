@@ -9,7 +9,7 @@ class MataKuliahController extends Controller
 {
     public function index()
     {
-        $data = MataKuliah::all();
+        $data = MataKuliah::orderBy('jurusan', 'asc')->orderBy('nama_mk', 'asc')->get();
         return view('admin.mata_kuliah.index', compact('data'));
     }
 

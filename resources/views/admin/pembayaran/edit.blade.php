@@ -36,8 +36,16 @@
         </div>
 
         <div>
+            <label class="block text-sm text-slate-700 mb-1">Batas Pembayaran</label>
+            <input name="batas_pembayaran" value="{{ $tagihan->batas_pembayaran }}" type="date" required class="w-full border rounded px-3 py-2">
+        </div>
+
+        <div>
             <label class="block text-sm text-slate-700 mb-1">Status</label>
-            <input name="status" value="{{ $tagihan->status }}" class="w-full border rounded px-3 py-2" placeholder="Belum Lunas / Lunas">
+            <select name="status" class="w-full border rounded px-3 py-2">
+                <option value="Belum Lunas" {{ $tagihan->status == 'Belum Lunas' ? 'selected' : '' }}>Belum Lunas</option>
+                <option value="Lunas" {{ $tagihan->status == 'Lunas' ? 'selected' : '' }}>Lunas</option>
+            </select>
         </div>
 
         <div class="pt-4">

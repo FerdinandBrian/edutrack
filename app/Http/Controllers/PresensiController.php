@@ -20,21 +20,19 @@ class PresensiController extends Controller
             $dosen = \App\Models\Dosen::where('user_id', $user->id)->first();
             
             if ($dosen) {
-                // Get IDs of classes taught by this dosen
-                $myJadwalIds = \App\Models\Perkuliahan::where('nip_dosen', $dosen->nip)->pluck('id_perkuliahan');
-
-                $sessions = Presensi::with(['jadwal.mataKuliah', 'jadwal.ruangan'])
-                    ->whereIn('jadwal_id', $myJadwalIds)
-                    ->select('jadwal_id', 'tanggal', \Illuminate\Support\Facades\DB::raw('count(*) as total_students'))
-                    ->groupBy('jadwal_id', 'tanggal')
-                    ->orderBy('tanggal', 'desc')
+                // Fetch Classes (Perkuliahan) taught by this lecturer
+                $classes = \App\Models\Perkuliahan::with(['mataKuliah', 'ruangan'])
+                    ->where('nip_dosen', $dosen->nip)
+                    ->whereHas('mataKuliah', function($q) {
+                        $q->where('nama_mk', 'not like', '%Praktikum%');
+                    })
+                    ->orderBy('hari')
                     ->get();
-                    
             } else {
-                $sessions = collect();
+                $classes = collect();
             }
             
-            return view('dosen.presensi.index', compact('sessions'));
+            return view('dosen.presensi.index', compact('classes'));
 
         } elseif ($user->role === 'mahasiswa') {
             // Summary per course for Mahasiswa (Image 1)
@@ -95,6 +93,9 @@ class PresensiController extends Controller
              if ($dosen) {
                  $jadwals = \App\Models\Perkuliahan::with('mataKuliah')
                             ->where('nip_dosen', $dosen->nip)
+                            ->whereHas('mataKuliah', function($q) {
+                                $q->where('nama_mk', 'not like', '%Praktikum%');
+                            })
                             ->orderBy('hari')
                             ->get();
              } else {
@@ -184,6 +185,9 @@ class PresensiController extends Controller
              if ($dosen) {
                  $jadwals = \App\Models\Perkuliahan::with('mataKuliah')
                             ->where('nip_dosen', $dosen->nip)
+                            ->whereHas('mataKuliah', function($q) {
+                                $q->where('nama_mk', 'not like', '%Praktikum%');
+                            })
                             ->orderBy('hari')
                             ->get();
              } else {
@@ -240,5 +244,18 @@ class PresensiController extends Controller
         // Default behavior for other roles
         $presensi = Presensi::findOrFail($id);
         return view($user->role . '.presensi.show', compact('presensi'));
+    }
+    public function showClass($id)
+    {
+        $jadwal = \App\Models\Perkuliahan::with(['mataKuliah', 'ruangan'])->findOrFail($id);
+        
+        // Fetch sessions for this specific class
+        $sessions = Presensi::where('jadwal_id', $id)
+            ->select('jadwal_id', 'tanggal', \Illuminate\Support\Facades\DB::raw('count(*) as total_students'))
+            ->groupBy('jadwal_id', 'tanggal')
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        return view('dosen.presensi.show_class', compact('sessions', 'jadwal'));
     }
 }

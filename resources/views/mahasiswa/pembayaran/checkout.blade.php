@@ -15,42 +15,56 @@
 
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
         <div class="p-6 border-b border-slate-100 bg-slate-50/50">
-            <h2 class="text-lg font-bold text-slate-800">Metode Pembayaran</h2>
-            <p class="text-sm text-slate-500">Pilih salah satu metode pembayaran</p>
+            <h2 class="text-lg font-bold text-slate-800">Detail Pembayaran</h2>
+            <p class="text-sm text-slate-500">Gunakan Nomor Virtual Account berikut</p>
         </div>
         
         <form action="/mahasiswa/pembayaran/{{ $tagihan->id }}/checkout" method="POST">
             @csrf
-            <div class="p-6 space-y-4">
-                <!-- BCA -->
-                <label class="flex items-center p-4 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
-                    <input type="radio" name="payment_method" value="BCA Virtual Account" checked class="w-5 h-5 text-indigo-600 border-slate-300 focus:ring-indigo-500">
-                    <div class="ml-4 flex-1">
-                        <span class="block font-bold text-slate-800">BCA Virtual Account</span>
-                        <span class="block text-sm text-slate-500">Cek otomatis</span>
+            <div class="p-8">
+                <!-- VA DISPLAY -->
+                <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 text-center">
+                    <p class="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-2">Nomor Virtual Account Anda</p>
+                    <div class="flex items-center justify-center gap-3">
+                         <h3 class="text-3xl font-mono font-bold text-slate-800 tracking-tighter" id="vaNumber">{{ $va }}</h3>
+                         <button type="button" onclick="copyVA('{{ $va }}', this)" class="p-2 bg-white rounded-lg border border-indigo-100 text-indigo-600 hover:text-indigo-800 hover:border-indigo-300 transition-all shadow-sm flex items-center gap-2 group">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                            <span class="text-xs font-bold hidden group-[.copied]:inline">Tersalin!</span>
+                         </button>
                     </div>
-                    <div class="w-10 h-10 bg-blue-600/10 rounded-lg flex items-center justify-center text-blue-700 font-bold text-xs">BCA</div>
-                </label>
-                
-                <!-- MANDIRI -->
-                <label class="flex items-center p-4 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
-                    <input type="radio" name="payment_method" value="Mandiri Virtual Account" class="w-5 h-5 text-indigo-600 border-slate-300 focus:ring-indigo-500">
-                    <div class="ml-4 flex-1">
-                        <span class="block font-bold text-slate-800">Mandiri Virtual Account</span>
-                        <span class="block text-sm text-slate-500">Cek otomatis</span>
+                    <p class="mt-4 text-[10px] text-slate-400 font-medium italic">Nomor ini bersifat tetap untuk seluruh pembayaran anda</p>
+                </div>
+
+                <script>
+                    function copyVA(text, btn) {
+                        navigator.clipboard.writeText(text).then(() => {
+                            btn.classList.add('copied', 'text-emerald-600', 'border-emerald-200');
+                            btn.classList.remove('text-indigo-600', 'border-indigo-100');
+                            
+                            setTimeout(() => {
+                                btn.classList.remove('copied', 'text-emerald-600', 'border-emerald-200');
+                                btn.classList.add('text-indigo-600', 'border-indigo-100');
+                            }, 2000);
+                        });
+                    }
+                </script>
+
+                <div class="mt-8 space-y-4">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-500">Nama Mahasiswa</span>
+                        <span class="font-bold text-slate-800">{{ optional($tagihan->mahasiswa)->nama }}</span>
                     </div>
-                    <div class="w-10 h-10 bg-yellow-600/10 rounded-lg flex items-center justify-center text-yellow-700 font-bold text-xs">MDR</div>
-                </label>
-                
-                 <!-- BRI -->
-                <label class="flex items-center p-4 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
-                    <input type="radio" name="payment_method" value="BRI Virtual Account" class="w-5 h-5 text-indigo-600 border-slate-300 focus:ring-indigo-500">
-                    <div class="ml-4 flex-1">
-                        <span class="block font-bold text-slate-800">BRI Virtual Account</span>
-                        <span class="block text-sm text-slate-500">Cek otomatis</span>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-500">NRP</span>
+                        <span class="font-mono font-bold text-slate-800">{{ $tagihan->nrp }}</span>
                     </div>
-                     <div class="w-10 h-10 bg-blue-600/10 rounded-lg flex items-center justify-center text-blue-700 font-bold text-xs">BRI</div>
-                </label>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-500">Keterangan</span>
+                        <span class="font-medium text-slate-800">{{ $tagihan->jenis }}</span>
+                    </div>
+                </div>
             </div>
             
             <div class="p-6 bg-slate-50 border-t border-slate-100">
@@ -58,8 +72,8 @@
                     <span class="text-sm font-medium text-slate-600">Total Tagihan</span>
                      <span class="text-xl font-bold text-indigo-700">Rp {{ number_format($tagihan->jumlah, 0, ',', '.') }}</span>
                 </div>
-                <button type="submit" class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
-                    Lanjut Pembayaran
+                <button type="submit" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200">
+                    Lanjut ke Instruksi Pembayaran
                 </button>
             </div>
         </form>

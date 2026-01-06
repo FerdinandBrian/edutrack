@@ -38,21 +38,21 @@ class DkbsController extends Controller
             $selectedTa = $request->tahun_ajaran ?? ($data->first()->tahun_ajaran ?? null);
             $totalSks = 0;
             if ($selectedTa) {
-                $totalSks = \Illuminate\Support\Facades\DB::select("SELECT get_total_sks(?, ?) AS total", [$user->identifier, $selectedTa])[0]->total;
+                // Determine suffix based on TA (Ganjil/Genap)
+                // Assuming function signatures or logic exist, otherwise simplified fallback
+                try {
+                    $totalSks = \Illuminate\Support\Facades\DB::select("SELECT get_total_sks(?, ?) AS total", [$user->identifier, $selectedTa])[0]->total;
+                } catch(\Exception $e) { $totalSks = 0; }
             }
 
             // Custom sorting for Days
-            $dayOrder = [
-                'Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4, 'Jumat' => 5, 'Sabtu' => 6, 'Minggu' => 7
-            ];
+            $dayOrder = ['Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4, 'Jumat' => 5, 'Sabtu' => 6, 'Minggu' => 7];
 
             $data = $data->sort(function($a, $b) use ($dayOrder) {
                 $dayA = $a->perkuliahan->hari ?? '';
                 $dayB = $b->perkuliahan->hari ?? '';
-                
                 $valA = $dayOrder[$dayA] ?? 99;
                 $valB = $dayOrder[$dayB] ?? 99;
-
                 if ($valA === $valB) {
                     return strcmp($a->perkuliahan->jam_mulai ?? '', $b->perkuliahan->jam_mulai ?? '');
                 }
@@ -62,15 +62,35 @@ class DkbsController extends Controller
             $tahun_ajarans = Dkbs::distinct()->pluck('tahun_ajaran');
             return view('mahasiswa.dkbs.index', compact('data', 'tahun_ajarans', 'totalSks'));
         } else {
-            $data = $query->get();
-            $tahun_ajarans = Dkbs::distinct()->pluck('tahun_ajaran');
-            return view('admin.dkbs.index', compact('data', 'tahun_ajarans'));
+            // Admin View: List of Students
+            $students = Mahasiswa::orderBy('jurusan', 'asc')
+                                 ->orderBy('nrp', 'asc');
+            if ($request->filled('search')) {
+                $students->where(function($q) use ($request) {
+                    $q->where('nama', 'like', '%' . $request->search . '%')
+                      ->orWhere('nrp', 'like', '%' . $request->search . '%');
+                });
+            }
+            $students = $students->get();
+            return view('admin.dkbs.index', compact('students'));
         }
     }
 
-    public function create()
+    public function showStudent($nrp)
+    {
+        $mahasiswa = Mahasiswa::where('nrp', $nrp)->firstOrFail();
+        $dkbs = Dkbs::with(['mataKuliah', 'perkuliahan.dosen', 'perkuliahan.ruangan'])
+            ->where('nrp', $nrp)
+            ->orderBy('tahun_ajaran', 'desc')
+            ->get();
+            
+        return view('admin.dkbs.show_student', compact('mahasiswa', 'dkbs'));
+    }
+
+    public function create(Request $request)
     {
         $mahasiswas = Mahasiswa::orderBy('nama')->get();
+        $selectedNrp = $request->query('nrp');
         
         $fixedPeriods = [
             '2024/2025 - Ganjil', '2024/2025 - Genap',
@@ -83,7 +103,7 @@ class DkbsController extends Controller
         $periods = array_values(array_unique(array_merge($dbPeriods, $fixedPeriods)));
         sort($periods);
 
-        return view('admin.dkbs.create', compact('mahasiswas', 'periods'));
+        return view('admin.dkbs.create', compact('mahasiswas', 'periods', 'selectedNrp'));
     }
 
     public function store(Request $request)

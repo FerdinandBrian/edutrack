@@ -18,21 +18,8 @@
         <!-- VA SECTION -->
         <div class="p-6 bg-slate-50/50 border-b border-slate-100">
             <div class="flex justify-between items-center mb-2">
-                <span class="text-sm font-medium text-slate-500">{{ $paymentData['method'] }}</span>
-                @php
-                    $bank = explode(' ', $paymentData['method'])[0];
-                    $logo = match($bank) {
-                        'BCA' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Bank_Central_Asia.svg/2560px-Bank_Central_Asia.svg.png',
-                        'Mandiri' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Bank_Mandiri_logo_2016.svg/2560px-Bank_Mandiri_logo_2016.svg.png',
-                        'BRI' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/BANK_BRI_logo.svg/2560px-BANK_BRI_logo.svg.png',
-                        default => ''
-                    };
-                @endphp
-                @if($logo)
-                    <img src="{{ $logo }}" class="h-6 object-contain" alt="{{ $bank }}" referrerpolicy="no-referrer" onerror="this.onerror=null; this.parentNode.innerHTML='<span class=\'font-bold text-slate-800\'>'+this.alt+'</span>'"> 
-                @else
-                    <span class="font-bold text-slate-300">{{ $bank }}</span>
-                @endif
+                <span class="text-sm font-medium text-slate-500">Virtual Account Edutrack</span>
+                <span class="font-bold text-slate-800 text-xs px-2 py-1 bg-white border rounded">FIXED VA</span>
             </div>
             <div class="flex justify-between items-center bg-white border border-slate-200 rounded-xl p-4">
                 <div>
@@ -66,43 +53,17 @@
         <div class="p-6">
             <h3 class="font-bold text-slate-800 mb-4">Cara Pembayaran</h3>
             <div class="space-y-4">
-                <details class="group rounded-xl border border-slate-200 open:bg-slate-50 open:border-indigo-100">
-                    <summary class="flex justify-between items-center p-4 cursor-pointer list-none font-medium text-slate-700">
-                        <span>ATM {{ explode(' ', $paymentData['method'])[0] }}</span>
-                        <span class="transition group-open:rotate-180">
-                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-                        </span>
-                    </summary>
-                    <div class="text-sm text-slate-600 px-4 pb-4">
-                        <ol class="list-decimal list-inside space-y-2">
-                            <li>Masukkan kartu ATM dan PIN</li>
-                            <li>Pilih menu <strong>Transaksi Lainnya</strong></li>
-                            <li>Pilih menu <strong>Transfer</strong> > <strong>Ke Rekening Virtual Account</strong></li>
-                            <li>Masukkan nomor VA: <strong>{{ $paymentData['va'] }}</strong></li>
-                            <li>Periksa detail pembayaran</li>
-                            <li>Pilih <strong>YA</strong> untuk konfirmasi</li>
-                        </ol>
-                    </div>
-                </details>
-                
-                 <details class="group rounded-xl border border-slate-200 open:bg-slate-50 open:border-indigo-100">
-                    <summary class="flex justify-between items-center p-4 cursor-pointer list-none font-medium text-slate-700">
-                        <span>M-Banking</span>
-                        <span class="transition group-open:rotate-180">
-                            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-                        </span>
-                    </summary>
-                    <div class="text-sm text-slate-600 px-4 pb-4">
-                        <ol class="list-decimal list-inside space-y-2">
-                            <li>Login ke aplikasi Mobile Banking</li>
-                            <li>Pilih menu <strong>m-Transfer</strong></li>
-                            <li>Pilih <strong>Virtual Account</strong></li>
-                            <li>Masukkan nomor VA: <strong>{{ $paymentData['va'] }}</strong></li>
-                            <li>Periksa detail pembayaran</li>
-                            <li>Masukkan PIN m-Banking</li>
-                        </ol>
-                    </div>
-                </details>
+                <div class="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+                    <p class="text-sm text-slate-700 font-medium mb-2">Langkah Pembayaran:</p>
+                    <ol class="list-decimal list-inside space-y-2 text-sm text-slate-600">
+                        <li>Gunakan aplikasi Bank pilihan Anda atau ATM</li>
+                        <li>Pilih menu <strong>Transfer</strong> > <strong>Antar Bank</strong> (Jika bank Anda berbeda)</li>
+                        <li>Masukkan nomor VA: <strong>{{ $paymentData['va'] }}</strong></li>
+                        <li>Masukkan nominal sesuai tagihan: <strong>Rp {{ number_format($tagihan->jumlah, 0, ',', '.') }}</strong></li>
+                        <li>Periksa detail nama mahasiswa pada layar konfirmasi</li>
+                        <li>Selesaikan transaksi dan simpan bukti pembayaran</li>
+                    </ol>
+                </div>
             </div>
             
             <form action="/mahasiswa/pembayaran/{{ $tagihan->id }}/confirm" method="POST" class="mt-8">
@@ -113,7 +74,7 @@
                     </svg>
                     Saya Sudah Membayar
                 </button>
-                <p class="text-center text-xs text-slate-400 mt-3">Klik tombol di atas jika sudah berhasil transfer</p>
+                <p class="text-center text-[10px] text-slate-400 mt-3 font-medium uppercase tracking-wide italic">Konfirmasi menggunakan Stored Procedure Database</p>
             </form>
         </div>
     </div>

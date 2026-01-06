@@ -25,7 +25,7 @@
                 $status = $tagihan->status ?? 'pending';
                 $statusColor = match(strtolower($status)) {
                     'lunas' => 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
-                    'pending' => 'bg-amber-50 text-amber-700 ring-amber-600/20',
+                    'pending', 'belum lunas' => 'bg-rose-50 text-rose-700 ring-rose-600/20',
                     default => 'bg-slate-50 text-slate-600 ring-slate-600/20',
                 };
             @endphp
@@ -45,7 +45,7 @@
                 <div class="md:text-right">
                     <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Detail Pembayaran</h3>
                     <p class="text-3xl font-bold text-slate-800 tracking-tight">Rp {{ number_format($tagihan->jumlah, 0, ',', '.') }}</p>
-                    <p class="text-sm text-slate-500 mt-1">Batas Waktu: {{ $tagihan->created_at ? $tagihan->created_at->addDays(30)->format('d M Y') : '-' }}</p>
+                    <p class="text-sm text-slate-500 mt-1">Batas Waktu: {{ $tagihan->batas_pembayaran ? \Carbon\Carbon::parse($tagihan->batas_pembayaran)->format('d M Y') : '-' }}</p>
                 </div>
             </div>
 
@@ -70,12 +70,15 @@
                    </p>
                 </div>
             @else
-                <div class="flex justify-end">
-                    <div class="inline-flex items-center text-emerald-600 bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <a href="/mahasiswa/pembayaran" class="w-full md:w-auto px-6 py-2.5 bg-slate-100 text-slate-600 font-semibold rounded-xl hover:bg-slate-200 transition-colors text-center border border-slate-200">
+                        Kembali ke Riwayat
+                    </a>
+                    <div class="w-full md:w-auto inline-flex items-center justify-center text-emerald-600 bg-emerald-50 px-4 py-2.5 rounded-xl border border-emerald-100">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span class="font-medium">Pembayaran Berhasil</span>
+                        <span class="font-bold">Pembayaran Berhasil</span>
                     </div>
                 </div>
             @endif
