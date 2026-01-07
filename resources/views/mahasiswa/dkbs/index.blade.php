@@ -73,6 +73,13 @@
                                     </svg>
                                     {{ \Illuminate\Support\Str::substr($row->perkuliahan->jam_mulai, 0, 5) }} - {{ \Illuminate\Support\Str::substr($row->perkuliahan->jam_berakhir, 0, 5) }}
                                 </div>
+                                @if($row->perkuliahan->ruangan)
+                                <div class="mt-1.5">
+                                    <span class="text-[10px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded border border-emerald-100 font-bold uppercase">
+                                        {{ $row->perkuliahan->ruangan->kode_ruangan }}
+                                    </span>
+                                </div>
+                                @endif
                             @else
                                 <span class="text-[10px] text-rose-500 italic">Jadwal belum tersedia</span>
                             @endif

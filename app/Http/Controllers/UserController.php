@@ -46,7 +46,8 @@ class UserController extends Controller
             'tanggal_lahir' => 'required|date',
             'no_telepon' => 'required|string',
             'alamat' => 'nullable|string',
-            'jurusan' => 'required_if:role,mahasiswa|nullable|string',
+            'alamat' => 'nullable|string',
+            'jurusan' => 'required_if:role,mahasiswa,dosen|nullable|string',
             'fakultas' => 'required_if:role,dosen|nullable|string',
         ]);
 
@@ -70,6 +71,7 @@ class UserController extends Controller
                         'jenis_kelamin' => $request->jenis_kelamin,
                         'tanggal_lahir' => $request->tanggal_lahir,
                         'no_telepon' => $request->no_telepon,
+                        'admin_level' => $request->admin_level ?? 'second', // Default to second admin
                         'alamat' => $request->alamat,
                     ]);
                 } elseif ($request->role === 'dosen') {
@@ -82,6 +84,9 @@ class UserController extends Controller
                         'tanggal_lahir' => $request->tanggal_lahir,
                         'no_telepon' => $request->no_telepon,
                         'fakultas' => $request->fakultas,
+                        'no_telepon' => $request->no_telepon,
+                        'fakultas' => $request->fakultas,
+                        'jurusan' => $request->jurusan,
                         'alamat' => $request->alamat,
                     ]);
                 } elseif ($request->role === 'mahasiswa') {
@@ -108,8 +113,17 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::findOrFail($id);
-        $detail = null;
+        
+        // Check if current admin is second admin trying to edit super admin
+        $currentAdmin = \App\Models\Admin::where('user_id', auth()->id())->first();
+        if ($currentAdmin && $currentAdmin->admin_level === 'second' && $user->role === 'admin') {
+            $targetAdmin = \App\Models\Admin::where('user_id', $user->id)->first();
+            if ($targetAdmin && $targetAdmin->admin_level === 'super') {
+                return redirect('/admin/users')->withErrors(['msg' => 'Anda tidak memiliki akses untuk mengedit Super Admin.']);
+            }
+        }
 
+        $detail = null;
         if ($user->role === 'admin') {
             $detail = Admin::where('user_id', $user->id)->first();
         } elseif ($user->role === 'dosen') {
@@ -124,6 +138,15 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        
+        // Check if current admin is second admin trying to update super admin
+        $currentAdmin = \App\Models\Admin::where('user_id', auth()->id())->first();
+        if ($currentAdmin && $currentAdmin->admin_level === 'second' && $user->role === 'admin') {
+            $targetAdmin = \App\Models\Admin::where('user_id', $user->id)->first();
+            if ($targetAdmin && $targetAdmin->admin_level === 'super') {
+                return redirect('/admin/users')->withErrors(['msg' => 'Anda tidak memiliki akses untuk mengupdate Super Admin.']);
+            }
+        }
 
         $request->validate([
             'nama' => 'required|string|max:100',
@@ -133,8 +156,8 @@ class UserController extends Controller
             'tanggal_lahir' => 'required|date',
             'no_telepon' => 'required|string',
             'alamat' => 'nullable|string',
-            'jurusan' => 'required_if:role,mahasiswa|nullable|string',
             'alamat' => 'nullable|string',
+            'jurusan' => 'required_if:role,mahasiswa,dosen|nullable|string',
             'fakultas' => 'required_if:role,dosen|nullable|string',
         ]);
 
@@ -168,6 +191,8 @@ class UserController extends Controller
                         'tanggal_lahir' => $request->tanggal_lahir,
                         'no_telepon' => $request->no_telepon,
                         'fakultas' => $request->fakultas,
+                        'fakultas' => $request->fakultas,
+                        'jurusan' => $request->jurusan,
                         'alamat' => $request->alamat,
                     ]);
                 } elseif ($user->role === 'mahasiswa') {
@@ -193,18 +218,34 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         
-        DB::transaction(function() use ($user) {
-            if ($user->role == 'admin') {
-                Admin::where('user_id', $user->id)->delete();
-            } elseif ($user->role == 'dosen') {
-                Dosen::where('user_id', $user->id)->delete();
-            } elseif ($user->role == 'mahasiswa') {
-                Mahasiswa::where('user_id', $user->id)->delete();
+        // Check if current admin is second admin trying to delete super admin
+        $currentAdmin = \App\Models\Admin::where('user_id', auth()->id())->first();
+        if ($currentAdmin && $currentAdmin->admin_level === 'second' && $user->role === 'admin') {
+            $targetAdmin = \App\Models\Admin::where('user_id', $user->id)->first();
+            if ($targetAdmin && $targetAdmin->admin_level === 'super') {
+                return redirect('/admin/users')->withErrors(['msg' => 'Anda tidak memiliki akses untuk menghapus Super Admin.']);
             }
-            
-            $user->delete();
-        });
+        }
+        
+        if ($user->id == auth()->id()) {
+            return back()->withErrors(['msg' => 'Tidak dapat menghapus akun sendiri.']);
+        }
 
-        return back()->with('success', 'User berhasil dihapus');
+        try {
+            DB::transaction(function () use ($user) {
+                if ($user->role === 'admin') {
+                    \App\Models\Admin::where('user_id', $user->id)->delete();
+                } elseif ($user->role === 'dosen') {
+                    Dosen::where('user_id', $user->id)->delete();
+                } elseif ($user->role === 'mahasiswa') {
+                    Mahasiswa::where('user_id', $user->id)->delete();
+                }
+                $user->delete();
+            });
+
+            return redirect('/admin/users')->with('success', 'User berhasil dihapus');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Gagal menghapus: ' . $e->getMessage()]);
+        }
     }
 }

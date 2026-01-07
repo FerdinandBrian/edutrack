@@ -85,8 +85,10 @@
                                         <span class="text-[10px] text-slate-400">
                                             {{ $item->mataKuliah->sks }} SKS
                                         </span>
-                                         @if($isPraktikum)
+                                        @if($isPraktikum)
                                             <span class="text-[10px] bg-amber-50 text-amber-600 border border-amber-100 px-1.5 py-0.5 rounded font-bold uppercase">Praktikum</span>
+                                        @elseif(str_contains($item->mataKuliah->nama_mk, 'Teori'))
+                                            <span class="text-[10px] bg-blue-50 text-blue-600 border border-blue-100 px-1.5 py-0.5 rounded font-bold uppercase">Teori</span>
                                         @endif
                                     </div>
                                 </div>
@@ -106,7 +108,9 @@
                                     <div class="space-y-1">
                                         <div class="flex items-center gap-1.5 text-slate-600">
                                             <span class="text-xs font-bold">{{ $item->perkuliahan->hari }}</span>
-                                            <span class="text-[10px] text-slate-400 font-mono">{{ \Illuminate\Support\Str::substr($item->perkuliahan->jam_mulai, 0, 5) }}</span>
+                                            <span class="text-[10px] text-slate-400 font-mono">
+                                                {{ \Illuminate\Support\Str::substr($item->perkuliahan->jam_mulai, 0, 5) }}-{{ \Illuminate\Support\Str::substr($item->perkuliahan->jam_berakhir, 0, 5) }}
+                                            </span>
                                         </div>
                                         <span class="text-[10px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded border border-emerald-100 font-bold uppercase">
                                             {{ optional($item->perkuliahan->ruangan)->kode_ruangan }}

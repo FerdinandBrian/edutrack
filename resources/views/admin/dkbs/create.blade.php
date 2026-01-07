@@ -95,8 +95,29 @@
         sortField: { field: "text", direction: "asc" }
     });
 
+    const nrpSelect = document.getElementById('nrp-select');
     const taSelect = document.getElementById('ta-select');
     const perkuliahanSelect = document.getElementById('perkuliahan-select');
+
+    // Store mahasiswa data with jurusan
+    const mahasiswaData = {
+        @foreach($mahasiswas as $m)
+            '{{ $m->nrp }}': '{{ $m->jurusan }}',
+        @endforeach
+    };
+
+    // Initialize with pre-selected student's jurusan if coming from previous page
+    let selectedJurusan = @json($selectedJurusan ?? null);
+
+    // Listen to student selection to get jurusan
+    nrpSelect.addEventListener('change', function() {
+        selectedJurusan = mahasiswaData[this.value] || null;
+        // Reset perkuliahan when student changes
+        perkuliahanSelect.innerHTML = '<option value="">-- Pilih Tahun Ajaran Terlebih Dahulu --</option>';
+        perkuliahanSelect.disabled = true;
+        perkuliahanSelect.classList.add('opacity-50');
+        taSelect.value = ''; // Reset TA selection
+    });
 
     taSelect.addEventListener('change', async function() {
         const ta = this.value;
@@ -104,13 +125,19 @@
         perkuliahanSelect.disabled = true;
         perkuliahanSelect.classList.add('opacity-50');
 
-        if (ta) {
+        if (ta && selectedJurusan) {
             try {
-                const response = await fetch(`/admin/api/perkuliahan-by-ta?tahun_ajaran=${encodeURIComponent(ta)}`);
+                // Use new API with jurusan filter
+                const response = await fetch(`/admin/api/perkuliahan-by-ta-jurusan?tahun_ajaran=${encodeURIComponent(ta)}&jurusan=${encodeURIComponent(selectedJurusan)}`);
                 const data = await response.json();
 
+                if (data.error) {
+                    perkuliahanSelect.innerHTML = `<option value="">Error: ${data.error}</option>`;
+                    return;
+                }
+
                 if (data.length === 0) {
-                    perkuliahanSelect.innerHTML = '<option value="">Tidak ada kelas untuk periode ini</option>';
+                    perkuliahanSelect.innerHTML = '<option value="">Tidak ada kelas untuk prodi ini pada periode ini</option>';
                     perkuliahanSelect.disabled = true;
                     perkuliahanSelect.classList.add('opacity-50');
                 } else {
@@ -127,6 +154,8 @@
                 console.error('Error fetching perkuliahan:', error);
                 perkuliahanSelect.innerHTML = '<option value="">Error memuat data</option>';
             }
+        } else if (!selectedJurusan) {
+            perkuliahanSelect.innerHTML = '<option value="">Pilih Mahasiswa terlebih dahulu</option>';
         } else {
             perkuliahanSelect.innerHTML = '<option value="">-- Pilih Tahun Ajaran Terlebih Dahulu --</option>';
         }

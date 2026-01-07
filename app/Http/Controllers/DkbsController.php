@@ -81,8 +81,26 @@ class DkbsController extends Controller
         $mahasiswa = Mahasiswa::where('nrp', $nrp)->firstOrFail();
         $dkbs = Dkbs::with(['mataKuliah', 'perkuliahan.dosen', 'perkuliahan.ruangan'])
             ->where('nrp', $nrp)
-            ->orderBy('tahun_ajaran', 'desc')
             ->get();
+        
+        // Sort by tahun_ajaran (desc), then by day of week, then by time
+        $dayOrder = ['Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4, 'Jumat' => 5, 'Sabtu' => 6, 'Minggu' => 7];
+        
+        $dkbs = $dkbs->sort(function($a, $b) use ($dayOrder) {
+            // First sort by tahun_ajaran (descending)
+            $taCompare = strcmp($b->tahun_ajaran, $a->tahun_ajaran);
+            if ($taCompare !== 0) return $taCompare;
+            
+            // Then sort by day of week
+            $dayA = $a->perkuliahan ? ($dayOrder[$a->perkuliahan->hari] ?? 99) : 99;
+            $dayB = $b->perkuliahan ? ($dayOrder[$b->perkuliahan->hari] ?? 99) : 99;
+            if ($dayA !== $dayB) return $dayA <=> $dayB;
+            
+            // Finally sort by time
+            $timeA = $a->perkuliahan ? $a->perkuliahan->jam_mulai : '99:99';
+            $timeB = $b->perkuliahan ? $b->perkuliahan->jam_mulai : '99:99';
+            return strcmp($timeA, $timeB);
+        });
             
         return view('admin.dkbs.show_student', compact('mahasiswa', 'dkbs'));
     }
@@ -91,6 +109,12 @@ class DkbsController extends Controller
     {
         $mahasiswas = Mahasiswa::orderBy('nama')->get();
         $selectedNrp = $request->query('nrp');
+        $selectedJurusan = null;
+        
+        if ($selectedNrp) {
+            $selectedMahasiswa = Mahasiswa::where('nrp', $selectedNrp)->first();
+            $selectedJurusan = $selectedMahasiswa ? $selectedMahasiswa->jurusan : null;
+        }
         
         $fixedPeriods = [
             '2024/2025 - Ganjil', '2024/2025 - Genap',
@@ -103,7 +127,7 @@ class DkbsController extends Controller
         $periods = array_values(array_unique(array_merge($dbPeriods, $fixedPeriods)));
         sort($periods);
 
-        return view('admin.dkbs.create', compact('mahasiswas', 'periods', 'selectedNrp'));
+        return view('admin.dkbs.create', compact('mahasiswas', 'periods', 'selectedNrp', 'selectedJurusan'));
     }
 
     public function store(Request $request)
@@ -261,28 +285,87 @@ class DkbsController extends Controller
     public function getPerkuliahanByTahunAjaran(Request $request)
     {
         $ta = $request->tahun_ajaran;
-        $data = Perkuliahan::with('mataKuliah')
-            ->where('tahun_ajaran', $ta)
-            ->get()
-            ->filter(function($p) {
-                // Only show Theory classes (ending with T) and standalone classes (not ending with P)
-                // Hide Praktikum classes since they will be auto-enrolled
-                $lastChar = substr($p->kode_mk, -1);
-                return $lastChar !== 'P'; // Exclude all Praktikum classes
-            })
-            ->sortBy([
-                ['mataKuliah.nama_mk', 'asc'],  // Sort by course name first
-                ['kelas', 'asc']                 // Then by class (A, B, C)
-            ])
-            ->map(function($p) {
+
+        try {
+            // Try using Stored Procedure first
+            $raw = \Illuminate\Support\Facades\DB::select('CALL sp_get_perkuliahan_by_ta(?)', [$ta]);
+            
+            $data = collect($raw)->map(function($p) {
                 return [
                     'id' => $p->id_perkuliahan,
-                    'label' => "[{$p->kode_mk}] {$p->mataKuliah->nama_mk} - Kelas {$p->kelas}"
+                    'label' => "[{$p->kode_mk}] {$p->nama_mk} - Kelas {$p->kelas} ({$p->hari}, {$p->jam_mulai}-{$p->jam_berakhir})"
                 ];
-            })
-            ->values(); // Re-index array after filter and sort
+            });
+
+            return response()->json($data);
+        } catch (\Exception $e) {
+            // Fallback to regular query if SP doesn't exist
+            try {
+                $data = Perkuliahan::with('mataKuliah')
+                    ->where('tahun_ajaran', $ta)
+                    ->orderBy('kode_mk')
+                    ->orderBy('kelas')
+                    ->get()
+                    ->map(function($p) {
+                        return [
+                            'id' => $p->id_perkuliahan,
+                            'label' => "[{$p->kode_mk}] {$p->mataKuliah->nama_mk} - Kelas {$p->kelas} ({$p->hari}, {$p->jam_mulai}-{$p->jam_berakhir})"
+                        ];
+                    });
+
+                return response()->json($data);
+            } catch (\Exception $fallbackError) {
+                return response()->json(['error' => 'Database error: ' . $fallbackError->getMessage()], 500);
+            }
+        }
+    }
+
+    public function getPerkuliahanByTaAndJurusan(Request $request)
+    {
+        $ta = $request->tahun_ajaran;
+        $jurusan = $request->jurusan;
+
+        try {
+            // Try using Stored Procedure with jurusan filter
+            $raw = \Illuminate\Support\Facades\DB::select('CALL sp_get_perkuliahan_by_ta_and_jurusan(?, ?)', [$ta, $jurusan]);
             
-        return response()->json($data);
+            $data = collect($raw)
+                ->filter(function($p) {
+                    // Exclude Praktikum classes since they are auto-enrolled with Teori
+                    return !str_contains($p->nama_mk, 'Praktikum');
+                })
+                ->map(function($p) {
+                    return [
+                        'id' => $p->id_perkuliahan,
+                        'label' => "[{$p->kode_mk}] {$p->nama_mk} - Kelas {$p->kelas} ({$p->hari}, {$p->jam_mulai}-{$p->jam_berakhir})"
+                    ];
+                });
+
+            return response()->json($data->values()); // Re-index after filter
+        } catch (\Exception $e) {
+            // Fallback to regular query if SP doesn't exist
+            try {
+                $data = Perkuliahan::with('mataKuliah')
+                    ->where('tahun_ajaran', $ta)
+                    ->whereHas('mataKuliah', function($q) use ($jurusan) {
+                        $q->where('jurusan', $jurusan)
+                          ->where('nama_mk', 'NOT LIKE', '%Praktikum%'); // Exclude Praktikum
+                    })
+                    ->orderBy('kode_mk')
+                    ->orderBy('kelas')
+                    ->get()
+                    ->map(function($p) {
+                        return [
+                            'id' => $p->id_perkuliahan,
+                            'label' => "[{$p->kode_mk}] {$p->mataKuliah->nama_mk} - Kelas {$p->kelas} ({$p->hari}, {$p->jam_mulai}-{$p->jam_berakhir})"
+                        ];
+                    });
+
+                return response()->json($data);
+            } catch (\Exception $fallbackError) {
+                return response()->json(['error' => 'Database error: ' . $fallbackError->getMessage()], 500);
+            }
+        }
     }
 
     public function getMataKuliahBySemester($semester)

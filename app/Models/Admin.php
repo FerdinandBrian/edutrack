@@ -17,10 +17,12 @@ class Admin extends Authenticatable
         'user_id',
         'nama',
         'email',
-        'jenis_kelamin',
+        'password',
         'tanggal_lahir',
         'no_telepon',
-        'alamat',
+        'jenis_kelamin',
+        'admin_level',
+        'alamat'
     ];
 
     // kolom yang disembunyikan

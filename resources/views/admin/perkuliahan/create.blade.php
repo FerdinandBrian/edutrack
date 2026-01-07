@@ -29,29 +29,31 @@
                 @csrf
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Prodi Selection -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-slate-600 mb-2">Pilih Program Studi</label>
+                        <select id="prodiSelect" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50">
+                            <option value="">-- Pilih Program Studi --</option>
+                            @foreach($jurusans as $j)
+                                <option value="{{ $j }}">{{ $j }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Mata Kuliah -->
                     <!-- Mata Kuliah -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-slate-600 mb-2">Pilih Mata Kuliah (Master Data)</label>
-                        <select name="kode_mk" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50">
-                            <option value="">-- Pilih Mata Kuliah --</option>
-                            @foreach($mataKuliahs as $mk)
-                                <option value="{{ $mk->kode_mk }}" {{ old('kode_mk') == $mk->kode_mk ? 'selected' : '' }}>
-                                    [{{ $mk->kode_mk }}] {{ $mk->nama_mk }} ({{ $mk->sks }} SKS)
-                                </option>
-                            @endforeach
+                        <select name="kode_mk" id="mkSelect" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50">
+                            <option value="">-- Pilih Program Studi Terlebih Dahulu --</option>
                         </select>
                     </div>
 
                     <!-- Dosen Pengampu -->
                     <div>
                         <label class="block text-sm font-medium text-slate-600 mb-2">Dosen Pengampu</label>
-                        <select name="nip_dosen" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50">
-                            <option value="">-- Pilih Dosen --</option>
-                            @foreach($dosens as $d)
-                                <option value="{{ $d->nip }}" {{ old('nip_dosen') == $d->nip ? 'selected' : '' }}>
-                                    {{ $d->nama }} ({{ $d->nip }})
-                                </option>
-                            @endforeach
+                        <select name="nip_dosen" id="dosenSelect" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50">
+                            <option value="">-- Pilih Program Studi Terlebih Dahulu --</option>
                         </select>
                     </div>
 
@@ -120,3 +122,64 @@
     </div>
 </div>
 @endsection
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const prodiSelect = document.getElementById('prodiSelect');
+        const dosenSelect = document.getElementById('dosenSelect');
+        const mkSelect = document.getElementById('mkSelect');
+
+        prodiSelect.addEventListener('change', function() {
+            const jurusan = this.value;
+            
+            dosenSelect.innerHTML = '<option value="">Sedang memuat...</option>';
+            mkSelect.innerHTML = '<option value="">Sedang memuat...</option>';
+            
+            if (!jurusan) {
+                 dosenSelect.innerHTML = '<option value="">-- Pilih Program Studi Terlebih Dahulu --</option>';
+                 mkSelect.innerHTML = '<option value="">-- Pilih Program Studi Terlebih Dahulu --</option>';
+                 return;
+            }
+
+            // Fetch Dosen
+            fetch(`/admin/api/dosen-by-jurusan?jurusan=${encodeURIComponent(jurusan)}`)
+                .then(response => response.json())
+                .then(data => {
+                    dosenSelect.innerHTML = '<option value="">-- Pilih Dosen --</option>';
+                    if(data.length === 0) {
+                        dosenSelect.innerHTML += '<option value="" disabled>Tidak ada dosen untuk prodi ini</option>';
+                    }
+                    data.forEach(dosen => {
+                        dosenSelect.innerHTML += `<option value="${dosen.nip}">${dosen.nama} (${dosen.nip})</option>`;
+                    });
+                })
+                .catch(err => {
+                    console.error('Error fetching dosens:', err);
+                    dosenSelect.innerHTML = '<option value="">Gagal memuat dosen</option>';
+                });
+
+            // Fetch Mata Kuliah (via Stored Procedure API)
+            fetch(`/admin/api/mata-kuliah-by-jurusan?jurusan=${encodeURIComponent(jurusan)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('API Error:', data.error);
+                        mkSelect.innerHTML = `<option value="">Error: ${data.error}</option>`;
+                        return;
+                    }
+
+                    mkSelect.innerHTML = '<option value="">-- Pilih Mata Kuliah --</option>';
+                    if(data.length === 0) {
+                        mkSelect.innerHTML += '<option value="" disabled>Tidak ada mata kuliah untuk prodi ini</option>';
+                    }
+                    data.forEach(mk => {
+                        mkSelect.innerHTML += `<option value="${mk.kode_mk}">[${mk.kode_mk}] ${mk.nama_mk} (${mk.sks} SKS) - Smst ${mk.semester}</option>`;
+                    });
+                })
+                .catch(err => {
+                    console.error('Error fetching matkul:', err);
+                    mkSelect.innerHTML = '<option value="">Gagal memuat mata kuliah (Cek Console)</option>';
+                });
+        });
+    });
+</script>

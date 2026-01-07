@@ -23,6 +23,7 @@ class MataKuliahController extends Controller
         $validated = $request->validate([
             'kode_mk' => 'required|string|unique:mata_kuliah,kode_mk',
             'nama_mk' => 'required|string',
+            'jurusan' => 'required|string',
             'sks' => 'required|integer|min:1|max:8',
             'semester' => 'required|integer|min:1|max:8',
         ]);
@@ -43,6 +44,7 @@ class MataKuliahController extends Controller
         
         $validated = $request->validate([
             'nama_mk' => 'required|string',
+            'jurusan' => 'required|string',
             'sks' => 'required|integer|min:1|max:8',
             'semester' => 'required|integer|min:1|max:8',
         ]);

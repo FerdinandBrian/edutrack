@@ -21,6 +21,7 @@ class Dosen extends Authenticatable
         'email',
         'no_telepon',
         'fakultas',
+        'jurusan',
         'alamat'
     ];
 

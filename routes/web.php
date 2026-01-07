@@ -76,7 +76,10 @@ Route::middleware('auth')->group(function () {
 
         // API
         Route::get('/api/mata-kuliah/{semester}', [DkbsController::class, 'getMataKuliahBySemester']);
+        Route::get('/api/mata-kuliah-by-jurusan', [PerkuliahanController::class, 'getMataKuliahByJurusan']);
         Route::get('/api/perkuliahan-by-ta', [DkbsController::class, 'getPerkuliahanByTahunAjaran']);
+        Route::get('/api/perkuliahan-by-ta-jurusan', [DkbsController::class, 'getPerkuliahanByTaAndJurusan']);
+        Route::get('/api/dosen-by-jurusan', [PerkuliahanController::class, 'getDosenByJurusan']);
 
         Route::get('/api/student-amount/{nrp}', [TagihanController::class, 'getStudentAmount']);
         

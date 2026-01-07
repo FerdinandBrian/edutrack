@@ -40,6 +40,19 @@
                     <input type="text" name="nama_mk" required placeholder="Contoh: Pemrograman Web" value="{{ old('nama_mk', $mk->nama_mk) }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition outline-none bg-slate-50">
                 </div>
 
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-2">Program Studi (Jurusan)</label>
+                    <select name="jurusan" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition outline-none bg-slate-50">
+                        <option value="">-- Pilih Program Studi --</option>
+                        @php $current = old('jurusan', $mk->jurusan); @endphp
+                        <option value="Teknik Informatika" {{ $current == 'Teknik Informatika' ? 'selected' : '' }}>Teknik Informatika</option>
+                        <option value="Sistem Komputer" {{ $current == 'Sistem Komputer' ? 'selected' : '' }}>Sistem Komputer</option>
+                        <option value="Sistem Informasi" {{ $current == 'Sistem Informasi' ? 'selected' : '' }}>Sistem Informasi</option>
+                        <option value="Teknologi Informasi" {{ $current == 'Teknologi Informasi' ? 'selected' : '' }}>Teknologi Informasi</option>
+                        <option value="Bisnis Digital" {{ $current == 'Bisnis Digital' ? 'selected' : '' }}>Bisnis Digital</option>
+                    </select>
+                </div>
+
                 <div class="grid grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-slate-600 mb-2">SKS</label>

@@ -7,6 +7,7 @@ use App\Models\MataKuliah;
 use App\Models\Dosen;
 use App\Models\Ruangan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PerkuliahanController extends Controller
 {
@@ -37,7 +38,8 @@ class PerkuliahanController extends Controller
         $mataKuliahs = MataKuliah::orderBy('nama_mk')->get();
         $dosens = Dosen::orderBy('nama')->get();
         $ruangans = Ruangan::all();
-        return view('admin.perkuliahan.create', compact('mataKuliahs', 'dosens', 'ruangans'));
+        $jurusans = Dosen::select('jurusan')->distinct()->whereNotNull('jurusan')->orderBy('jurusan')->pluck('jurusan');
+        return view('admin.perkuliahan.create', compact('mataKuliahs', 'dosens', 'ruangans', 'jurusans'));
     }
 
     public function store(Request $request)
@@ -91,7 +93,38 @@ class PerkuliahanController extends Controller
             return back()->withInput()->withErrors(['msg' => "Bentrok! Dosen tersebut sudah memiliki jadwal mengajar di jam tersebut."]);
         }
 
+
         Perkuliahan::create($validated);
+
+        // Auto-create Praktikum class if this is a Teori class
+        $mk = MataKuliah::where('kode_mk', $request->kode_mk)->first();
+        if ($mk && str_contains($mk->nama_mk, '(Teori)')) {
+            // Find the paired Praktikum course
+            $praktikumName = str_replace('(Teori)', '(Praktikum)', $mk->nama_mk);
+            $praktikumMk = MataKuliah::where('nama_mk', $praktikumName)
+                ->where('jurusan', $mk->jurusan)
+                ->first();
+
+            if ($praktikumMk) {
+                // Calculate Praktikum schedule: 30 minutes after Teori ends
+                $teoriEnd = \Carbon\Carbon::parse($request->jam_berakhir);
+                $praktikumStart = $teoriEnd->copy()->addMinutes(30);
+                $praktikumEnd = $praktikumStart->copy()->addMinutes($praktikumMk->sks * 50);
+
+                // Create Praktikum class automatically
+                Perkuliahan::create([
+                    'kode_mk' => $praktikumMk->kode_mk,
+                    'nip_dosen' => $request->nip_dosen,
+                    'kode_ruangan' => $request->kode_ruangan,
+                    'kelas' => $request->kelas,
+                    'hari' => $request->hari,
+                    'jam_mulai' => $praktikumStart->format('H:i'),
+                    'jam_berakhir' => $praktikumEnd->format('H:i'),
+                    'tahun_ajaran' => $request->tahun_ajaran,
+                ]);
+            }
+        }
+
         return redirect('/admin/perkuliahan')->with('success', 'Jadwal perkuliahan berhasil dibuat.');
     }
 
@@ -165,5 +198,26 @@ class PerkuliahanController extends Controller
     {
         Perkuliahan::destroy($id);
         return back()->with('success', 'Jadwal perkuliahan berhasil dihapus.');
+    }
+
+    public function getDosenByJurusan(Request $request)
+    {
+        $jurusan = $request->query('jurusan');
+        $dosens = Dosen::where('jurusan', $jurusan)->orderBy('nama')->get();
+        return response()->json($dosens);
+    }
+
+    public function getMataKuliahByJurusan(Request $request)
+    {
+        $jurusan = $request->query('jurusan');
+        try {
+            $mataKuliahs = DB::select('CALL sp_get_matkul_by_jurusan(?)', [$jurusan]);
+            return response()->json($mataKuliahs);
+        } catch (\Exception $e) {
+            // Fallback for robustness during development (optional)
+            // return response()->json(\App\Models\MataKuliah::where('jurusan', $jurusan)->orderBy('semester')->orderBy('nama_mk')->get());
+            
+            return response()->json(['error' => $e->getMessage()], 200);
+        }
     }
 }

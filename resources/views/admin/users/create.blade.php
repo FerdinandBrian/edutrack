@@ -36,6 +36,16 @@
                 </div>
             </div>
 
+            <!-- Admin Level Selection (Only for Super Admin creating new Admin) -->
+            <div id="adminLevelField" style="display: none;">
+                <label class="block text-sm font-medium text-slate-700 mb-2">Level Admin</label>
+                <select name="admin_level" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition">
+                    <option value="second">Second Admin (Akses Terbatas)</option>
+                    <option value="super">Super Admin (Akses Penuh)</option>
+                </select>
+                <p class="text-xs text-slate-500 mt-1">Super Admin dapat mengelola semua data termasuk admin lain. Second Admin hanya dapat melihat data.</p>
+            </div>
+
             <div class="grid grid-cols-2 gap-6">
                 <div class="col-span-2">
                     <label class="block text-sm font-medium text-slate-700 mb-2">Nama Lengkap</label>
@@ -66,13 +76,13 @@
                     <label class="block text-sm font-medium text-slate-700 mb-2">No Telepon</label>
                     <input type="text" name="no_telepon" placeholder="08..." value="{{ old('no_telepon') }}" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition">
                 </div>
-                <div id="jurusanField">
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Jurusan</label>
-                    <input type="text" name="jurusan" placeholder="Teknik Informatika" value="{{ old('jurusan') }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition">
-                </div>
                 <div id="fakultasField" class="hidden">
                     <label class="block text-sm font-medium text-slate-700 mb-2">Fakultas</label>
                     <input type="text" name="fakultas" placeholder="Fakultas Teknologi Informasi" value="{{ old('fakultas') }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition">
+                </div>
+                <div id="jurusanField">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Jurusan</label>
+                    <input type="text" name="jurusan" placeholder="Teknik Informatika" value="{{ old('jurusan') }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition">
                 </div>
             </div>
 
@@ -106,23 +116,31 @@
     const identifierLabel = document.getElementById('identifierLabel');
     const jurusanField = document.getElementById('jurusanField');
     const fakultasField = document.getElementById('fakultasField');
+    const adminLevelField = document.getElementById('adminLevelField');
 
     roleSelect.addEventListener('change', function() {
         const val = this.value;
         
-        // Label Identifier
+        // Label Identifier and Fields Visibility
         if(val === 'mahasiswa') {
             identifierLabel.innerText = 'NRP';
             jurusanField.classList.remove('hidden');
             fakultasField.classList.add('hidden');
+            adminLevelField.style.display = 'none';
+            // Change label for Mahasiswa if needed or keep generic "Jurusan"
+            jurusanField.querySelector('label').innerText = 'Jurusan';
         } else if(val === 'dosen') {
             identifierLabel.innerText = 'NIP';
-            jurusanField.classList.add('hidden');
+            jurusanField.classList.remove('hidden'); // Enable Jurusan for Dosen
             fakultasField.classList.remove('hidden');
+            adminLevelField.style.display = 'none';
+            // Change label for Dosen
+             jurusanField.querySelector('label').innerText = 'Program Studi (Jurusan)';
         } else {
             identifierLabel.innerText = 'Kode Admin';
             jurusanField.classList.add('hidden');
             fakultasField.classList.add('hidden');
+            adminLevelField.style.display = 'block'; // Show admin level field
         }
     });
 

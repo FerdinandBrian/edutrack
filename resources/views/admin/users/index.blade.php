@@ -60,14 +60,32 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right">
+                        @php
+                            $currentAdmin = \App\Models\Admin::where('user_id', auth()->id())->first();
+                            $isSecondAdmin = $currentAdmin && $currentAdmin->admin_level === 'second';
+                            
+                            $targetAdmin = null;
+                            if($user->role === 'admin') {
+                                $targetAdmin = \App\Models\Admin::where('kode_admin', $user->identifier)->first();
+                            }
+                            $isSuperAdmin = $targetAdmin && $targetAdmin->admin_level === 'super';
+                            
+                            // Second admin cannot edit/delete super admin
+                            $canModify = !($isSecondAdmin && $isSuperAdmin);
+                        @endphp
+                        
                         <div class="flex items-center justify-end gap-3">
-                            <a href="/admin/users/{{ $user->id }}/edit" class="text-amber-600 hover:text-amber-700 font-bold text-xs uppercase tracking-wider bg-amber-50 px-3 py-1 rounded-lg border border-amber-100 transition">Edit</a>
-                            @if($user->id != auth()->id())
-                            <form action="/admin/users/{{ $user->id }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus user ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button class="text-rose-600 hover:text-rose-700 font-bold text-xs uppercase tracking-wider bg-rose-50 px-3 py-1 rounded-lg border border-rose-100 transition">Hapus</button>
-                            </form>
+                            @if($canModify)
+                                <a href="/admin/users/{{ $user->id }}/edit" class="text-amber-600 hover:text-amber-700 font-bold text-xs uppercase tracking-wider bg-amber-50 px-3 py-1 rounded-lg border border-amber-100 transition">Edit</a>
+                                @if($user->id != auth()->id())
+                                <form action="/admin/users/{{ $user->id }}" method="POST" class="inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus user ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="text-rose-600 hover:text-rose-700 font-bold text-xs uppercase tracking-wider bg-rose-50 px-3 py-1 rounded-lg border border-rose-100 transition">Hapus</button>
+                                </form>
+                                @endif
+                            @else
+                                <span class="text-slate-400 text-xs italic">Anda Tidak Memiliki Akses</span>
                             @endif
                         </div>
                     </td>
