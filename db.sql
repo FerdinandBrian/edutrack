@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 03 Jan 2026 pada 08.32
--- Versi server: 10.4.32-MariaDB
--- Versi PHP: 8.2.12
+-- Generation Time: Jan 08, 2026 at 05:49 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -23,8 +23,55 @@ SET time_zone = "+00:00";
 
 DELIMITER $$
 --
--- Prosedur
+-- Procedures
 --
+CREATE DEFINER=`` PROCEDURE `sp_bayar_tagihan` (IN `tagihan_id` INT)   BEGIN
+                UPDATE tagihan SET status = 'Lunas', updated_at = NOW() WHERE id = tagihan_id;
+            END$$
+
+CREATE DEFINER=`` PROCEDURE `sp_get_matkul_by_jurusan` (IN `p_jurusan` VARCHAR(255))   BEGIN
+                SELECT * 
+                FROM mata_kuliah 
+                WHERE jurusan = p_jurusan COLLATE utf8mb4_unicode_ci
+                ORDER BY semester ASC, nama_mk ASC;
+            END$$
+
+CREATE DEFINER=`` PROCEDURE `sp_get_perkuliahan_by_ta` (IN `p_ta` VARCHAR(255))   BEGIN
+    SELECT 
+        p.id_perkuliahan,
+        p.kode_mk,
+        m.nama_mk,
+        p.kelas,
+        p.hari,
+        p.jam_mulai,
+        p.jam_berakhir
+    FROM perkuliahan p
+    JOIN mata_kuliah m ON p.kode_mk = m.kode_mk
+    WHERE p.tahun_ajaran = p_ta
+    ORDER BY m.nama_mk ASC, p.kelas ASC;
+END$$
+
+CREATE DEFINER=`` PROCEDURE `sp_get_perkuliahan_by_ta_and_jurusan` (IN `p_ta` VARCHAR(255), IN `p_jurusan` VARCHAR(255))   BEGIN
+                SELECT 
+                    p.id_perkuliahan,
+                    p.kode_mk,
+                    m.nama_mk,
+                    m.jurusan,
+                    p.kelas,
+                    p.hari,
+                    p.jam_mulai,
+                    p.jam_berakhir
+                FROM perkuliahan p
+                JOIN mata_kuliah m ON p.kode_mk = m.kode_mk
+                WHERE p.tahun_ajaran = p_ta
+                  AND m.jurusan = p_jurusan
+                ORDER BY m.nama_mk ASC, p.kelas ASC;
+            END$$
+
+CREATE DEFINER=`` PROCEDURE `sp_get_va` (IN `student_nrp` VARCHAR(50))   BEGIN
+                SELECT CONCAT('2911', student_nrp) AS va;
+            END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `update_nilai_akhir` ()   BEGIN
     UPDATE nilai
     SET nilai_akhir = CASE
@@ -37,12 +84,52 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `update_nilai_akhir` ()   BEGIN
     END;
 END$$
 
+--
+-- Functions
+--
+CREATE DEFINER=`root`@`localhost` FUNCTION `get_ipk` (`p_nrp` VARCHAR(20) COLLATE utf8mb4_unicode_ci) RETURNS DECIMAL(3,2) DETERMINISTIC BEGIN
+    DECLARE v_total_bobot FLOAT DEFAULT 0;
+    DECLARE v_total_sks INT DEFAULT 0;
+    DECLARE v_ipk DECIMAL(3,2) DEFAULT 0;
+
+    SELECT 
+        SUM(CASE 
+            WHEN n.nilai_akhir = 'A' THEN 4.0 * mk.sks
+            WHEN n.nilai_akhir = 'B' THEN 3.0 * mk.sks
+            WHEN n.nilai_akhir = 'C' THEN 2.0 * mk.sks
+            WHEN n.nilai_akhir = 'D' THEN 1.0 * mk.sks
+            ELSE 0 
+        END),
+        SUM(mk.sks)
+    INTO v_total_bobot, v_total_sks
+    FROM nilai n
+    JOIN mata_kuliah mk ON n.kode_mk = mk.kode_mk
+    WHERE n.nrp = p_nrp;
+
+    IF v_total_sks > 0 THEN
+        SET v_ipk = v_total_bobot / v_total_sks;
+    END IF;
+
+    RETURN v_ipk;
+END$$
+
+CREATE DEFINER=`root`@`localhost` FUNCTION `get_total_sks` (`p_nrp` VARCHAR(20) COLLATE utf8mb4_unicode_ci, `p_ta` VARCHAR(50) COLLATE utf8mb4_unicode_ci) RETURNS INT(11) DETERMINISTIC BEGIN
+    DECLARE total INT;
+    
+    SELECT SUM(mk.sks) INTO total
+    FROM dkbs d
+    JOIN mata_kuliah mk ON d.kode_mk = mk.kode_mk
+    WHERE d.nrp = p_nrp AND d.tahun_ajaran = p_ta;
+    
+    RETURN IFNULL(total, 0);
+END$$
+
 DELIMITER ;
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `admin`
+-- Table structure for table `admin`
 --
 
 CREATE TABLE `admin` (
@@ -54,21 +141,39 @@ CREATE TABLE `admin` (
   `no_telepon` varchar(255) NOT NULL,
   `alamat` text DEFAULT NULL,
   `jenis_kelamin` varchar(255) NOT NULL,
+  `admin_level` enum('super','second') NOT NULL DEFAULT 'second',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `admin`
+-- Dumping data for table `admin`
 --
 
-INSERT INTO `admin` (`kode_admin`, `user_id`, `nama`, `email`, `tanggal_lahir`, `no_telepon`, `alamat`, `jenis_kelamin`, `created_at`, `updated_at`) VALUES
-('ADM001', 1, 'Super Admin', 'admin@edutrack.com', '1990-01-01', '08123456789', NULL, 'Laki-laki', '2025-12-28 22:47:56', '2025-12-29 02:24:07');
+INSERT INTO `admin` (`kode_admin`, `user_id`, `nama`, `email`, `tanggal_lahir`, `no_telepon`, `alamat`, `jenis_kelamin`, `admin_level`, `created_at`, `updated_at`) VALUES
+('ADM001', 1, 'Super Admin', 'admin@edutrack.com', '1990-01-01', '08123456789', NULL, 'Laki-laki', 'super', '2025-12-28 22:47:56', '2025-12-29 02:24:07'),
+('ADM002', 22, 'Seccond Admin', 'admin2@edutrack.com', '1991-01-01', '089876543212', NULL, 'Laki-laki', 'second', '2026-01-07 12:00:59', '2026-01-07 12:00:59');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `cache`
+-- Table structure for table `audit_logs_nilai`
+--
+
+CREATE TABLE `audit_logs_nilai` (
+  `id` int(11) NOT NULL,
+  `nrp` varchar(20) DEFAULT NULL,
+  `kode_mk` varchar(20) DEFAULT NULL,
+  `nilai_lama_total` float DEFAULT NULL,
+  `nilai_baru_total` float DEFAULT NULL,
+  `perubahan_oleh` varchar(100) DEFAULT NULL,
+  `waktu_perubahan` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cache`
 --
 
 CREATE TABLE `cache` (
@@ -80,7 +185,7 @@ CREATE TABLE `cache` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `cache_locks`
+-- Table structure for table `cache_locks`
 --
 
 CREATE TABLE `cache_locks` (
@@ -92,7 +197,7 @@ CREATE TABLE `cache_locks` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `dkbs`
+-- Table structure for table `dkbs`
 --
 
 CREATE TABLE `dkbs` (
@@ -108,7 +213,7 @@ CREATE TABLE `dkbs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `dkbs`
+-- Dumping data for table `dkbs`
 --
 
 INSERT INTO `dkbs` (`id`, `nrp`, `kode_mk`, `id_perkuliahan`, `semester`, `status`, `created_at`, `updated_at`, `tahun_ajaran`) VALUES
@@ -131,12 +236,47 @@ INSERT INTO `dkbs` (`id`, `nrp`, `kode_mk`, `id_perkuliahan`, `semester`, `statu
 (25, '2472022', 'MK005', 5, '3', 'Terdaftar', '2026-01-03 00:26:39', '2026-01-03 00:26:39', '2025/2026 - Ganjil'),
 (26, '2472022', 'MK007', 9, '3', 'Terdaftar', '2026-01-03 00:26:54', '2026-01-03 00:26:54', '2025/2026 - Ganjil'),
 (27, '2472022', 'MK001T', 10, '3', 'Terdaftar', '2026-01-03 00:28:00', '2026-01-03 00:28:00', '2025/2026 - Ganjil'),
-(28, '2472022', 'MK001P', 11, '3', 'Terdaftar', '2026-01-03 00:28:00', '2026-01-03 00:28:00', '2025/2026 - Ganjil');
+(28, '2472022', 'MK001P', 11, '3', 'Terdaftar', '2026-01-03 00:28:00', '2026-01-03 00:28:00', '2025/2026 - Ganjil'),
+(29, '2473020', 'MK103', 31, '1', 'Terdaftar', '2026-01-07 11:35:04', '2026-01-07 11:35:04', '2025/2026 - Ganjil'),
+(30, '2473020', 'MK101T', 33, '1', 'Terdaftar', '2026-01-07 11:46:20', '2026-01-07 11:46:20', '2025/2026 - Ganjil'),
+(31, '2473020', 'MK101P', 34, '1', 'Terdaftar', '2026-01-07 11:46:20', '2026-01-07 11:46:20', '2025/2026 - Ganjil'),
+(32, '2473020', 'MK106T', 35, '2', 'Terdaftar', '2026-01-07 12:19:30', '2026-01-07 12:19:30', '2025/2026 - Ganjil'),
+(33, '2473020', 'MK106P', 36, '2', 'Terdaftar', '2026-01-07 12:19:30', '2026-01-07 12:19:30', '2025/2026 - Ganjil'),
+(37, '2473021', 'MK106T', 39, '2', 'Terdaftar', '2026-01-07 21:35:49', '2026-01-07 21:35:49', '2025/2026 - Ganjil'),
+(38, '2473021', 'MK106P', 40, '2', 'Terdaftar', '2026-01-07 21:35:49', '2026-01-07 21:35:49', '2025/2026 - Ganjil'),
+(39, '2473021', 'MK103', 37, '1', 'Terdaftar', '2026-01-07 21:36:17', '2026-01-07 21:36:17', '2025/2026 - Ganjil'),
+(40, '2473021', 'MK101T', 43, '1', 'Terdaftar', '2026-01-07 21:37:05', '2026-01-07 21:37:05', '2025/2026 - Ganjil'),
+(41, '2473021', 'MK101P', 44, '1', 'Terdaftar', '2026-01-07 21:37:05', '2026-01-07 21:37:05', '2025/2026 - Ganjil');
+
+--
+-- Triggers `dkbs`
+--
+DELIMITER $$
+CREATE TRIGGER `trg_cek_kapasitas_dkbs` BEFORE INSERT ON `dkbs` FOR EACH ROW BEGIN
+    DECLARE cap INT;
+    DECLARE enrolled INT;
+    
+    -- Ambil kapasitas dari ruangan melalui tabel perkuliahan
+    SELECT r.kapasitas INTO cap 
+    FROM perkuliahan p
+    JOIN ruangan r ON p.kode_ruangan = r.kode_ruangan
+    WHERE p.id_perkuliahan = NEW.id_perkuliahan;
+
+    -- Hitung yang sudah terdaftar
+    SELECT COUNT(*) INTO enrolled FROM dkbs WHERE id_perkuliahan = NEW.id_perkuliahan;
+
+    IF enrolled >= cap THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Kelas sudah penuh!';
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `dosen`
+-- Table structure for table `dosen`
 --
 
 CREATE TABLE `dosen` (
@@ -149,27 +289,34 @@ CREATE TABLE `dosen` (
   `no_telepon` varchar(255) DEFAULT NULL,
   `alamat` text DEFAULT NULL,
   `fakultas` varchar(255) DEFAULT NULL,
+  `jurusan` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `dosen`
+-- Dumping data for table `dosen`
 --
 
-INSERT INTO `dosen` (`nip`, `user_id`, `nama`, `tanggal_lahir`, `jenis_kelamin`, `email`, `no_telepon`, `alamat`, `fakultas`, `created_at`, `updated_at`) VALUES
-('0072201', 2, 'Tjatur Kandaga, S.Si., M.T.', '1985-05-20', 'Laki-laki', '0072201@edutrack.com', '08987654321', 'Jl. Melati No. 12', 'Teknologi Rekayasa Cerdas', '2025-12-28 22:47:57', '2025-12-29 04:51:07'),
-('0072202', 9, 'Ir. Teddy Marcus Zakaria, M.T.', '1986-11-05', 'Laki-laki', '0072202@edutrack.com', '081234567890', 'Jl. Kenanga Raya No. 45', 'Teknologi Rekayasa Cerdas', '2025-12-29 01:41:28', '2025-12-29 02:19:07'),
-('0072203', 8, 'Erico Darmawan Handoyo, S. Kom., M.T.', '1990-01-09', 'Laki-laki', '0072203@edutrack.com', '087656728372', 'Jl. Mawar Indah No. 7', 'Teknologi Rekayasa Cerdas', '2025-12-29 01:37:49', '2025-12-29 02:19:17'),
-('0072204', 10, 'Andreas Widjaja, S.Si., M.Sc., Ph.D', '1980-10-20', 'Laki-laki', '0072204@edutrack.com', '083822334455', 'Jl. Anggrek Lestari No. 88', 'Teknologi Rekayasa Cerdas', '2025-12-29 02:22:52', '2025-12-29 02:22:52'),
-('0072205', 11, 'Maresha Caroline Wijanto, S.Kom., M.T., Ph.D.', '1990-07-19', 'Perempuan', '0072205@edutrack.com', '081333445566', 'Jl. Cendana No. 23', 'Teknologi Rekayasa Cerdas', '2025-12-29 02:26:23', '2026-01-02 23:47:23'),
-('0072206', 12, 'Wenny Franciska Senjaya, S.Kom., M.T., Ph.D.', '1992-03-17', 'Perempuan', '0072206@edutrack.com', '081245678901', 'Jl. Flamboyan No. 56', 'Teknologi Rekayasa Cerdas', '2025-12-29 02:27:57', '2026-01-02 23:48:22'),
-('0072207', 13, 'Meliana Christianti J., S. Kom., M.T.', '1996-09-10', 'Perempuan', '0072207@edutrack.com', '082134567890', 'Jl. Dahlia No. 89', 'Teknologi Rekayasa Cerdas', '2025-12-29 02:29:33', '2025-12-29 02:29:33');
+INSERT INTO `dosen` (`nip`, `user_id`, `nama`, `tanggal_lahir`, `jenis_kelamin`, `email`, `no_telepon`, `alamat`, `fakultas`, `jurusan`, `created_at`, `updated_at`) VALUES
+('0072201', 2, 'Tjatur Kandaga, S.Si., M.T.', '1985-05-20', 'Laki-laki', '0072201@edutrack.com', '08987654321', 'Jl. Melati No. 12', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2025-12-28 22:47:57', '2025-12-29 04:51:07'),
+('0072202', 9, 'Ir. Teddy Marcus Zakaria, M.T.', '1986-11-05', 'Laki-laki', '0072202@edutrack.com', '081234567890', 'Jl. Kenanga Raya No. 45', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2025-12-29 01:41:28', '2025-12-29 02:19:07'),
+('0072203', 8, 'Erico Darmawan Handoyo, S. Kom., M.T.', '1990-01-09', 'Laki-laki', '0072203@edutrack.com', '087656728372', 'Jl. Mawar Indah No. 7', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2025-12-29 01:37:49', '2025-12-29 02:19:17'),
+('0072204', 10, 'Andreas Widjaja, S.Si., M.Sc., Ph.D', '1980-10-20', 'Laki-laki', '0072204@edutrack.com', '083822334455', 'Jl. Anggrek Lestari No. 88', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2025-12-29 02:22:52', '2025-12-29 02:22:52'),
+('0072205', 11, 'Maresha Caroline Wijanto, S.Kom., M.T., Ph.D.', '1990-07-19', 'Perempuan', '0072205@edutrack.com', '081333445566', 'Jl. Cendana No. 23', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2025-12-29 02:26:23', '2026-01-02 23:47:23'),
+('0072206', 12, 'Wenny Franciska Senjaya, S.Kom., M.T., Ph.D.', '1992-03-17', 'Perempuan', '0072206@edutrack.com', '081245678901', 'Jl. Flamboyan No. 56', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2025-12-29 02:27:57', '2026-01-02 23:48:22'),
+('0072207', 13, 'Meliana Christianti J., S. Kom., M.T.', '1996-09-10', 'Perempuan', '0072207@edutrack.com', '082134567890', 'Jl. Dahlia No. 89', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2025-12-29 02:29:33', '2025-12-29 02:29:33'),
+('0072208', 14, 'Rossevine Artha Nathasya, S.Kom., M.T.', '1997-01-14', 'Perempuan', '0072208@edutrack.com', '089526374688', 'Jl. Tulip No 11A', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2026-01-04 03:16:47', '2026-01-04 03:16:47'),
+('0072209', 15, 'Hendra Bunyamin, S.Si., M.T.', '1979-05-15', 'Laki-laki', '0072209@edutrack.com', '089537462987', 'Jl. Anyelir no 20', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2026-01-04 03:27:53', '2026-01-04 03:27:53'),
+('0072210', 19, 'Jimmy Agustian Loekito, S.T., M.T.', '1986-05-13', 'Laki-laki', '0072210@edutrack.com', '0895723019', 'Jl. Gerbera No 42', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-07 10:40:07', '2026-01-07 10:40:07'),
+('0072211', 20, 'Pin Panji Yapinus, S.T., M.T.', '1983-11-16', 'Laki-laki', '0072211@edutrack.com', '089526048382', 'Jl. Sakura No 2B', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-07 11:38:22', '2026-01-07 11:38:22'),
+('0072212', 23, 'Semuil Tjiharjadi, S.T., M.M., M.T.', '1983-05-09', 'Laki-laki', '0072212@edutrack.com', '08967439163', 'Jl. Hydrangea No 20', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-07 12:14:47', '2026-01-07 12:14:47'),
+('0072213', 24, 'Markus Tanubrata, S.T., M.M., M.T.', '1980-12-09', 'Laki-laki', '0072213@edutrack.com', '089563748193', 'Jl. Rafflesia Arnoldi No 25', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-07 12:23:02', '2026-01-07 12:23:02');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `failed_jobs`
+-- Table structure for table `failed_jobs`
 --
 
 CREATE TABLE `failed_jobs` (
@@ -185,7 +332,7 @@ CREATE TABLE `failed_jobs` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `jadwal`
+-- Table structure for table `jadwal`
 --
 
 CREATE TABLE `jadwal` (
@@ -201,7 +348,7 @@ CREATE TABLE `jadwal` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `jobs`
+-- Table structure for table `jobs`
 --
 
 CREATE TABLE `jobs` (
@@ -217,7 +364,7 @@ CREATE TABLE `jobs` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `job_batches`
+-- Table structure for table `job_batches`
 --
 
 CREATE TABLE `job_batches` (
@@ -236,7 +383,7 @@ CREATE TABLE `job_batches` (
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `mahasiswa`
+-- Table structure for table `mahasiswa`
 --
 
 CREATE TABLE `mahasiswa` (
@@ -254,22 +401,25 @@ CREATE TABLE `mahasiswa` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `mahasiswa`
+-- Dumping data for table `mahasiswa`
 --
 
 INSERT INTO `mahasiswa` (`nrp`, `user_id`, `nama`, `jurusan`, `email`, `jenis_kelamin`, `tanggal_lahir`, `alamat`, `no_telepon`, `created_at`, `updated_at`) VALUES
 ('2472021', 3, 'Ferdinand Brian', 'Teknik Informatika', '2472021@edutrack.com', 'Laki-laki', '2004-10-15', 'Jl. Kebon Jeruk No. 12', '087712345678', '2025-12-28 22:47:57', '2025-12-29 04:29:01'),
-('2472022', 4, 'Bryan Christian', 'Teknik Informatika', '2472022@edutrack.com', 'Laki-laki', '2006-07-28', 'Kopo', '089626312738', '2025-12-28 23:07:50', '2025-12-28 23:07:50');
+('2472022', 4, 'Bryan Christian', 'Teknik Informatika', '2472022@edutrack.com', 'Laki-laki', '2006-07-28', 'Jl. Kopo', '089626312738', '2025-12-28 23:07:50', '2025-12-28 23:07:50'),
+('2473020', 17, 'Juan Alexander', 'Sistem Komputer', '2473020@edutrack.com', 'Laki-laki', '2005-06-14', 'Jl. Margaasih No 21', '089527384910', '2026-01-07 01:13:07', '2026-01-07 10:35:55'),
+('2473021', 18, 'Rafael Adiputra', 'Sistem Komputer', '2473021@edutrack.com', 'Laki-laki', '2004-03-04', 'Jl. Babakan Jeruk No 23', '089573648291', '2026-01-07 01:18:32', '2026-01-07 10:36:33');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `mata_kuliah`
+-- Table structure for table `mata_kuliah`
 --
 
 CREATE TABLE `mata_kuliah` (
   `kode_mk` varchar(255) NOT NULL,
   `nama_mk` varchar(255) NOT NULL,
+  `jurusan` varchar(255) NOT NULL DEFAULT 'Teknik Informatika',
   `sks` int(11) NOT NULL,
   `semester` int(11) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -277,25 +427,33 @@ CREATE TABLE `mata_kuliah` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `mata_kuliah`
+-- Dumping data for table `mata_kuliah`
 --
 
-INSERT INTO `mata_kuliah` (`kode_mk`, `nama_mk`, `sks`, `semester`, `created_at`, `updated_at`) VALUES
-('MK001P', 'Paradigma Pemrograman (Praktikum)', 2, 3, '2025-12-29 06:54:13', '2025-12-29 06:54:13'),
-('MK001T', 'Paradigma Pemrograman (Teori)', 2, 3, '2025-12-29 06:54:13', '2025-12-29 06:54:13'),
-('MK002P', 'Desain Basis Data Lanjut (Praktikum)', 3, 3, '2025-12-29 06:54:13', '2025-12-29 06:54:13'),
-('MK002T', 'Desain Basis Data Lanjut (Teori)', 3, 3, '2025-12-29 06:54:13', '2025-12-29 00:59:37'),
-('MK003', 'Rekayasa Perangkat Lunak', 3, 3, '2025-12-29 06:54:13', '2025-12-29 01:04:02'),
-('MK004', 'Teknologi Multimedia', 2, 3, '2025-12-29 00:40:18', '2025-12-29 00:58:31'),
-('MK005', 'Matematika Diskrit', 3, 3, '2025-12-29 00:59:19', '2025-12-29 00:59:19'),
-('MK006P', 'Algoritma Struktur Data (Praktikum)', 3, 3, '2025-12-29 01:17:34', '2025-12-29 01:17:34'),
-('MK006T', 'Algoritma Struktur Data (Teori)', 3, 3, '2025-12-29 01:05:13', '2025-12-29 01:17:44'),
-('MK007', 'Sistem Operasi Komputer', 2, 3, '2025-12-29 01:18:06', '2025-12-29 01:18:06');
+INSERT INTO `mata_kuliah` (`kode_mk`, `nama_mk`, `jurusan`, `sks`, `semester`, `created_at`, `updated_at`) VALUES
+('MK001P', 'Paradigma Pemrograman (Praktikum)', 'Teknik Informatika', 1, 3, '2025-12-29 06:54:13', '2026-01-03 03:22:32'),
+('MK001T', 'Paradigma Pemrograman (Teori)', 'Teknik Informatika', 3, 3, '2025-12-29 06:54:13', '2026-01-03 03:22:32'),
+('MK002P', 'Desain Basis Data Lanjut (Praktikum)', 'Teknik Informatika', 1, 3, '2025-12-29 06:54:13', '2026-01-03 03:22:32'),
+('MK002T', 'Desain Basis Data Lanjut (Teori)', 'Teknik Informatika', 2, 3, '2025-12-29 06:54:13', '2026-01-03 03:22:32'),
+('MK003', 'Rekayasa Perangkat Lunak', 'Teknik Informatika', 3, 3, '2025-12-29 06:54:13', '2025-12-29 01:04:02'),
+('MK004', 'Teknologi Multimedia', 'Teknik Informatika', 2, 3, '2025-12-29 00:40:18', '2025-12-29 00:58:31'),
+('MK005', 'Matematika Diskrit', 'Teknik Informatika', 3, 3, '2025-12-29 00:59:19', '2025-12-29 00:59:19'),
+('MK006P', 'Algoritma Struktur Data (Praktikum)', 'Teknik Informatika', 1, 3, '2025-12-29 01:17:34', '2026-01-03 03:22:32'),
+('MK006T', 'Algoritma Struktur Data (Teori)', 'Teknik Informatika', 3, 3, '2025-12-29 01:05:13', '2025-12-29 01:17:44'),
+('MK007', 'Sistem Operasi Komputer', 'Teknik Informatika', 2, 3, '2025-12-29 01:18:06', '2025-12-29 01:18:06'),
+('MK101P', 'Pengantar Teknologi Komputer (Praktikum)', 'Sistem Komputer', 1, 1, '2026-01-07 11:01:16', '2026-01-07 11:01:16'),
+('MK101T', 'Pengantar Teknologi Komputer (Teori)', 'Sistem Komputer', 2, 1, '2026-01-07 10:52:22', '2026-01-07 11:00:31'),
+('MK102', 'Probabilitas & Statistika', 'Sistem Komputer', 2, 1, '2026-01-07 10:56:27', '2026-01-07 10:56:27'),
+('MK103', 'Kalkulus', 'Sistem Komputer', 3, 1, '2026-01-07 10:56:52', '2026-01-07 10:56:52'),
+('MK104', 'Matematika Diskrit', 'Sistem Komputer', 3, 2, '2026-01-07 10:57:13', '2026-01-07 10:57:13'),
+('MK105', 'Logika dan Sistem Digital', 'Sistem Komputer', 3, 2, '2026-01-07 10:59:31', '2026-01-07 10:59:31'),
+('MK106P', 'Pemrograman Tingkat Dasar (Praktikum)', 'Sistem Komputer', 1, 2, '2026-01-07 12:08:33', '2026-01-07 12:08:33'),
+('MK106T', 'Pemrograman Tingkat Dasar (Teori)', 'Sistem Komputer', 3, 2, '2026-01-07 12:07:49', '2026-01-07 12:07:58');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `migrations`
+-- Table structure for table `migrations`
 --
 
 CREATE TABLE `migrations` (
@@ -305,7 +463,7 @@ CREATE TABLE `migrations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `migrations`
+-- Dumping data for table `migrations`
 --
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
@@ -319,12 +477,23 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (8, '2025_12_29_075654_add_details_to_mata_kuliah_table', 3),
 (9, '2025_12_29_081043_add_id_perkuliahan_to_dkbs', 4),
 (10, '2025_12_29_084255_add_alamat_to_admin_and_dosen_tables', 5),
-(11, '2025_12_29_115615_add_meeting_scores_to_nilai_table', 6);
+(11, '2025_12_29_115615_add_meeting_scores_to_nilai_table', 6),
+(12, '2025_12_31_125040_create_pengumumen_table', 7),
+(13, '2026_01_06_142000_add_details_to_tagihan_table', 8),
+(14, '2026_01_06_150206_create_sp_bayar_tagihan', 9),
+(15, '2026_01_06_150641_add_sp_generate_va', 10),
+(16, '2026_01_06_165247_add_jurusan_to_mata_kuliah_table', 11),
+(17, '2026_01_08_000000_add_jurusan_to_dosen_table', 12),
+(18, '2026_01_08_005500_create_sp_get_matkul_by_jurusan', 13),
+(19, '2026_01_08_011000_fix_sp_get_matkul_by_jurusan', 14),
+(20, '2026_01_08_012500_create_sp_get_perkuliahan_by_ta', 15),
+(21, '2026_01_08_013000_create_sp_get_perkuliahan_by_ta_and_jurusan', 16),
+(22, '2026_01_08_015500_add_admin_level_to_admin_table', 17);
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `nilai`
+-- Table structure for table `nilai`
 --
 
 CREATE TABLE `nilai` (
@@ -354,17 +523,30 @@ CREATE TABLE `nilai` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `nilai`
+-- Dumping data for table `nilai`
 --
 
 INSERT INTO `nilai` (`id`, `nrp`, `kode_mk`, `p1`, `p2`, `p3`, `p4`, `p5`, `p6`, `p7`, `uts`, `p9`, `p10`, `p11`, `p12`, `p13`, `p14`, `p15`, `uas`, `nilai_total`, `nilai_akhir`, `created_at`, `updated_at`) VALUES
 (1, '2472021', 'MK001P', 80, 80, 85, 90, 80, 80, 80, 75, 89, 80, 85, 80, 80, 0, 0, 0, 64.45, 'C', '2026-01-02 22:48:46', '2026-01-02 22:51:01'),
 (2, '2472021', 'MK001T', 90, 90, 90, 98, 87, 90, 95, 75, 80, 87, 89, 94, 85, 0, 0, 0, 68.75, 'C', '2026-01-02 22:51:55', '2026-01-02 22:51:55');
 
+--
+-- Triggers `nilai`
+--
+DELIMITER $$
+CREATE TRIGGER `trg_log_perubahan_nilai` BEFORE UPDATE ON `nilai` FOR EACH ROW BEGIN
+    IF OLD.nilai_total <> NEW.nilai_total THEN
+        INSERT INTO audit_logs_nilai (nrp, kode_mk, nilai_lama_total, nilai_baru_total, perubahan_oleh)
+        VALUES (OLD.nrp, OLD.kode_mk, OLD.nilai_total, NEW.nilai_total, USER());
+    END IF;
+END
+$$
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `pengumuman`
+-- Table structure for table `pengumuman`
 --
 
 CREATE TABLE `pengumuman` (
@@ -379,18 +561,16 @@ CREATE TABLE `pengumuman` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `pengumuman`
+-- Dumping data for table `pengumuman`
 --
 
 INSERT INTO `pengumuman` (`id`, `judul`, `isi`, `kategori`, `waktu_mulai`, `waktu_selesai`, `created_at`, `updated_at`) VALUES
-(1, 'Libur Natal & Tahun Baru', 'Seluruh kegiatan akademik diliburkan dalam rangka libur Natal dan Tahun Baru.', 'libur', '2025-12-30 00:00:00', '2026-01-04 00:00:00', '2025-12-31 05:56:07', '2026-01-02 00:01:04'),
-(2, 'Masa Ujian Akhir Semester (UAS)', 'Pelaksanaan UAS', 'akademik', '2026-01-19 00:00:00', '2026-01-23 00:00:00', '2026-01-01 23:46:34', '2026-01-02 00:01:47'),
-(4, 'Masa Ujian Akhir Semester (UAS)', 'Pelaksanaan UAS', 'akademik', '2026-01-26 00:00:00', '2026-01-27 00:00:00', '2026-01-02 00:01:25', '2026-01-02 00:01:39');
+(1, 'Libur Natal & Tahun Baru', 'Seluruh kegiatan akademik diliburkan', 'libur', '2025-12-22 00:00:00', '2026-01-04 00:00:00', '2026-01-03 03:09:59', '2026-01-03 03:10:16');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `perkuliahan`
+-- Table structure for table `perkuliahan`
 --
 
 CREATE TABLE `perkuliahan` (
@@ -408,7 +588,7 @@ CREATE TABLE `perkuliahan` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `perkuliahan`
+-- Dumping data for table `perkuliahan`
 --
 
 INSERT INTO `perkuliahan` (`id_perkuliahan`, `kode_ruangan`, `nip_dosen`, `kode_mk`, `kelas`, `hari`, `jam_mulai`, `jam_berakhir`, `tahun_ajaran`, `created_at`, `updated_at`) VALUES
@@ -427,9 +607,9 @@ INSERT INTO `perkuliahan` (`id_perkuliahan`, `kode_ruangan`, `nip_dosen`, `kode_
 (14, 'L8002', '0072203', 'MK004', 'C', 'Senin', '12:30:00', '14:10:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
 (15, 'L8006', '0072204', 'MK005', 'A', 'Senin', '07:00:00', '09:30:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
 (16, 'L8006', '0072204', 'MK005', 'B', 'Senin', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
-(17, 'L8002', '0072206', 'MK006T', 'A', 'Jumat', '12:30:00', '15:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
+(17, 'L8002', '0072206', 'MK006T', 'A', 'Kamis', '12:30:00', '15:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-08 02:51:04'),
 (18, 'L8003', '0072206', 'MK006T', 'C', 'Rabu', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
-(19, 'L8002', '0072206', 'MK006P', 'A', 'Kamis', '15:00:00', '17:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
+(19, 'L8002', '0072206', 'MK006P', 'A', 'Kamis', '15:30:00', '17:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-08 02:52:25'),
 (20, 'L8003', '0072206', 'MK006P', 'C', 'Rabu', '12:30:00', '14:30:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
 (21, 'L8004', '0072201', 'MK001T', 'B', 'Rabu', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
 (22, 'L8004', '0072201', 'MK001T', 'C', 'Selasa', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
@@ -440,12 +620,25 @@ INSERT INTO `perkuliahan` (`id_perkuliahan`, `kode_ruangan`, `nip_dosen`, `kode_
 (27, 'L8001', '0072202', 'MK002P', 'A', 'Jumat', '13:00:00', '15:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
 (28, 'L8001', '0072202', 'MK002P', 'B', 'Rabu', '15:00:00', '17:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
 (29, 'L8005', '0072207', 'MK007', 'B', 'Jumat', '15:00:00', '16:40:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
-(30, 'L8005', '0072207', 'MK007', 'C', 'Jumat', '17:30:00', '19:10:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01');
+(30, 'L8005', '0072207', 'MK007', 'C', 'Jumat', '17:30:00', '19:10:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
+(31, 'L8007', '0072210', 'MK103', 'A', 'Senin', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-07 11:20:27', '2026-01-07 12:12:52'),
+(33, 'L8007', '0072211', 'MK101T', 'A', 'Rabu', '09:30:00', '11:10:00', '2025/2026 - Ganjil', '2026-01-07 11:45:50', '2026-01-07 11:45:50'),
+(34, 'L8007', '0072211', 'MK101P', 'A', 'Rabu', '11:40:00', '12:30:00', '2025/2026 - Ganjil', '2026-01-07 11:45:50', '2026-01-07 11:45:50'),
+(35, 'L8005', '0072212', 'MK106T', 'A', 'Senin', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-07 12:15:39', '2026-01-07 20:11:15'),
+(36, 'L8005', '0072212', 'MK106P', 'A', 'Senin', '12:30:00', '13:20:00', '2025/2026 - Ganjil', '2026-01-07 12:15:39', '2026-01-07 20:13:57'),
+(37, 'L8007', '0072210', 'MK103', 'B', 'Selasa', '12:30:00', '15:00:00', '2025/2026 - Ganjil', '2026-01-07 20:04:06', '2026-01-07 20:04:19'),
+(38, 'L8008', '0072210', 'MK103', 'C', 'Rabu', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-07 20:06:31', '2026-01-07 20:06:31'),
+(39, 'L8005', '0072212', 'MK106T', 'B', 'Rabu', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-07 21:28:37', '2026-01-07 21:34:05'),
+(40, 'L8005', '0072212', 'MK106P', 'B', 'Rabu', '12:30:00', '13:20:00', '2025/2026 - Ganjil', '2026-01-07 21:28:37', '2026-01-07 21:34:15'),
+(41, 'L8004', '0072211', 'MK101T', 'B', 'Senin', '08:00:00', '09:40:00', '2025/2026 - Ganjil', '2026-01-07 21:31:00', '2026-01-07 21:31:00'),
+(42, 'L8004', '0072211', 'MK101P', 'B', 'Senin', '10:10:00', '11:00:00', '2025/2026 - Ganjil', '2026-01-07 21:31:00', '2026-01-07 21:31:00'),
+(43, 'L8010', '0072211', 'MK101T', 'C', 'Senin', '12:00:00', '13:40:00', '2025/2026 - Ganjil', '2026-01-07 21:32:30', '2026-01-07 21:32:48'),
+(44, 'L8010', '0072211', 'MK101P', 'C', 'Senin', '14:10:00', '15:00:00', '2025/2026 - Ganjil', '2026-01-07 21:32:30', '2026-01-07 21:33:05');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `presensi`
+-- Table structure for table `presensi`
 --
 
 CREATE TABLE `presensi` (
@@ -460,7 +653,7 @@ CREATE TABLE `presensi` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `presensi`
+-- Dumping data for table `presensi`
 --
 
 INSERT INTO `presensi` (`id`, `nrp`, `jadwal_id`, `tanggal`, `status`, `keterangan`, `created_at`, `updated_at`) VALUES
@@ -647,7 +840,7 @@ INSERT INTO `presensi` (`id`, `nrp`, `jadwal_id`, `tanggal`, `status`, `keterang
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `ruangan`
+-- Table structure for table `ruangan`
 --
 
 CREATE TABLE `ruangan` (
@@ -660,7 +853,7 @@ CREATE TABLE `ruangan` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `ruangan`
+-- Dumping data for table `ruangan`
 --
 
 INSERT INTO `ruangan` (`kode_ruangan`, `nama_ruangan`, `kapasitas`, `deskripsi_fasilitas`, `created_at`, `updated_at`) VALUES
@@ -678,7 +871,7 @@ INSERT INTO `ruangan` (`kode_ruangan`, `nama_ruangan`, `kapasitas`, `deskripsi_f
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `sessions`
+-- Table structure for table `sessions`
 --
 
 CREATE TABLE `sessions` (
@@ -691,16 +884,16 @@ CREATE TABLE `sessions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `sessions`
+-- Dumping data for table `sessions`
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('FOrmCoFtZDapUEOs3xPiKf4lo2l8XzMp0blCz4um', 4, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoick81YmRZeTJldW5MMXlTeGRTcEw0cjJDc2VzRzFKUlo3dnBHQlJEayI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NDE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9tYWhhc2lzd2EvZGFzaGJvYXJkIjtzOjU6InJvdXRlIjtOO31zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aTo0O30=', 1767337692);
+('p3bPtjOA7j3rmRq5o6MZWcZJCAsCilexNN1cnFAG', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiVFNwVHJwM3FEQ1lxR2h6bmFIa1J3Qm1SMzlUSGhaRWVZWTRCUVdFUCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9ka2JzIjtzOjU6InJvdXRlIjtOO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1767847044);
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `tagihan`
+-- Table structure for table `tagihan`
 --
 
 CREATE TABLE `tagihan` (
@@ -708,15 +901,25 @@ CREATE TABLE `tagihan` (
   `nrp` varchar(255) NOT NULL,
   `jenis` varchar(255) NOT NULL,
   `jumlah` decimal(12,2) NOT NULL,
+  `batas_pembayaran` date DEFAULT NULL,
+  `tipe_pembayaran` int(11) DEFAULT NULL,
+  `cicilan_ke` int(11) DEFAULT NULL,
   `status` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `tagihan`
+--
+
+INSERT INTO `tagihan` (`id`, `nrp`, `jenis`, `jumlah`, `batas_pembayaran`, `tipe_pembayaran`, `cicilan_ke`, `status`, `created_at`, `updated_at`) VALUES
+(10, '2472021', 'Tagihan Semester', 6300000.00, '2026-02-09', NULL, NULL, 'Belum Lunas', '2026-01-06 09:15:11', '2026-01-06 09:15:29');
+
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -730,7 +933,7 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Dumping data untuk tabel `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `nama`, `email`, `password`, `role`, `created_at`, `updated_at`) VALUES
@@ -743,14 +946,23 @@ INSERT INTO `users` (`id`, `nama`, `email`, `password`, `role`, `created_at`, `u
 (10, 'Andreas Widjaja, S.Si., M.Sc., Ph.D', '0072204@edutrack.com', '$2y$12$mQjSGR8xatAV9hWs4u3YAu6COj3HerCvlh5pDV/wKtEBkF8vtGLAe', 'dosen', '2025-12-29 02:22:52', '2025-12-29 02:22:52'),
 (11, 'Maresha Caroline Wijanto, S.Kom., M.T., Ph.D.', '0072205@edutrack.com', '$2y$12$LFIH2.6ZM6ch8BrELeYtue0zoRWxwZj2SCqMiN6LajNk9u1gkxQ3S', 'dosen', '2025-12-29 02:26:23', '2026-01-02 23:47:23'),
 (12, 'Wenny Franciska Senjaya, S.Kom., M.T., Ph.D.', '0072206@edutrack.com', '$2y$12$k6T/1O/KDSHxOZJkoJL.S.uTAVZ1AAUWTnsJnC9FTtLTyb3OHLUUy', 'dosen', '2025-12-29 02:27:57', '2026-01-02 23:48:22'),
-(13, 'Meliana Christianti J., S. Kom., M.T.', '0072207@edutrack.com', '$2y$12$C97naCO4OmqMPpkFmYkffOw.UL5tu5t.n17lxAeqFJ40CUoAc4Sxe', 'dosen', '2025-12-29 02:29:33', '2025-12-29 02:29:33');
+(13, 'Meliana Christianti J., S. Kom., M.T.', '0072207@edutrack.com', '$2y$12$C97naCO4OmqMPpkFmYkffOw.UL5tu5t.n17lxAeqFJ40CUoAc4Sxe', 'dosen', '2025-12-29 02:29:33', '2025-12-29 02:29:33'),
+(14, 'Rossevine Artha Nathasya, S.Kom., M.T.', '0072208@edutrack.com', '$2y$12$G5I.apu04eeNE.PmuBGARe5o6x01KEC0rNoZONrfEB3ogAvuFWmlG', 'dosen', '2026-01-04 03:16:47', '2026-01-04 03:16:47'),
+(15, 'Hendra Bunyamin, S.Si., M.T.', '0072209@edutrack.com', '$2y$12$FIrba1NSJtW97tgAxFVzheMTM.wpTdcC8hHRI8YZfVdMbIm5.lk/e', 'dosen', '2026-01-04 03:27:53', '2026-01-04 03:27:53'),
+(17, 'Juan Alexander', '2473020@edutrack.com', '$2y$12$Ifq2ZfGz9EvNKdCiXKWGJez76n7DkQfuSpRwm7JZXkms.ejMBSTtC', 'mahasiswa', '2026-01-07 01:13:07', '2026-01-07 01:13:07'),
+(18, 'Rafael Adiputra', '2473021@edutrack.com', '$2y$12$uh/vjWwCSzOk.ltRsrQVYOhl7CbnbaGkEau0LG8/6gjTjJItMizza', 'mahasiswa', '2026-01-07 01:18:32', '2026-01-07 01:18:32'),
+(19, 'Jimmy Agustian Loekito, S.T., M.T.', '0072210@edutrack.com', '$2y$12$mFwk7vkA2ypSZ9QpKUsZ6uOs8Kl9qVjtCCnS1Jap.qBbJaTeDt0Am', 'dosen', '2026-01-07 10:40:07', '2026-01-07 10:40:07'),
+(20, 'Pin Panji Yapinus, S.T., M.T.', '0072211@edutrack.com', '$2y$12$lfd1ovvEnXzN7Fk7x327fOtybGUPtTkM0m/0lkh6c1uvp4PRC8ONu', 'dosen', '2026-01-07 11:38:22', '2026-01-07 11:38:22'),
+(22, 'Seccond Admin', 'admin2@edutrack.com', '$2y$12$JNY8JGxD50jB2dl5R92ILe1uf4aBfpAHro4poYkaxEn35B3tvdhuy', 'admin', '2026-01-07 12:00:59', '2026-01-07 12:00:59'),
+(23, 'Semuil Tjiharjadi, S.T., M.M., M.T.', '0072212@edutrack.com', '$2y$12$GrsREkNLOj0xPZCg.hqlZ.ar3v66WXLKKYqAkB/KG.RHiRLUXT7bW', 'dosen', '2026-01-07 12:14:47', '2026-01-07 12:14:47'),
+(24, 'Markus Tanubrata, S.T., M.M., M.T.', '0072213@edutrack.com', '$2y$12$XFyFzFUzRaZ8yleOXFhH6eHrmgGjSU.0.QYknRbwUiZtpCVivRIvK', 'dosen', '2026-01-07 12:23:02', '2026-01-07 12:23:02');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indeks untuk tabel `admin`
+-- Indexes for table `admin`
 --
 ALTER TABLE `admin`
   ADD PRIMARY KEY (`kode_admin`),
@@ -758,19 +970,25 @@ ALTER TABLE `admin`
   ADD UNIQUE KEY `admin_email_unique` (`email`);
 
 --
--- Indeks untuk tabel `cache`
+-- Indexes for table `audit_logs_nilai`
+--
+ALTER TABLE `audit_logs_nilai`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `cache`
 --
 ALTER TABLE `cache`
   ADD PRIMARY KEY (`key`);
 
 --
--- Indeks untuk tabel `cache_locks`
+-- Indexes for table `cache_locks`
 --
 ALTER TABLE `cache_locks`
   ADD PRIMARY KEY (`key`);
 
 --
--- Indeks untuk tabel `dkbs`
+-- Indexes for table `dkbs`
 --
 ALTER TABLE `dkbs`
   ADD PRIMARY KEY (`id`),
@@ -778,7 +996,7 @@ ALTER TABLE `dkbs`
   ADD KEY `fk_dkbs_kode_mk` (`kode_mk`);
 
 --
--- Indeks untuk tabel `dosen`
+-- Indexes for table `dosen`
 --
 ALTER TABLE `dosen`
   ADD PRIMARY KEY (`nip`),
@@ -786,33 +1004,33 @@ ALTER TABLE `dosen`
   ADD UNIQUE KEY `dosen_email_unique` (`email`);
 
 --
--- Indeks untuk tabel `failed_jobs`
+-- Indexes for table `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
 
 --
--- Indeks untuk tabel `jadwal`
+-- Indexes for table `jadwal`
 --
 ALTER TABLE `jadwal`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `jobs`
+-- Indexes for table `jobs`
 --
 ALTER TABLE `jobs`
   ADD PRIMARY KEY (`id`),
   ADD KEY `jobs_queue_index` (`queue`);
 
 --
--- Indeks untuk tabel `job_batches`
+-- Indexes for table `job_batches`
 --
 ALTER TABLE `job_batches`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `mahasiswa`
+-- Indexes for table `mahasiswa`
 --
 ALTER TABLE `mahasiswa`
   ADD PRIMARY KEY (`nrp`),
@@ -820,26 +1038,32 @@ ALTER TABLE `mahasiswa`
   ADD UNIQUE KEY `mahasiswa_email_unique` (`email`);
 
 --
--- Indeks untuk tabel `mata_kuliah`
+-- Indexes for table `mata_kuliah`
 --
 ALTER TABLE `mata_kuliah`
   ADD PRIMARY KEY (`kode_mk`);
 
 --
--- Indeks untuk tabel `migrations`
+-- Indexes for table `migrations`
 --
 ALTER TABLE `migrations`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `nilai`
+-- Indexes for table `nilai`
 --
 ALTER TABLE `nilai`
   ADD PRIMARY KEY (`id`),
   ADD KEY `nilai_nrp_index` (`nrp`);
 
 --
--- Indeks untuk tabel `perkuliahan`
+-- Indexes for table `pengumuman`
+--
+ALTER TABLE `pengumuman`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `perkuliahan`
 --
 ALTER TABLE `perkuliahan`
   ADD PRIMARY KEY (`id_perkuliahan`),
@@ -848,20 +1072,20 @@ ALTER TABLE `perkuliahan`
   ADD KEY `fk_mk` (`kode_mk`);
 
 --
--- Indeks untuk tabel `presensi`
+-- Indexes for table `presensi`
 --
 ALTER TABLE `presensi`
   ADD PRIMARY KEY (`id`),
   ADD KEY `presensi_nrp_index` (`nrp`);
 
 --
--- Indeks untuk tabel `ruangan`
+-- Indexes for table `ruangan`
 --
 ALTER TABLE `ruangan`
   ADD PRIMARY KEY (`kode_ruangan`);
 
 --
--- Indeks untuk tabel `sessions`
+-- Indexes for table `sessions`
 --
 ALTER TABLE `sessions`
   ADD PRIMARY KEY (`id`),
@@ -869,113 +1093,125 @@ ALTER TABLE `sessions`
   ADD KEY `sessions_last_activity_index` (`last_activity`);
 
 --
--- Indeks untuk tabel `tagihan`
+-- Indexes for table `tagihan`
 --
 ALTER TABLE `tagihan`
   ADD PRIMARY KEY (`id`),
   ADD KEY `tagihan_nrp_index` (`nrp`);
 
 --
--- Indeks untuk tabel `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `users_email_unique` (`email`);
 
 --
--- AUTO_INCREMENT untuk tabel yang dibuang
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT untuk tabel `dkbs`
+-- AUTO_INCREMENT for table `audit_logs_nilai`
+--
+ALTER TABLE `audit_logs_nilai`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `dkbs`
 --
 ALTER TABLE `dkbs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
--- AUTO_INCREMENT untuk tabel `failed_jobs`
+-- AUTO_INCREMENT for table `failed_jobs`
 --
 ALTER TABLE `failed_jobs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `jadwal`
+-- AUTO_INCREMENT for table `jadwal`
 --
 ALTER TABLE `jadwal`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `jobs`
+-- AUTO_INCREMENT for table `jobs`
 --
 ALTER TABLE `jobs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT untuk tabel `migrations`
+-- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
--- AUTO_INCREMENT untuk tabel `nilai`
+-- AUTO_INCREMENT for table `nilai`
 --
 ALTER TABLE `nilai`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT untuk tabel `perkuliahan`
+-- AUTO_INCREMENT for table `pengumuman`
 --
-ALTER TABLE `perkuliahan`
-  MODIFY `id_perkuliahan` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+ALTER TABLE `pengumuman`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT untuk tabel `presensi`
+-- AUTO_INCREMENT for table `perkuliahan`
+--
+ALTER TABLE `perkuliahan`
+  MODIFY `id_perkuliahan` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+
+--
+-- AUTO_INCREMENT for table `presensi`
 --
 ALTER TABLE `presensi`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=180;
 
 --
--- AUTO_INCREMENT untuk tabel `tagihan`
+-- AUTO_INCREMENT for table `tagihan`
 --
 ALTER TABLE `tagihan`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
--- AUTO_INCREMENT untuk tabel `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
--- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
+-- Constraints for dumped tables
 --
 
 --
--- Ketidakleluasaan untuk tabel `admin`
+-- Constraints for table `admin`
 --
 ALTER TABLE `admin`
   ADD CONSTRAINT `admin_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Ketidakleluasaan untuk tabel `dkbs`
+-- Constraints for table `dkbs`
 --
 ALTER TABLE `dkbs`
   ADD CONSTRAINT `fk_dkbs_kode_mk` FOREIGN KEY (`kode_mk`) REFERENCES `mata_kuliah` (`kode_mk`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Ketidakleluasaan untuk tabel `dosen`
+-- Constraints for table `dosen`
 --
 ALTER TABLE `dosen`
   ADD CONSTRAINT `dosen_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Ketidakleluasaan untuk tabel `mahasiswa`
+-- Constraints for table `mahasiswa`
 --
 ALTER TABLE `mahasiswa`
   ADD CONSTRAINT `mahasiswa_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Ketidakleluasaan untuk tabel `perkuliahan`
+-- Constraints for table `perkuliahan`
 --
 ALTER TABLE `perkuliahan`
   ADD CONSTRAINT `fk_dosen` FOREIGN KEY (`nip_dosen`) REFERENCES `dosen` (`nip`) ON DELETE CASCADE ON UPDATE CASCADE,
