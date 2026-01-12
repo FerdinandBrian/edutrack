@@ -45,9 +45,7 @@
                         <option value="">-- Pilih Program Studi --</option>
                         <option value="Teknik Informatika" {{ old('jurusan') == 'Teknik Informatika' ? 'selected' : '' }}>Teknik Informatika</option>
                         <option value="Sistem Komputer" {{ old('jurusan') == 'Sistem Komputer' ? 'selected' : '' }}>Sistem Komputer</option>
-                        <option value="Sistem Informasi" {{ old('jurusan') == 'Sistem Informasi' ? 'selected' : '' }}>Sistem Informasi</option>
-                        <option value="Teknologi Informasi" {{ old('jurusan') == 'Teknologi Informasi' ? 'selected' : '' }}>Teknologi Informasi</option>
-                        <option value="Bisnis Digital" {{ old('jurusan') == 'Bisnis Digital' ? 'selected' : '' }}>Bisnis Digital</option>
+                        <option value="Psikologi" {{ old('jurusan') == 'Psikologi' ? 'selected' : '' }}>Psikologi</option>
                     </select>
                 </div>
 

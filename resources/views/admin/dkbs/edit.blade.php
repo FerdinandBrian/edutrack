@@ -55,7 +55,7 @@
                     </h3>
                     <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 space-y-6">
                         <div>
-                            <label class="block text-sm font-medium text-slate-600 mb-2">Tahun Ajaran</label>
+                            <label class="block text-sm font-medium text-slate-600 mb-2">1. Pilih Tahun Ajaran</label>
                             <select id="ta-select" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 transition outline-none bg-white">
                                 <option value="">-- Pilih Periode --</option>
                                 @foreach($periods as $ta)
@@ -65,11 +65,18 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-slate-600 mb-2">Pilih Kelas Perkuliahan</label>
-                            <select name="id_perkuliahan" id="perkuliahan-select" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 transition outline-none bg-white">
+                            <label class="block text-sm font-medium text-slate-600 mb-2">2. Pilih Mata Kuliah</label>
+                            <select id="matkul-select" required class="w-full">
                                 <option value="">-- Pilih Tahun Ajaran Dahulu --</option>
                             </select>
-                            <p class="text-[10px] text-slate-400 mt-2 italic font-medium">* Menampilkan daftar kelas yang aktif pada periode terpilih.</p>
+                        </div>
+
+                        <div id="kelas-selection-container" class="hidden">
+                            <label class="block text-sm font-medium text-slate-600 mb-2">3. Pilih Kelas & Jadwal</label>
+                            <div id="kelas-options-list" class="space-y-3">
+                                <!-- Dynamic Radio Cards -->
+                            </div>
+                            <input type="hidden" name="id_perkuliahan" id="id_perkuliahan_input" value="{{ $dkbs->id_perkuliahan }}" required>
                         </div>
 
                         <div>
@@ -94,7 +101,7 @@
 
                 <div class="pt-8 flex items-center justify-end gap-4 border-t border-slate-50">
                     <a href="/admin/dkbs" class="px-6 py-3 text-slate-500 hover:text-slate-700 font-medium transition">Batal</a>
-                    <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-10 py-3 rounded-xl shadow-lg shadow-amber-200 transition transform hover:-translate-y-0.5 active:translate-y-0">
+                    <button type="submit" id="submit-btn" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-10 py-3 rounded-xl shadow-lg shadow-amber-200 transition transform hover:-translate-y-0.5 active:translate-y-0">
                         Simpan Perubahan
                     </button>
                 </div>
@@ -102,6 +109,18 @@
         </div>
     </div>
 </div>
+
+<style>
+    .radio-card {
+        @apply cursor-pointer border-2 border-slate-100 bg-white p-4 rounded-xl transition-all flex items-center justify-between;
+    }
+    .radio-card:hover {
+        @apply border-amber-200 bg-amber-50/30;
+    }
+    .radio-card.selected {
+        @apply border-amber-500 bg-amber-50 ring-2 ring-amber-500/10;
+    }
+</style>
 
 <!-- Scripts for Dynamic Loading -->
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
@@ -112,48 +131,107 @@
         sortField: { field: "text", direction: "asc" }
     });
 
+    const matkulSelect = new TomSelect("#matkul-select", {
+        create: false,
+        placeholder: "Cari Mata Kuliah...",
+        sortField: { field: "text", direction: "asc" }
+    });
+
     const taSelect = document.getElementById('ta-select');
-    const perkuliahanSelect = document.getElementById('perkuliahan-select');
+    const kelasContainer = document.getElementById('kelas-selection-container');
+    const kelasList = document.getElementById('kelas-options-list');
+    const hiddenInput = document.getElementById('id_perkuliahan_input');
     const currentIdPerkuliahan = "{{ $dkbs->id_perkuliahan }}";
 
-    async function updatePerkuliahanOptions(ta, selectedId = null) {
-        if (!ta) {
-            perkuliahanSelect.innerHTML = '<option value="">-- Pilih Tahun Ajaran Dahulu --</option>';
-            perkuliahanSelect.disabled = true;
-            perkuliahanSelect.classList.add('opacity-50');
-            return;
-        }
+    let allPerkuliahan = [];
 
-        perkuliahanSelect.innerHTML = '<option value="">-- Memuat Kelas... --</option>';
-        perkuliahanSelect.disabled = true;
+    async function updatePerkuliahanOptions(ta, initialLoad = false) {
+        matkulSelect.clear();
+        matkulSelect.clearOptions();
+        matkulSelect.disable();
+        kelasContainer.classList.add('hidden');
+        kelasList.innerHTML = '';
+
+        if (!ta) return;
 
         try {
             const response = await fetch(`/admin/api/perkuliahan-by-ta?tahun_ajaran=${encodeURIComponent(ta)}`);
-            const data = await response.json();
+            allPerkuliahan = await response.json();
 
-            let options = '<option value="">-- Pilih Kelas --</option>';
-            data.forEach(p => {
-                const isSelected = selectedId && p.id == selectedId ? 'selected' : '';
-                options += `<option value="${p.id}" ${isSelected}>${p.label}</option>`;
-            });
+            const matkuls = [...new Set(allPerkuliahan.map(p => p.nama_mk))];
+            matkuls.forEach(m => matkulSelect.addOption({value: m, text: m}));
+            matkulSelect.enable();
 
-            perkuliahanSelect.innerHTML = options;
-            perkuliahanSelect.disabled = false;
-            perkuliahanSelect.classList.remove('opacity-50');
-        } catch (error) {
-            console.error('Error fetching perkuliahan:', error);
-            perkuliahanSelect.innerHTML = '<option value="">Error memuat data</option>';
+            if (initialLoad) {
+                const currentMatkul = allPerkuliahan.find(p => p.id == currentIdPerkuliahan)?.nama_mk;
+                if (currentMatkul) {
+                    matkulSelect.setValue(currentMatkul);
+                    renderClasses(currentMatkul, currentIdPerkuliahan);
+                }
+            }
+        } catch (e) {
+            console.error(e);
         }
+    }
+
+    function renderClasses(matkulName, selectedId = null) {
+        kelasList.innerHTML = '';
+        const filtered = allPerkuliahan.filter(p => p.nama_mk === matkulName);
+        
+        filtered.forEach(p => {
+            const isSelected = selectedId && p.id == selectedId;
+            const card = document.createElement('div');
+            card.className = `radio-card border-2 border-slate-100 bg-white p-4 rounded-xl transition-all flex items-center justify-between cursor-pointer hover:border-amber-200 hover:bg-amber-50/30 ${isSelected ? 'border-amber-500 bg-amber-50 ring-2 ring-amber-500/10' : ''}`;
+            
+            card.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full ${isSelected ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-500'} flex items-center justify-center font-bold text-lg class-badge">
+                        ${p.kelas}
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-800">Kelas ${p.kelas}</div>
+                        <div class="text-xs text-slate-500 flex items-center gap-2">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            ${p.hari}, ${p.jam_mulai} - ${p.jam_berakhir}
+                        </div>
+                    </div>
+                </div>
+                <div class="w-6 h-6 rounded-full border-2 ${isSelected ? 'border-amber-500' : 'border-slate-200'} flex items-center justify-center bg-white transition-all radio-check">
+                    <div class="w-3 h-3 rounded-full bg-amber-600 ${isSelected ? 'scale-100' : 'scale-0'} transition-all"></div>
+                </div>
+            `;
+            
+            card.onclick = () => {
+                document.querySelectorAll('.radio-card').forEach(c => {
+                    c.classList.remove('border-amber-500', 'bg-amber-50', 'ring-2', 'ring-amber-500/10');
+                    c.querySelector('.radio-check').classList.remove('border-amber-500');
+                    c.querySelector('.radio-check div').classList.remove('scale-100');
+                    c.querySelector('.class-badge').classList.replace('bg-amber-100', 'bg-slate-100');
+                    c.querySelector('.class-badge').classList.replace('text-amber-700', 'text-slate-500');
+                });
+                card.classList.add('border-amber-500', 'bg-amber-50', 'ring-2', 'ring-amber-500/10');
+                card.querySelector('.radio-check').classList.add('border-amber-500');
+                card.querySelector('.radio-check div').classList.add('scale-100');
+                card.querySelector('.class-badge').classList.replace('bg-slate-100', 'bg-amber-100');
+                card.querySelector('.class-badge').classList.replace('text-slate-500', 'text-amber-700');
+                hiddenInput.value = p.id;
+            };
+            kelasList.appendChild(card);
+        });
+        kelasContainer.classList.remove('hidden');
     }
 
     taSelect.addEventListener('change', function() {
         updatePerkuliahanOptions(this.value);
     });
 
-    // Initial load for edit page
+    matkulSelect.on('change', function(value) {
+        if (value) renderClasses(value);
+    });
+
     window.addEventListener('DOMContentLoaded', () => {
         if (taSelect.value) {
-            updatePerkuliahanOptions(taSelect.value, currentIdPerkuliahan);
+            updatePerkuliahanOptions(taSelect.value, true);
         }
     });
 </script>

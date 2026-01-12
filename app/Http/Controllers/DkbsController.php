@@ -101,8 +101,9 @@ class DkbsController extends Controller
             $timeB = $b->perkuliahan ? $b->perkuliahan->jam_mulai : '99:99';
             return strcmp($timeA, $timeB);
         });
+        $totalSksKumulatif = $dkbs->sum('mataKuliah.sks');
             
-        return view('admin.dkbs.show_student', compact('mahasiswa', 'dkbs'));
+        return view('admin.dkbs.show_student', compact('mahasiswa', 'dkbs', 'totalSksKumulatif'));
     }
 
     public function create(Request $request)
@@ -154,6 +155,22 @@ class DkbsController extends Controller
 
         if ($exists) {
             return back()->withErrors(['msg' => 'Mahasiswa sudah terdaftar di kelas ini.'])->withInput();
+        }
+
+        // 3. Schedule Conflict Check
+        $conflicts = Dkbs::where('nrp', $request->nrp)
+            ->where('tahun_ajaran', $perkuliahan->tahun_ajaran)
+            ->whereHas('perkuliahan', function($q) use ($perkuliahan) {
+                $q->where('hari', $perkuliahan->hari)
+                  ->where('jam_mulai', '<', $perkuliahan->jam_berakhir)
+                  ->where('jam_berakhir', '>', $perkuliahan->jam_mulai);
+            })
+            ->with(['mataKuliah', 'perkuliahan'])
+            ->get();
+
+        if ($conflicts->isNotEmpty()) {
+            $conflictNames = $conflicts->map(fn($c) => $c->mataKuliah->nama_mk . " (" . substr($c->perkuliahan->jam_mulai, 0, 5) . "-" . substr($c->perkuliahan->jam_berakhir, 0, 5) . ")")->implode(', ');
+            return back()->withErrors(['msg' => "Gagal: Jadwal bentrok dengan mata kuliah yang sudah ada: $conflictNames."])->withInput();
         }
 
         try {
@@ -222,7 +239,7 @@ class DkbsController extends Controller
             }
         }
 
-        return redirect('/admin/dkbs')->with('success', 'Mahasiswa berhasil didaftarkan ke kelas' . ($pairedKodeMk && $pairedPerkuliahan ? ' (termasuk pasangan Teori/Praktikum)' : ''));
+        return redirect('/admin/dkbs/student/' . $request->nrp)->with('success', 'Mahasiswa berhasil didaftarkan ke kelas' . ($pairedKodeMk && $pairedPerkuliahan ? ' (termasuk pasangan Teori/Praktikum)' : ''));
     }
 
     public function edit(Dkbs $dkbs)
@@ -264,6 +281,23 @@ class DkbsController extends Controller
             return back()->withErrors(['msg' => 'Data duplikat terdeteksi.'])->withInput();
         }
 
+        // 3. Schedule Conflict Check (excluding self)
+        $conflicts = Dkbs::where('nrp', $request->nrp)
+            ->where('tahun_ajaran', $perkuliahan->tahun_ajaran)
+            ->where('id', '!=', $dkbs->id)
+            ->whereHas('perkuliahan', function($q) use ($perkuliahan) {
+                $q->where('hari', $perkuliahan->hari)
+                  ->where('jam_mulai', '<', $perkuliahan->jam_berakhir)
+                  ->where('jam_berakhir', '>', $perkuliahan->jam_mulai);
+            })
+            ->with(['mataKuliah', 'perkuliahan'])
+            ->get();
+
+        if ($conflicts->isNotEmpty()) {
+            $conflictNames = $conflicts->map(fn($c) => $c->mataKuliah->nama_mk . " (" . substr($c->perkuliahan->jam_mulai, 0, 5) . "-" . substr($c->perkuliahan->jam_berakhir, 0, 5) . ")")->implode(', ');
+            return back()->withErrors(['msg' => "Gagal: Jadwal bentrok dengan mata kuliah yang sudah ada: $conflictNames."])->withInput();
+        }
+
         $dkbs->update([
             'nrp' => $request->nrp,
             'id_perkuliahan' => $request->id_perkuliahan,
@@ -273,7 +307,7 @@ class DkbsController extends Controller
             'semester' => $perkuliahan->mataKuliah->semester
         ]);
         
-        return redirect('/admin/dkbs')->with('success','DKBS diperbarui');
+        return redirect('/admin/dkbs/student/' . $request->nrp)->with('success','DKBS diperbarui');
     }
 
     public function destroy(Dkbs $dkbs)
@@ -293,7 +327,12 @@ class DkbsController extends Controller
             $data = collect($raw)->map(function($p) {
                 return [
                     'id' => $p->id_perkuliahan,
-                    'label' => "[{$p->kode_mk}] {$p->nama_mk} - Kelas {$p->kelas} ({$p->hari}, {$p->jam_mulai}-{$p->jam_berakhir})"
+                    'label' => "[{$p->kode_mk}] {$p->nama_mk} - Kelas {$p->kelas} ({$p->hari}, {$p->jam_mulai}-{$p->jam_berakhir})",
+                    'nama_mk' => $p->nama_mk,
+                    'kelas' => $p->kelas,
+                    'hari' => $p->hari,
+                    'jam_mulai' => substr($p->jam_mulai, 0, 5),
+                    'jam_berakhir' => substr($p->jam_berakhir, 0, 5)
                 ];
             });
 
@@ -309,7 +348,12 @@ class DkbsController extends Controller
                     ->map(function($p) {
                         return [
                             'id' => $p->id_perkuliahan,
-                            'label' => "[{$p->kode_mk}] {$p->mataKuliah->nama_mk} - Kelas {$p->kelas} ({$p->hari}, {$p->jam_mulai}-{$p->jam_berakhir})"
+                            'label' => "[{$p->kode_mk}] {$p->mataKuliah->nama_mk} - Kelas {$p->kelas} ({$p->hari}, {$p->jam_mulai}-{$p->jam_berakhir})",
+                            'nama_mk' => $p->mataKuliah->nama_mk,
+                            'kelas' => $p->kelas,
+                            'hari' => $p->hari,
+                            'jam_mulai' => substr($p->jam_mulai, 0, 5),
+                            'jam_berakhir' => substr($p->jam_berakhir, 0, 5)
                         ];
                     });
 
@@ -337,7 +381,12 @@ class DkbsController extends Controller
                 ->map(function($p) {
                     return [
                         'id' => $p->id_perkuliahan,
-                        'label' => "[{$p->kode_mk}] {$p->nama_mk} - Kelas {$p->kelas} ({$p->hari}, {$p->jam_mulai}-{$p->jam_berakhir})"
+                        'label' => "[{$p->kode_mk}] {$p->nama_mk} - Kelas {$p->kelas} ({$p->hari}, {$p->jam_mulai}-{$p->jam_berakhir})",
+                        'nama_mk' => $p->nama_mk,
+                        'kelas' => $p->kelas,
+                        'hari' => $p->hari,
+                        'jam_mulai' => substr($p->jam_mulai, 0, 5),
+                        'jam_berakhir' => substr($p->jam_berakhir, 0, 5)
                     ];
                 });
 
@@ -357,7 +406,12 @@ class DkbsController extends Controller
                     ->map(function($p) {
                         return [
                             'id' => $p->id_perkuliahan,
-                            'label' => "[{$p->kode_mk}] {$p->mataKuliah->nama_mk} - Kelas {$p->kelas} ({$p->hari}, {$p->jam_mulai}-{$p->jam_berakhir})"
+                            'label' => "[{$p->kode_mk}] {$p->mataKuliah->nama_mk} - Kelas {$p->kelas} ({$p->hari}, {$p->jam_mulai}-{$p->jam_berakhir})",
+                            'nama_mk' => $p->mataKuliah->nama_mk,
+                            'kelas' => $p->kelas,
+                            'hari' => $p->hari,
+                            'jam_mulai' => substr($p->jam_mulai, 0, 5),
+                            'jam_berakhir' => substr($p->jam_berakhir, 0, 5)
                         ];
                     });
 

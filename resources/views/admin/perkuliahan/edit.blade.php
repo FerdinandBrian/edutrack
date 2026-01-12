@@ -33,8 +33,8 @@
                     <!-- Mata Kuliah (Disabled) -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-slate-600 mb-2">Mata Kuliah</label>
-                        <select disabled class="w-full border border-slate-200 rounded-xl px-4 py-3 bg-slate-100 text-slate-500 cursor-not-allowed">
-                            <option>[{{ $perkuliahan->kode_mk }}] {{ $perkuliahan->mataKuliah->nama_mk }}</option>
+                        <select disabled id="mkSelect" data-nama="{{ $perkuliahan->mataKuliah->nama_mk }}" data-sks="{{ $perkuliahan->mataKuliah->sks }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 bg-slate-100 text-slate-500 cursor-not-allowed">
+                            <option>[{{ $perkuliahan->kode_mk }}] {{ $perkuliahan->mataKuliah->nama_mk }} ({{ $perkuliahan->mataKuliah->sks }} SKS)</option>
                         </select>
                         <input type="hidden" name="kode_mk" value="{{ $perkuliahan->kode_mk }}">
                     </div>
@@ -70,13 +70,12 @@
                     <!-- Ruangan -->
                     <div>
                         <label class="block text-sm font-medium text-slate-600 mb-2">Ruangan</label>
-                        <select name="kode_ruangan" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 transition outline-none bg-slate-50">
+                        <input type="text" name="kode_ruangan" id="ruanganInput" list="ruanganList" required placeholder="Ketik Kode Ruangan" value="{{ old('kode_ruangan', $perkuliahan->kode_ruangan) }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 transition outline-none bg-slate-50 uppercase">
+                        <datalist id="ruanganList">
                             @foreach($ruangans as $r)
-                                <option value="{{ $r->kode_ruangan }}" {{ (old('kode_ruangan', $perkuliahan->kode_ruangan)) == $r->kode_ruangan ? 'selected' : '' }}>
-                                    {{ $r->kode_ruangan }} - {{ $r->nama_ruangan }}
-                                </option>
+                                <option value="{{ $r->kode_ruangan }}">{{ $r->nama_ruangan }}</option>
                             @endforeach
-                        </select>
+                        </datalist>
                     </div>
 
                     <!-- Tahun Ajaran -->
@@ -97,8 +96,8 @@
 
                     <!-- Jam Berakhir -->
                     <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-2">Jam Berakhir</label>
-                        <input type="time" name="jam_berakhir" required value="{{ old('jam_berakhir', \Illuminate\Support\Str::substr($perkuliahan->jam_berakhir, 0, 5)) }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 transition outline-none bg-slate-50">
+                        <label class="block text-sm font-medium text-slate-600 mb-2">Jam Berakhir (Otomatis)</label>
+                        <input type="time" name="jam_berakhir" id="jamBerakhir" readonly required value="{{ old('jam_berakhir', \Illuminate\Support\Str::substr($perkuliahan->jam_berakhir, 0, 5)) }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 transition outline-none bg-slate-100 cursor-not-allowed font-semibold text-amber-700" title="Jam berakhir dihitung otomatis">
                     </div>
                 </div>
 
@@ -113,3 +112,39 @@
     </div>
 </div>
 @endsection
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mkSelect = document.getElementById('mkSelect');
+        const jamMulaiInput = document.querySelector('input[name="jam_mulai"]');
+        const jamBerakhirInput = document.getElementById('jamBerakhir');
+
+        function updateEndTime() {
+            const mkNama = mkSelect.dataset.nama.toLowerCase();
+            const mkKode = document.querySelector('input[name="kode_mk"]').value;
+            const mkSks = parseInt(mkSelect.dataset.sks);
+            const startTime = jamMulaiInput.value;
+            
+            if (!startTime) return;
+
+            let minutes = 0;
+            // Same logic: 120 for Praktikum, SKS * 50 for others
+            if (mkNama.includes('praktikum') || mkKode.endsWith('P')) {
+                minutes = 120;
+            } else {
+                minutes = mkSks * 50;
+            }
+
+            const [hours, mins] = startTime.split(':').map(Number);
+            const date = new Date();
+            date.setHours(hours, mins + minutes, 0);
+            
+            const endHours = String(date.getHours()).padStart(2, '0');
+            const endMins = String(date.getMinutes()).padStart(2, '0');
+            
+            jamBerakhirInput.value = `${endHours}:${endMins}`;
+        }
+
+        jamMulaiInput.addEventListener('change', updateEndTime);
+    });
+</script>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 08, 2026 at 05:49 AM
+-- Generation Time: Jan 12, 2026 at 11:43 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -170,6 +170,15 @@ CREATE TABLE `audit_logs_nilai` (
   `waktu_perubahan` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `audit_logs_nilai`
+--
+
+INSERT INTO `audit_logs_nilai` (`id`, `nrp`, `kode_mk`, `nilai_lama_total`, `nilai_baru_total`, `perubahan_oleh`, `waktu_perubahan`) VALUES
+(1, '2472021', 'MK001T', 68.75, 84.5, 'root@', '2026-01-12 10:18:12'),
+(2, '2472021', 'MK001P', 64.45, 80.03, 'root@', '2026-01-12 10:19:14'),
+(3, '2472021', 'MK001T', 84.5, 82.49, 'root@', '2026-01-12 10:35:04');
+
 -- --------------------------------------------------------
 
 --
@@ -237,16 +246,20 @@ INSERT INTO `dkbs` (`id`, `nrp`, `kode_mk`, `id_perkuliahan`, `semester`, `statu
 (26, '2472022', 'MK007', 9, '3', 'Terdaftar', '2026-01-03 00:26:54', '2026-01-03 00:26:54', '2025/2026 - Ganjil'),
 (27, '2472022', 'MK001T', 10, '3', 'Terdaftar', '2026-01-03 00:28:00', '2026-01-03 00:28:00', '2025/2026 - Ganjil'),
 (28, '2472022', 'MK001P', 11, '3', 'Terdaftar', '2026-01-03 00:28:00', '2026-01-03 00:28:00', '2025/2026 - Ganjil'),
-(29, '2473020', 'MK103', 31, '1', 'Terdaftar', '2026-01-07 11:35:04', '2026-01-07 11:35:04', '2025/2026 - Ganjil'),
-(30, '2473020', 'MK101T', 33, '1', 'Terdaftar', '2026-01-07 11:46:20', '2026-01-07 11:46:20', '2025/2026 - Ganjil'),
-(31, '2473020', 'MK101P', 34, '1', 'Terdaftar', '2026-01-07 11:46:20', '2026-01-07 11:46:20', '2025/2026 - Ganjil'),
 (32, '2473020', 'MK106T', 35, '2', 'Terdaftar', '2026-01-07 12:19:30', '2026-01-07 12:19:30', '2025/2026 - Ganjil'),
 (33, '2473020', 'MK106P', 36, '2', 'Terdaftar', '2026-01-07 12:19:30', '2026-01-07 12:19:30', '2025/2026 - Ganjil'),
-(37, '2473021', 'MK106T', 39, '2', 'Terdaftar', '2026-01-07 21:35:49', '2026-01-07 21:35:49', '2025/2026 - Ganjil'),
-(38, '2473021', 'MK106P', 40, '2', 'Terdaftar', '2026-01-07 21:35:49', '2026-01-07 21:35:49', '2025/2026 - Ganjil'),
-(39, '2473021', 'MK103', 37, '1', 'Terdaftar', '2026-01-07 21:36:17', '2026-01-07 21:36:17', '2025/2026 - Ganjil'),
-(40, '2473021', 'MK101T', 43, '1', 'Terdaftar', '2026-01-07 21:37:05', '2026-01-07 21:37:05', '2025/2026 - Ganjil'),
-(41, '2473021', 'MK101P', 44, '1', 'Terdaftar', '2026-01-07 21:37:05', '2026-01-07 21:37:05', '2025/2026 - Ganjil');
+(42, '2430001', 'MK201', 67, '3', 'Terdaftar', '2026-01-11 20:36:50', '2026-01-11 20:36:50', '2025/2026 - Ganjil'),
+(43, '2430001', 'MK204T', 49, '3', 'Terdaftar', '2026-01-11 20:37:44', '2026-01-11 20:37:44', '2025/2026 - Ganjil'),
+(44, '2430001', 'MK204P', 50, '3', 'Terdaftar', '2026-01-11 20:37:44', '2026-01-11 20:37:44', '2025/2026 - Ganjil'),
+(45, '2430001', 'MK203', 64, '3', 'Terdaftar', '2026-01-11 20:39:01', '2026-01-11 20:39:01', '2025/2026 - Ganjil'),
+(46, '2430001', 'MK202', 70, '3', 'Terdaftar', '2026-01-11 20:39:24', '2026-01-11 20:39:24', '2025/2026 - Ganjil'),
+(48, '2473020', 'MK101T', 41, '3', 'Terdaftar', '2026-01-11 20:57:48', '2026-01-11 20:57:48', '2025/2026 - Ganjil'),
+(49, '2473020', 'MK101P', 42, '3', 'Terdaftar', '2026-01-11 20:57:49', '2026-01-11 20:57:49', '2025/2026 - Ganjil'),
+(50, '2473020', 'MK102', 60, '3', 'Terdaftar', '2026-01-11 20:58:14', '2026-01-11 20:58:14', '2025/2026 - Ganjil'),
+(51, '2473020', 'MK103', 38, '3', 'Terdaftar', '2026-01-11 21:00:01', '2026-01-11 21:00:01', '2025/2026 - Ganjil'),
+(52, '2473020', 'MK105', 63, '3', 'Terdaftar', '2026-01-11 21:01:03', '2026-01-11 21:01:03', '2025/2026 - Ganjil'),
+(53, '2473020', 'MK104', 55, '3', 'Terdaftar', '2026-01-11 21:04:55', '2026-01-11 21:04:55', '2025/2026 - Ganjil'),
+(54, '2473021', 'MK102', 58, '3', 'Terdaftar', '2026-01-11 21:10:05', '2026-01-11 21:10:05', '2025/2026 - Ganjil');
 
 --
 -- Triggers `dkbs`
@@ -299,6 +312,13 @@ CREATE TABLE `dosen` (
 --
 
 INSERT INTO `dosen` (`nip`, `user_id`, `nama`, `tanggal_lahir`, `jenis_kelamin`, `email`, `no_telepon`, `alamat`, `fakultas`, `jurusan`, `created_at`, `updated_at`) VALUES
+('0071101', 19, 'Jimmy Agustian Loekito, S.T., M.T.', '1986-05-13', 'Laki-laki', '0071101@edutrack.com', '0895723019', 'Jl. Gerbera No 42', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-07 10:40:07', '2026-01-07 10:40:07'),
+('0071102', 20, 'Pin Panji Yapinus, S.T., M.T.', '1983-11-16', 'Laki-laki', '0071102@edutrack.com', '089526048382', 'Jl. Sakura No 2', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-07 11:38:22', '2026-01-07 11:38:22'),
+('0071103', 23, 'Semuil Tjiharjadi, S.T., M.M., M.T.', '1983-05-09', 'Laki-laki', '0071103@edutrack.com', '08967439163', 'Jl. Hydrangea No 20', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-07 12:14:47', '2026-01-07 12:14:47'),
+('0071104', 24, 'Markus Tanubrata, S.T., M.M., M.T.', '1980-12-09', 'Laki-laki', '0071104@edutrack.com', '089563748193', 'Jl. Rafflesia Arnoldi No 25', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-07 12:23:02', '2026-01-07 12:23:02'),
+('0071105', 28, 'Hendry Wong, S.T., M.Kom.', '1979-08-13', 'Laki-laki', '0071105@edutrack.com', '089527849012', 'Jl. Krisan No 12', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-09 22:48:57', '2026-01-09 22:48:57'),
+('0071106', 29, 'Andrew Sebastian Lehman, S.T., M.Eng.', '1999-06-13', 'Laki-laki', '0071106@edutrack.com', '089573908192', 'Jl. Kantong Semar No 20', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-09 22:56:35', '2026-01-09 22:56:35'),
+('0071107', 30, 'Jonathan Chandra, S.T., M.T.', '1996-09-17', 'Laki-laki', '0071107@edutrack.com', '08950942718', 'Jl. Lavender No 4', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-09 22:57:54', '2026-01-09 22:57:54'),
 ('0072201', 2, 'Tjatur Kandaga, S.Si., M.T.', '1985-05-20', 'Laki-laki', '0072201@edutrack.com', '08987654321', 'Jl. Melati No. 12', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2025-12-28 22:47:57', '2025-12-29 04:51:07'),
 ('0072202', 9, 'Ir. Teddy Marcus Zakaria, M.T.', '1986-11-05', 'Laki-laki', '0072202@edutrack.com', '081234567890', 'Jl. Kenanga Raya No. 45', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2025-12-29 01:41:28', '2025-12-29 02:19:07'),
 ('0072203', 8, 'Erico Darmawan Handoyo, S. Kom., M.T.', '1990-01-09', 'Laki-laki', '0072203@edutrack.com', '087656728372', 'Jl. Mawar Indah No. 7', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2025-12-29 01:37:49', '2025-12-29 02:19:17'),
@@ -306,12 +326,16 @@ INSERT INTO `dosen` (`nip`, `user_id`, `nama`, `tanggal_lahir`, `jenis_kelamin`,
 ('0072205', 11, 'Maresha Caroline Wijanto, S.Kom., M.T., Ph.D.', '1990-07-19', 'Perempuan', '0072205@edutrack.com', '081333445566', 'Jl. Cendana No. 23', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2025-12-29 02:26:23', '2026-01-02 23:47:23'),
 ('0072206', 12, 'Wenny Franciska Senjaya, S.Kom., M.T., Ph.D.', '1992-03-17', 'Perempuan', '0072206@edutrack.com', '081245678901', 'Jl. Flamboyan No. 56', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2025-12-29 02:27:57', '2026-01-02 23:48:22'),
 ('0072207', 13, 'Meliana Christianti J., S. Kom., M.T.', '1996-09-10', 'Perempuan', '0072207@edutrack.com', '082134567890', 'Jl. Dahlia No. 89', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2025-12-29 02:29:33', '2025-12-29 02:29:33'),
-('0072208', 14, 'Rossevine Artha Nathasya, S.Kom., M.T.', '1997-01-14', 'Perempuan', '0072208@edutrack.com', '089526374688', 'Jl. Tulip No 11A', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2026-01-04 03:16:47', '2026-01-04 03:16:47'),
+('0072208', 14, 'Rossevine Artha Nathasya, S.Kom., M.T.', '1997-01-14', 'Perempuan', '0072208@edutrack.com', '089526374688', 'Jl. Tulip No 11', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2026-01-04 03:16:47', '2026-01-04 03:16:47'),
 ('0072209', 15, 'Hendra Bunyamin, S.Si., M.T.', '1979-05-15', 'Laki-laki', '0072209@edutrack.com', '089537462987', 'Jl. Anyelir no 20', 'Teknologi Rekayasa Cerdas', 'Teknik Informatika', '2026-01-04 03:27:53', '2026-01-04 03:27:53'),
-('0072210', 19, 'Jimmy Agustian Loekito, S.T., M.T.', '1986-05-13', 'Laki-laki', '0072210@edutrack.com', '0895723019', 'Jl. Gerbera No 42', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-07 10:40:07', '2026-01-07 10:40:07'),
-('0072211', 20, 'Pin Panji Yapinus, S.T., M.T.', '1983-11-16', 'Laki-laki', '0072211@edutrack.com', '089526048382', 'Jl. Sakura No 2B', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-07 11:38:22', '2026-01-07 11:38:22'),
-('0072212', 23, 'Semuil Tjiharjadi, S.T., M.M., M.T.', '1983-05-09', 'Laki-laki', '0072212@edutrack.com', '08967439163', 'Jl. Hydrangea No 20', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-07 12:14:47', '2026-01-07 12:14:47'),
-('0072213', 24, 'Markus Tanubrata, S.T., M.M., M.T.', '1980-12-09', 'Laki-laki', '0072213@edutrack.com', '089563748193', 'Jl. Rafflesia Arnoldi No 25', 'Teknologi Rekayasa Cerdas', 'Sistem Komputer', '2026-01-07 12:23:02', '2026-01-07 12:23:02');
+('0073301', 25, 'Marissa Chitra Sulastra, S.Psi., M.Psi., Psikolog', '1997-03-18', 'Perempuan', '0073301@edutrack.com', '089573849012', 'Jl. Seruni No 14', 'Psikologi', 'Psikologi', '2026-01-08 00:24:54', '2026-01-08 00:24:54'),
+('0073302', 31, 'Lisa Imelia Satyawan, M.Psi., Psikolog.', '1982-05-12', 'Perempuan', '0073302@edutrack.com', '089583019283', 'Jl. Matahari No 7', 'Psikologi', 'Psikologi', '2026-01-09 23:07:50', '2026-01-09 23:07:50'),
+('0073303', 32, 'Cindy Maria, M.Psi., Psikolog', '1992-12-15', 'Perempuan', '0073303@edutrack.com', '089582093821', 'Jl. Lili No 24', 'Psikologi', 'Psikologi', '2026-01-09 23:09:06', '2026-01-09 23:09:06'),
+('0073304', 33, 'Indah Puspitasari, M.Psi., Psikolog.', '1990-06-13', 'Perempuan', '0073304@edutrack.com', '089582901029', 'Jl. Edelweis No 10', 'Psikologi', 'Psikologi', '2026-01-09 23:10:21', '2026-01-09 23:10:21'),
+('0073305', 34, 'Meta Dwijayanthy, M.Psi., Psikolog.', '1989-11-28', 'Perempuan', '0073305@edutrack.com', '089582739102', 'Jl. Wijayakusuma No 13', 'Psikologi', 'Psikologi', '2026-01-09 23:12:37', '2026-01-09 23:12:37'),
+('0073306', 35, 'Dr. Tery Setiawan, B.A., S.Psi., M.Si.', '1990-07-13', 'Laki-laki', '0073306@edutrack.com', '089582703912', 'Jl. Bougenville No 9', 'Psikologi', 'Psikologi', '2026-01-09 23:16:11', '2026-01-09 23:16:11'),
+('0073307', 36, 'Dr. Yuspendi, M.Psi., Psikolog, M.Pd.', '1983-05-23', 'Laki-laki', '0073307@dutrack.com', '089592038291', 'Jl. Calla Lily', 'Psikologi', 'Psikologi', '2026-01-09 23:18:57', '2026-01-09 23:18:57'),
+('0073308', 37, 'Heliany Kiswantomo, S.Psi., M.Si., Psikolog.', '1995-06-23', 'Perempuan', '0073308@edutrack.com', '089592038494', 'Jl. Alamanda No 7', 'Psikologi', 'Psikologi', '2026-01-09 23:21:08', '2026-01-09 23:21:08');
 
 -- --------------------------------------------------------
 
@@ -405,6 +429,8 @@ CREATE TABLE `mahasiswa` (
 --
 
 INSERT INTO `mahasiswa` (`nrp`, `user_id`, `nama`, `jurusan`, `email`, `jenis_kelamin`, `tanggal_lahir`, `alamat`, `no_telepon`, `created_at`, `updated_at`) VALUES
+('2430001', 26, 'Errvin Junius', 'Psikologi', '2430001@edutrack.com', 'Laki-laki', '2005-08-05', 'Jl. Babakan Jeruk No 13', '089574092836', '2026-01-08 00:28:17', '2026-01-08 00:28:17'),
+('2430002', 27, 'Hans Maulana', 'Psikologi', '2430002@edutrack.com', 'Laki-laki', '2004-09-06', 'Jl. Sukakarya No 20', '089573485901', '2026-01-08 00:29:37', '2026-01-08 00:29:37'),
 ('2472021', 3, 'Ferdinand Brian', 'Teknik Informatika', '2472021@edutrack.com', 'Laki-laki', '2004-10-15', 'Jl. Kebon Jeruk No. 12', '087712345678', '2025-12-28 22:47:57', '2025-12-29 04:29:01'),
 ('2472022', 4, 'Bryan Christian', 'Teknik Informatika', '2472022@edutrack.com', 'Laki-laki', '2006-07-28', 'Jl. Kopo', '089626312738', '2025-12-28 23:07:50', '2025-12-28 23:07:50'),
 ('2473020', 17, 'Juan Alexander', 'Sistem Komputer', '2473020@edutrack.com', 'Laki-laki', '2005-06-14', 'Jl. Margaasih No 21', '089527384910', '2026-01-07 01:13:07', '2026-01-07 10:35:55'),
@@ -441,14 +467,19 @@ INSERT INTO `mata_kuliah` (`kode_mk`, `nama_mk`, `jurusan`, `sks`, `semester`, `
 ('MK006P', 'Algoritma Struktur Data (Praktikum)', 'Teknik Informatika', 1, 3, '2025-12-29 01:17:34', '2026-01-03 03:22:32'),
 ('MK006T', 'Algoritma Struktur Data (Teori)', 'Teknik Informatika', 3, 3, '2025-12-29 01:05:13', '2025-12-29 01:17:44'),
 ('MK007', 'Sistem Operasi Komputer', 'Teknik Informatika', 2, 3, '2025-12-29 01:18:06', '2025-12-29 01:18:06'),
-('MK101P', 'Pengantar Teknologi Komputer (Praktikum)', 'Sistem Komputer', 1, 1, '2026-01-07 11:01:16', '2026-01-07 11:01:16'),
-('MK101T', 'Pengantar Teknologi Komputer (Teori)', 'Sistem Komputer', 2, 1, '2026-01-07 10:52:22', '2026-01-07 11:00:31'),
-('MK102', 'Probabilitas & Statistika', 'Sistem Komputer', 2, 1, '2026-01-07 10:56:27', '2026-01-07 10:56:27'),
-('MK103', 'Kalkulus', 'Sistem Komputer', 3, 1, '2026-01-07 10:56:52', '2026-01-07 10:56:52'),
-('MK104', 'Matematika Diskrit', 'Sistem Komputer', 3, 2, '2026-01-07 10:57:13', '2026-01-07 10:57:13'),
-('MK105', 'Logika dan Sistem Digital', 'Sistem Komputer', 3, 2, '2026-01-07 10:59:31', '2026-01-07 10:59:31'),
-('MK106P', 'Pemrograman Tingkat Dasar (Praktikum)', 'Sistem Komputer', 1, 2, '2026-01-07 12:08:33', '2026-01-07 12:08:33'),
-('MK106T', 'Pemrograman Tingkat Dasar (Teori)', 'Sistem Komputer', 3, 2, '2026-01-07 12:07:49', '2026-01-07 12:07:58');
+('MK101P', 'Pengantar Teknologi Komputer (Praktikum)', 'Sistem Komputer', 1, 3, '2026-01-07 11:01:16', '2026-01-07 23:41:27'),
+('MK101T', 'Pengantar Teknologi Komputer (Teori)', 'Sistem Komputer', 2, 3, '2026-01-07 10:52:22', '2026-01-07 23:41:31'),
+('MK102', 'Probabilitas & Statistika', 'Sistem Komputer', 2, 3, '2026-01-07 10:56:27', '2026-01-07 23:41:35'),
+('MK103', 'Kalkulus', 'Sistem Komputer', 3, 3, '2026-01-07 10:56:52', '2026-01-07 23:41:10'),
+('MK104', 'Matematika Diskrit', 'Sistem Komputer', 3, 3, '2026-01-07 10:57:13', '2026-01-07 23:41:17'),
+('MK105', 'Logika dan Sistem Digital', 'Sistem Komputer', 3, 3, '2026-01-07 10:59:31', '2026-01-07 23:41:12'),
+('MK106P', 'Pemrograman Tingkat Dasar (Praktikum)', 'Sistem Komputer', 1, 3, '2026-01-07 12:08:33', '2026-01-07 23:41:22'),
+('MK106T', 'Pemrograman Tingkat Dasar (Teori)', 'Sistem Komputer', 3, 3, '2026-01-07 12:07:49', '2026-01-07 23:41:05'),
+('MK201', 'Psikologi Pendidikan', 'Psikologi', 4, 3, '2026-01-07 23:58:21', '2026-01-07 23:58:21'),
+('MK202', 'Statistika', 'Psikologi', 3, 3, '2026-01-07 23:58:43', '2026-01-07 23:58:43'),
+('MK203', 'Kode Etik', 'Psikologi', 3, 3, '2026-01-07 23:59:02', '2026-01-07 23:59:02'),
+('MK204P', 'PSIKOPATOLOGI (Praktikum)', 'Psikologi', 3, 3, '2026-01-08 00:01:38', '2026-01-08 00:01:38'),
+('MK204T', 'PSIKOPATOLOGI (Teori)', 'Psikologi', 3, 3, '2026-01-08 00:01:06', '2026-01-08 00:01:06');
 
 -- --------------------------------------------------------
 
@@ -527,8 +558,8 @@ CREATE TABLE `nilai` (
 --
 
 INSERT INTO `nilai` (`id`, `nrp`, `kode_mk`, `p1`, `p2`, `p3`, `p4`, `p5`, `p6`, `p7`, `uts`, `p9`, `p10`, `p11`, `p12`, `p13`, `p14`, `p15`, `uas`, `nilai_total`, `nilai_akhir`, `created_at`, `updated_at`) VALUES
-(1, '2472021', 'MK001P', 80, 80, 85, 90, 80, 80, 80, 75, 89, 80, 85, 80, 80, 0, 0, 0, 64.45, 'C', '2026-01-02 22:48:46', '2026-01-02 22:51:01'),
-(2, '2472021', 'MK001T', 90, 90, 90, 98, 87, 90, 95, 75, 80, 87, 89, 94, 85, 0, 0, 0, 68.75, 'C', '2026-01-02 22:51:55', '2026-01-02 22:51:55');
+(1, '2472021', 'MK001P', 80, 80, 85, 90, 80, 80, 80, 75, 89, 80, 85, 80, 80, 85, 70, 80, 80.03, 'B', '2026-01-02 22:48:46', '2026-01-12 03:19:14'),
+(2, '2472021', 'MK001T', 90, 90, 90, 98, 70, 60, 95, 75, 80, 87, 89, 94, 85, 70, 80, 85, 82.49, 'B', '2026-01-02 22:51:55', '2026-01-12 03:35:04');
 
 --
 -- Triggers `nilai`
@@ -609,7 +640,7 @@ INSERT INTO `perkuliahan` (`id_perkuliahan`, `kode_ruangan`, `nip_dosen`, `kode_
 (16, 'L8006', '0072204', 'MK005', 'B', 'Senin', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
 (17, 'L8002', '0072206', 'MK006T', 'A', 'Kamis', '12:30:00', '15:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-08 02:51:04'),
 (18, 'L8003', '0072206', 'MK006T', 'C', 'Rabu', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
-(19, 'L8002', '0072206', 'MK006P', 'A', 'Kamis', '15:30:00', '17:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-08 02:52:25'),
+(19, 'L8002', '0072206', 'MK006P', 'A', 'Kamis', '15:30:00', '17:30:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-09 22:08:18'),
 (20, 'L8003', '0072206', 'MK006P', 'C', 'Rabu', '12:30:00', '14:30:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
 (21, 'L8004', '0072201', 'MK001T', 'B', 'Rabu', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
 (22, 'L8004', '0072201', 'MK001T', 'C', 'Selasa', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
@@ -621,19 +652,42 @@ INSERT INTO `perkuliahan` (`id_perkuliahan`, `kode_ruangan`, `nip_dosen`, `kode_
 (28, 'L8001', '0072202', 'MK002P', 'B', 'Rabu', '15:00:00', '17:00:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
 (29, 'L8005', '0072207', 'MK007', 'B', 'Jumat', '15:00:00', '16:40:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
 (30, 'L8005', '0072207', 'MK007', 'C', 'Jumat', '17:30:00', '19:10:00', '2025/2026 - Ganjil', '2026-01-02 23:20:40', '2026-01-02 23:30:01'),
-(31, 'L8007', '0072210', 'MK103', 'A', 'Senin', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-07 11:20:27', '2026-01-07 12:12:52'),
-(33, 'L8007', '0072211', 'MK101T', 'A', 'Rabu', '09:30:00', '11:10:00', '2025/2026 - Ganjil', '2026-01-07 11:45:50', '2026-01-07 11:45:50'),
-(34, 'L8007', '0072211', 'MK101P', 'A', 'Rabu', '11:40:00', '12:30:00', '2025/2026 - Ganjil', '2026-01-07 11:45:50', '2026-01-07 11:45:50'),
-(35, 'L8005', '0072212', 'MK106T', 'A', 'Senin', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-07 12:15:39', '2026-01-07 20:11:15'),
-(36, 'L8005', '0072212', 'MK106P', 'A', 'Senin', '12:30:00', '13:20:00', '2025/2026 - Ganjil', '2026-01-07 12:15:39', '2026-01-07 20:13:57'),
-(37, 'L8007', '0072210', 'MK103', 'B', 'Selasa', '12:30:00', '15:00:00', '2025/2026 - Ganjil', '2026-01-07 20:04:06', '2026-01-07 20:04:19'),
-(38, 'L8008', '0072210', 'MK103', 'C', 'Rabu', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-07 20:06:31', '2026-01-07 20:06:31'),
-(39, 'L8005', '0072212', 'MK106T', 'B', 'Rabu', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-07 21:28:37', '2026-01-07 21:34:05'),
-(40, 'L8005', '0072212', 'MK106P', 'B', 'Rabu', '12:30:00', '13:20:00', '2025/2026 - Ganjil', '2026-01-07 21:28:37', '2026-01-07 21:34:15'),
-(41, 'L8004', '0072211', 'MK101T', 'B', 'Senin', '08:00:00', '09:40:00', '2025/2026 - Ganjil', '2026-01-07 21:31:00', '2026-01-07 21:31:00'),
-(42, 'L8004', '0072211', 'MK101P', 'B', 'Senin', '10:10:00', '11:00:00', '2025/2026 - Ganjil', '2026-01-07 21:31:00', '2026-01-07 21:31:00'),
-(43, 'L8010', '0072211', 'MK101T', 'C', 'Senin', '12:00:00', '13:40:00', '2025/2026 - Ganjil', '2026-01-07 21:32:30', '2026-01-07 21:32:48'),
-(44, 'L8010', '0072211', 'MK101P', 'C', 'Senin', '14:10:00', '15:00:00', '2025/2026 - Ganjil', '2026-01-07 21:32:30', '2026-01-07 21:33:05');
+(31, 'L8007', '0071101', 'MK103', 'A', 'Senin', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-07 11:20:27', '2026-01-07 12:12:52'),
+(33, 'L8007', '0071102', 'MK101T', 'A', 'Rabu', '09:30:00', '11:10:00', '2025/2026 - Ganjil', '2026-01-07 11:45:50', '2026-01-07 11:45:50'),
+(34, 'L8007', '0071102', 'MK101P', 'A', 'Rabu', '11:40:00', '13:40:00', '2025/2026 - Ganjil', '2026-01-07 11:45:50', '2026-01-09 22:08:18'),
+(35, 'L8005', '0071103', 'MK106T', 'A', 'Senin', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-07 12:15:39', '2026-01-07 20:11:15'),
+(36, 'L8005', '0071103', 'MK106P', 'A', 'Senin', '12:30:00', '14:30:00', '2025/2026 - Ganjil', '2026-01-07 12:15:39', '2026-01-09 22:08:18'),
+(37, 'L8007', '0071101', 'MK103', 'B', 'Selasa', '12:30:00', '15:00:00', '2025/2026 - Ganjil', '2026-01-07 20:04:06', '2026-01-07 20:04:19'),
+(38, 'L8008', '0071101', 'MK103', 'C', 'Rabu', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-07 20:06:31', '2026-01-07 20:06:31'),
+(39, 'L8005', '0071103', 'MK106T', 'B', 'Rabu', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-07 21:28:37', '2026-01-07 21:34:05'),
+(40, 'L8005', '0071103', 'MK106P', 'B', 'Rabu', '12:30:00', '14:30:00', '2025/2026 - Ganjil', '2026-01-07 21:28:37', '2026-01-09 22:08:18'),
+(41, 'L8007', '0071102', 'MK101T', 'B', 'Selasa', '08:00:00', '09:40:00', '2025/2026 - Ganjil', '2026-01-07 21:31:00', '2026-01-11 20:54:47'),
+(42, 'L8007', '0071102', 'MK101P', 'B', 'Selasa', '10:10:00', '12:10:00', '2025/2026 - Ganjil', '2026-01-07 21:31:00', '2026-01-11 20:55:08'),
+(43, 'L8010', '0071102', 'MK101T', 'C', 'Senin', '12:00:00', '13:40:00', '2025/2026 - Ganjil', '2026-01-07 21:32:30', '2026-01-07 21:32:48'),
+(44, 'L8010', '0071102', 'MK101P', 'C', 'Senin', '14:10:00', '16:10:00', '2025/2026 - Ganjil', '2026-01-07 21:32:30', '2026-01-09 22:08:18'),
+(45, 'H04B02', '0073301', 'MK204T', 'A', 'Senin', '08:00:00', '10:30:00', '2025/2026 - Ganjil', '2026-01-08 00:25:59', '2026-01-09 22:30:12'),
+(46, 'H04B02', '0073301', 'MK204P', 'A', 'Senin', '11:00:00', '13:00:00', '2025/2026 - Ganjil', '2026-01-08 00:25:59', '2026-01-09 22:30:32'),
+(49, 'H04B01', '0073301', 'MK204T', 'C', 'Kamis', '09:00:00', '11:30:00', '2025/2026 - Ganjil', '2026-01-09 22:29:48', '2026-01-09 22:30:46'),
+(50, 'H04B01', '0073301', 'MK204P', 'C', 'Kamis', '12:00:00', '14:00:00', '2025/2026 - Ganjil', '2026-01-09 22:29:48', '2026-01-09 22:30:52'),
+(53, 'H04B01', '0073301', 'MK204T', 'B', 'Senin', '14:00:00', '16:30:00', '2025/2026 - Ganjil', '2026-01-09 22:33:23', '2026-01-09 22:33:23'),
+(54, 'H04B01', '0073301', 'MK204P', 'B', 'Senin', '17:00:00', '19:00:00', '2025/2026 - Ganjil', '2026-01-09 22:33:23', '2026-01-09 22:33:23'),
+(55, 'L8009', '0071104', 'MK104', 'A', 'Kamis', '08:00:00', '10:30:00', '2025/2026 - Ganjil', '2026-01-09 22:35:41', '2026-01-11 21:04:03'),
+(56, 'L8009', '0071104', 'MK104', 'B', 'Kamis', '12:30:00', '15:00:00', '2025/2026 - Ganjil', '2026-01-09 22:40:25', '2026-01-11 21:04:14'),
+(57, 'L8009', '0071104', 'MK104', 'C', 'Jumat', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-09 22:41:17', '2026-01-11 21:04:31'),
+(58, 'L8002', '0071105', 'MK102', 'A', 'Rabu', '08:00:00', '09:40:00', '2025/2026 - Ganjil', '2026-01-09 22:50:32', '2026-01-09 22:50:32'),
+(59, 'L8006', '0071105', 'MK102', 'B', 'Rabu', '10:00:00', '11:40:00', '2025/2026 - Ganjil', '2026-01-09 22:51:46', '2026-01-09 22:51:46'),
+(60, 'L8009', '0071105', 'MK102', 'C', 'Rabu', '13:00:00', '14:40:00', '2025/2026 - Ganjil', '2026-01-09 22:52:48', '2026-01-09 22:52:48'),
+(61, 'L8001', '0071106', 'MK105', 'A', 'Senin', '08:00:00', '10:30:00', '2025/2026 - Ganjil', '2026-01-09 22:58:45', '2026-01-09 22:58:45'),
+(62, 'L8001', '0071106', 'MK105', 'B', 'Senin', '12:30:00', '15:00:00', '2025/2026 - Ganjil', '2026-01-09 22:59:11', '2026-01-09 22:59:11'),
+(63, 'L8001', '0071106', 'MK105', 'C', 'Senin', '16:30:00', '19:00:00', '2025/2026 - Ganjil', '2026-01-09 22:59:52', '2026-01-09 22:59:52'),
+(64, 'H04C01', '0073303', 'MK203', 'A', 'Selasa', '08:00:00', '10:30:00', '2025/2026 - Ganjil', '2026-01-09 23:32:11', '2026-01-09 23:32:11'),
+(65, 'H04C01', '0073303', 'MK203', 'B', 'Selasa', '12:00:00', '14:30:00', '2025/2026 - Ganjil', '2026-01-09 23:38:18', '2026-01-09 23:38:18'),
+(66, 'H04C01', '0073303', 'MK203', 'C', 'Selasa', '15:30:00', '18:00:00', '2025/2026 - Ganjil', '2026-01-11 08:17:12', '2026-01-11 08:17:12'),
+(67, 'H03A01', '0073306', 'MK201', 'A', 'Senin', '08:00:00', '11:20:00', '2025/2026 - Ganjil', '2026-01-11 08:18:15', '2026-01-11 08:18:15'),
+(68, 'H03A01', '0073306', 'MK201', 'B', 'Senin', '13:00:00', '16:20:00', '2025/2026 - Ganjil', '2026-01-11 08:18:58', '2026-01-11 08:18:58'),
+(69, 'H04B01', '0073308', 'MK202', 'A', 'Rabu', '07:00:00', '09:30:00', '2025/2026 - Ganjil', '2026-01-11 08:19:36', '2026-01-11 08:19:36'),
+(70, 'H04B01', '0073308', 'MK202', 'B', 'Rabu', '09:30:00', '12:00:00', '2025/2026 - Ganjil', '2026-01-11 20:32:46', '2026-01-11 20:32:46'),
+(71, 'H04B01', '0073308', 'MK202', 'C', 'Rabu', '13:00:00', '15:30:00', '2025/2026 - Ganjil', '2026-01-11 20:35:53', '2026-01-11 20:35:53');
 
 -- --------------------------------------------------------
 
@@ -835,7 +889,8 @@ INSERT INTO `presensi` (`id`, `nrp`, `jadwal_id`, `tanggal`, `status`, `keterang
 (176, '2472021', 11, '2025-06-05', 'Hadir', NULL, '2026-01-02 23:04:35', '2026-01-02 23:04:35'),
 (177, '2472022', 11, '2025-06-05', 'Hadir', NULL, '2026-01-02 23:04:35', '2026-01-02 23:04:35'),
 (178, '2472022', 11, '2026-01-03', 'Hadir', NULL, '2026-01-02 23:06:20', '2026-01-02 23:06:20'),
-(179, '2472021', 11, '2026-01-03', 'Hadir', NULL, '2026-01-02 23:06:20', '2026-01-02 23:06:20');
+(179, '2472021', 11, '2026-01-03', 'Hadir', NULL, '2026-01-02 23:06:20', '2026-01-02 23:06:20'),
+(180, '2472022', 10, '2025-03-20', 'Absen', NULL, '2026-01-12 03:34:21', '2026-01-12 03:34:21');
 
 -- --------------------------------------------------------
 
@@ -857,6 +912,10 @@ CREATE TABLE `ruangan` (
 --
 
 INSERT INTO `ruangan` (`kode_ruangan`, `nama_ruangan`, `kapasitas`, `deskripsi_fasilitas`, `created_at`, `updated_at`) VALUES
+('H03A01', 'Ruang H03A01', 40, NULL, '2026-01-11 08:18:15', '2026-01-11 08:18:15'),
+('H04B01', 'Ruang H04B01', 40, NULL, '2026-01-09 22:30:46', '2026-01-09 22:30:46'),
+('H04B02', 'Ruang H04B02', 40, NULL, '2026-01-09 22:28:42', '2026-01-09 22:28:42'),
+('H04C01', 'Ruang H04C01', 40, NULL, '2026-01-09 23:32:11', '2026-01-09 23:32:11'),
 ('L8001', 'ADV 1', 25, 'AC, Proyektor, Whiteboard, PC Dosen, PC Mahasiswa, Meja, Kursi', '2025-12-29 06:48:37', '2025-12-29 08:03:29'),
 ('L8002', 'ADV 2', 25, 'AC, Proyektor, Whiteboard, PC Dosen, PC Mahasiswa, Meja, Kursi', '2025-12-29 06:48:37', '2025-12-29 08:03:33'),
 ('L8003', 'ADV 3', 30, 'AC, Proyektor, Whiteboard, PC Dosen, PC Mahasiswa, Meja, Kursi', '2025-12-29 06:48:37', '2025-12-29 08:03:35'),
@@ -888,7 +947,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('p3bPtjOA7j3rmRq5o6MZWcZJCAsCilexNN1cnFAG', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiVFNwVHJwM3FEQ1lxR2h6bmFIa1J3Qm1SMzlUSGhaRWVZWTRCUVdFUCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzI6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9ka2JzIjtzOjU6InJvdXRlIjtOO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxO30=', 1767847044);
+('EpbZrQboD5I4E7fvYBIgf3qH8wLufarVbjEiwv8c', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiWWg2dGJrWUV4SjFUSkE4VVJtb0Q2QThrdmxuZHhFU3FmZDdncTdxQiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbi9tYXRhLWt1bGlhaCI7czo1OiJyb3V0ZSI7Tjt9czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTt9', 1768214318);
 
 -- --------------------------------------------------------
 
@@ -914,7 +973,8 @@ CREATE TABLE `tagihan` (
 --
 
 INSERT INTO `tagihan` (`id`, `nrp`, `jenis`, `jumlah`, `batas_pembayaran`, `tipe_pembayaran`, `cicilan_ke`, `status`, `created_at`, `updated_at`) VALUES
-(10, '2472021', 'Tagihan Semester', 6300000.00, '2026-02-09', NULL, NULL, 'Belum Lunas', '2026-01-06 09:15:11', '2026-01-06 09:15:29');
+(10, '2472021', 'Tagihan Semester', 6300000.00, '2026-01-26', NULL, NULL, 'Belum Lunas', '2026-01-06 09:15:11', '2026-01-11 21:07:24'),
+(11, '2472022', 'Tagihan Semester', 6300000.00, '2026-01-26', 1, 1, 'Lunas', '2026-01-11 21:06:58', '2026-01-12 10:31:02');
 
 -- --------------------------------------------------------
 
@@ -955,7 +1015,20 @@ INSERT INTO `users` (`id`, `nama`, `email`, `password`, `role`, `created_at`, `u
 (20, 'Pin Panji Yapinus, S.T., M.T.', '0072211@edutrack.com', '$2y$12$lfd1ovvEnXzN7Fk7x327fOtybGUPtTkM0m/0lkh6c1uvp4PRC8ONu', 'dosen', '2026-01-07 11:38:22', '2026-01-07 11:38:22'),
 (22, 'Seccond Admin', 'admin2@edutrack.com', '$2y$12$JNY8JGxD50jB2dl5R92ILe1uf4aBfpAHro4poYkaxEn35B3tvdhuy', 'admin', '2026-01-07 12:00:59', '2026-01-07 12:00:59'),
 (23, 'Semuil Tjiharjadi, S.T., M.M., M.T.', '0072212@edutrack.com', '$2y$12$GrsREkNLOj0xPZCg.hqlZ.ar3v66WXLKKYqAkB/KG.RHiRLUXT7bW', 'dosen', '2026-01-07 12:14:47', '2026-01-07 12:14:47'),
-(24, 'Markus Tanubrata, S.T., M.M., M.T.', '0072213@edutrack.com', '$2y$12$XFyFzFUzRaZ8yleOXFhH6eHrmgGjSU.0.QYknRbwUiZtpCVivRIvK', 'dosen', '2026-01-07 12:23:02', '2026-01-07 12:23:02');
+(24, 'Markus Tanubrata, S.T., M.M., M.T.', '0072213@edutrack.com', '$2y$12$XFyFzFUzRaZ8yleOXFhH6eHrmgGjSU.0.QYknRbwUiZtpCVivRIvK', 'dosen', '2026-01-07 12:23:02', '2026-01-07 12:23:02'),
+(25, 'Marissa Chitra Sulastra, S.Psi., M.Psi., Psikolog', '0072214@edutrack.com', '$2y$12$3HFN9NQfI0SjKUVoli3r5OkAuWMeqxMTOJqe3ylKLPHOx9tGxorxS', 'dosen', '2026-01-08 00:24:54', '2026-01-08 00:24:54'),
+(26, 'Errvin Junius', '2430001@edutrack.com', '$2y$12$3TW4ejZZei3fTEa.d3KW/eEZzp55FHjx5/CceW6JEjX0IGBU03qfS', 'mahasiswa', '2026-01-08 00:28:17', '2026-01-08 00:28:17'),
+(27, 'Hans Maulana', '2430002@edutrack.com', '$2y$12$3TBqRauR8JeRMRdB7M5R.uPZd6U6emD/jp6tAUXuCfxBYC5rq3aea', 'mahasiswa', '2026-01-08 00:29:37', '2026-01-08 00:29:37'),
+(28, 'Hendry Wong, S.T., M.Kom.', '0071105@edutrack.com', '$2y$12$Fv5shXkPQx9bRggbnEooYuPzNrq7EYYnE6YPICbBlkMq0mjByCAuK', 'dosen', '2026-01-09 22:48:57', '2026-01-09 22:48:57'),
+(29, 'Andrew Sebastian Lehman, S.T., M.Eng.', '0071106@edutrack.com', '$2y$12$iwR.kjPpTdNdN9R65ybOz.wv8gH4c.0SlPvYGoNwUxF3ernZHsFTG', 'dosen', '2026-01-09 22:56:35', '2026-01-09 22:56:35'),
+(30, 'Jonathan Chandra, S.T., M.T.', '0071107@edutrack.com', '$2y$12$UtOOhHbL.Ide83kCzNKFq.sq7AcEEi3e3vb6MG1NK.j84idDKt5CC', 'dosen', '2026-01-09 22:57:53', '2026-01-09 22:57:53'),
+(31, 'Lisa Imelia Satyawan, M.Psi., Psikolog.', '0073302@edutrack.com', '$2y$12$nzaqE4yn87fS4Zh/AIAFjelq/6FozYbKBhmiC2pMepLr9JLD8fYPG', 'dosen', '2026-01-09 23:07:50', '2026-01-09 23:07:50'),
+(32, 'Cindy Maria, M.Psi., Psikolog', '0073303@edutrack.com', '$2y$12$YvExMXEaScuLXvpAGmAwrux98FdJwAHKoJeor6Cm75zcYIeboG0gm', 'dosen', '2026-01-09 23:09:06', '2026-01-09 23:09:06'),
+(33, 'Indah Puspitasari, M.Psi., Psikolog.', '0073304@edutrack.com', '$2y$12$20bUq4fK.UtWPK61XL4hQedZVN4Uy4/BrWwBatiDPj7NCFpl/oOSO', 'dosen', '2026-01-09 23:10:21', '2026-01-09 23:10:21'),
+(34, 'Meta Dwijayanthy, M.Psi., Psikolog.', '0073305@edutrack.com', '$2y$12$h.dnOhoxGx3MYd2KuT8oHuPx17POVNu7oWFyQacsY/Sz7.X0ltFY2', 'dosen', '2026-01-09 23:12:37', '2026-01-09 23:12:37'),
+(35, 'Dr. Tery Setiawan, B.A., S.Psi., M.Si.', '0073306@edutrack.com', '$2y$12$eXA1QUvoJCU/dMB9zqurOewn6DE9IsA4nQ1YKVwuap6yt5VRUT4Bu', 'dosen', '2026-01-09 23:16:11', '2026-01-09 23:16:11'),
+(36, 'Dr. Yuspendi, M.Psi., Psikolog, M.Pd.', '0073307@dutrack.com', '$2y$12$U2fXawBEwJi/Wy0ZoZMh6Oq43hHrDUCDaaRe9oX.OW/O3zEXLCQ72', 'dosen', '2026-01-09 23:18:57', '2026-01-09 23:18:57'),
+(37, 'Heliany Kiswantomo, S.Psi., M.Si., Psikolog.', '0073308@edutrack.com', '$2y$12$ler7nhRmitKQftDEXkAhfuZC3BrNicnLk/atN7wGS1h6WRZyxyAmK', 'dosen', '2026-01-09 23:21:08', '2026-01-09 23:21:08');
 
 --
 -- Indexes for dumped tables
@@ -1114,13 +1187,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `audit_logs_nilai`
 --
 ALTER TABLE `audit_logs_nilai`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `dkbs`
 --
 ALTER TABLE `dkbs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `failed_jobs`
@@ -1162,25 +1235,25 @@ ALTER TABLE `pengumuman`
 -- AUTO_INCREMENT for table `perkuliahan`
 --
 ALTER TABLE `perkuliahan`
-  MODIFY `id_perkuliahan` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id_perkuliahan` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
 -- AUTO_INCREMENT for table `presensi`
 --
 ALTER TABLE `presensi`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=180;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=181;
 
 --
 -- AUTO_INCREMENT for table `tagihan`
 --
 ALTER TABLE `tagihan`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- Constraints for dumped tables

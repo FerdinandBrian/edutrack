@@ -20,9 +20,13 @@
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0c0 .884.356 1.633.927 2.196M12 4v16m0 0l-3-3m3 3l3-3" /></svg>
                         NRP: <span class="font-mono text-slate-700">{{ $mahasiswa->nrp }}</span>
                     </div>
+                    <div class="flex items-center gap-2 text-slate-500 text-sm font-medium">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        Total SKS Kumulatif: <span class="text-blue-600 font-bold ml-1">{{ $totalSksKumulatif }} SKS</span>
+                    </div>
                     <div class="flex items-center gap-2 text-slate-500 text-sm">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                        Teknik Informatika
+                        {{ $mahasiswa->jurusan }}
                     </div>
                 </div>
             </div>
@@ -63,9 +67,14 @@
                         @if($lastTa !== $currentTa)
                             <tr>
                                 <td colspan="5" class="bg-slate-50/90 px-8 py-3 border-y border-slate-200 sticky top-0 backdrop-blur-sm z-10">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
-                                        <h3 class="font-bold text-slate-600 text-sm uppercase tracking-wide">{{ $currentTa }}</h3>
+                                    <div class="flex items-center justify-between whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
+                                            <h3 class="font-bold text-slate-600 text-sm uppercase tracking-wide">{{ $currentTa }}</h3>
+                                        </div>
+                                        <div class="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg border border-blue-100 text-[10px] font-bold uppercase tracking-wider">
+                                            Total: {{ $dkbs->where('tahun_ajaran', $currentTa)->sum('mataKuliah.sks') }} SKS
+                                        </div>
                                     </div>
                                 </td>
                             </tr>

@@ -41,7 +41,6 @@
                     </div>
 
                     <!-- Mata Kuliah -->
-                    <!-- Mata Kuliah -->
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-slate-600 mb-2">Pilih Mata Kuliah (Master Data)</label>
                         <select name="kode_mk" id="mkSelect" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50">
@@ -77,14 +76,12 @@
                     <!-- Ruangan -->
                     <div>
                         <label class="block text-sm font-medium text-slate-600 mb-2">Ruangan</label>
-                        <select name="kode_ruangan" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50">
-                            <option value="">-- Pilih Ruangan --</option>
+                        <input type="text" name="kode_ruangan" id="ruanganInput" list="ruanganList" required placeholder="Ketik Kode Ruangan (Contoh: L8001)" value="{{ old('kode_ruangan') }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50 uppercase">
+                        <datalist id="ruanganList">
                             @foreach($ruangans as $r)
-                                <option value="{{ $r->kode_ruangan }}" {{ old('kode_ruangan') == $r->kode_ruangan ? 'selected' : '' }}>
-                                    {{ $r->kode_ruangan }} - {{ $r->nama_ruangan }}
-                                </option>
+                                <option value="{{ $r->kode_ruangan }}">{{ $r->nama_ruangan }}</option>
                             @endforeach
-                        </select>
+                        </datalist>
                     </div>
 
                     <!-- Tahun Ajaran -->
@@ -106,8 +103,8 @@
 
                     <!-- Jam Berakhir -->
                     <div>
-                        <label class="block text-sm font-medium text-slate-600 mb-2">Jam Berakhir</label>
-                        <input type="time" name="jam_berakhir" required value="{{ old('jam_berakhir') }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50">
+                        <label class="block text-sm font-medium text-slate-600 mb-2">Jam Berakhir (Otomatis)</label>
+                        <input type="time" name="jam_berakhir" id="jamBerakhir" readonly required value="{{ old('jam_berakhir') }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-100 cursor-not-allowed font-semibold text-indigo-700" title="Jam berakhir dihitung otomatis berdasarkan SKS atau jenis kelas">
                     </div>
                 </div>
 
@@ -181,5 +178,45 @@
                     mkSelect.innerHTML = '<option value="">Gagal memuat mata kuliah (Cek Console)</option>';
                 });
         });
+
+        // Auto-calculate End Time
+        const jamMulaiInput = document.querySelector('input[name="jam_mulai"]');
+        const jamBerakhirInput = document.getElementById('jamBerakhir');
+
+        function updateEndTime() {
+            const mkOption = mkSelect.options[mkSelect.selectedIndex];
+            const startTime = jamMulaiInput.value;
+            
+            if (!mkOption || !mkOption.value || !startTime) {
+                // Don't clear if there's an old value, but usually it's better to clear if invalid
+                return;
+            }
+
+            const mkText = mkOption.text.toLowerCase();
+            const mkKode = mkOption.value;
+            let minutes = 0;
+
+            // Same logic as controller: Praktikum = 120 mins, others = SKS * 50
+            // Check name for 'praktikum' or kode_mk for 'P' suffix
+            if (mkText.includes('praktikum') || mkKode.endsWith('P')) {
+                minutes = 120;
+            } else {
+                const sksMatch = mkOption.text.match(/\((\d+)\s*SKS\)/);
+                const sks = sksMatch ? parseInt(sksMatch[1]) : 2; // Default 2 SKS
+                minutes = sks * 50;
+            }
+
+            const [hours, mins] = startTime.split(':').map(Number);
+            const date = new Date();
+            date.setHours(hours, mins + minutes, 0);
+            
+            const endHours = String(date.getHours()).padStart(2, '0');
+            const endMins = String(date.getMinutes()).padStart(2, '0');
+            
+            jamBerakhirInput.value = `${endHours}:${endMins}`;
+        }
+
+        mkSelect.addEventListener('change', updateEndTime);
+        jamMulaiInput.addEventListener('change', updateEndTime);
     });
 </script>

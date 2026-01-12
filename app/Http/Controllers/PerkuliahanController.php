@@ -25,7 +25,7 @@ class PerkuliahanController extends Controller
                 $jurusan = $item->mataKuliah->jurusan ?? 'Umum';
                 $name = $item->mataKuliah->nama_mk;
                 $baseName = trim(str_replace(['(Teori)', '(Praktikum)'], '', $name));
-                $typeRank = str_contains($name, 'Praktikum') ? 1 : 0; // 0 for Teori, 1 for Praktikum
+                $typeRank = stripos($name, 'Praktikum') !== false ? 1 : 0; // 0 for Teori, 1 for Praktikum
                 
                 return sprintf('%s|%s|%s|%d', $jurusan, $baseName, $item->kelas, $typeRank);
             });
@@ -48,7 +48,14 @@ class PerkuliahanController extends Controller
         if ($request->has('kode_mk') && $request->has('jam_mulai')) {
              $mk = MataKuliah::where('kode_mk', $request->kode_mk)->first();
              if ($mk) {
-                 $minutes = $mk->sks * 50;
+                 // Check if it's a Praktikum class (case-insensitive + kode_mk suffix check)
+                 $isPraktikum = stripos($mk->nama_mk, 'Praktikum') !== false || str_ends_with($mk->kode_mk, 'P');
+                 
+                 if ($isPraktikum) {
+                     $minutes = 120; // 2 hours for Praktikum
+                 } else {
+                     $minutes = $mk->sks * 50;
+                 }
                  $endTime = \Carbon\Carbon::parse($request->jam_mulai)->addMinutes($minutes)->format('H:i');
                  $request->merge(['jam_berakhir' => $endTime]);
              }
@@ -57,7 +64,7 @@ class PerkuliahanController extends Controller
         $validated = $request->validate([
             'kode_mk' => 'required|string|exists:mata_kuliah,kode_mk',
             'nip_dosen' => 'required|string|exists:dosen,nip',
-            'kode_ruangan' => 'required|string|exists:ruangan,kode_ruangan',
+            'kode_ruangan' => 'required|string',
             'kelas' => 'required|string|max:10',
             'hari' => 'required|string',
             'jam_mulai' => 'required',
@@ -94,14 +101,26 @@ class PerkuliahanController extends Controller
         }
 
 
+        // Ensure Room Exists (Foreign Key Requirement)
+        Ruangan::firstOrCreate(
+            ['kode_ruangan' => $validated['kode_ruangan']],
+            [
+                'nama_ruangan' => 'Ruang ' . $validated['kode_ruangan'],
+                'kapasitas' => 40 // Default capacity for manual entry
+            ]
+        );
+
         Perkuliahan::create($validated);
 
         // Auto-create Praktikum class if this is a Teori class
         $mk = MataKuliah::where('kode_mk', $request->kode_mk)->first();
-        if ($mk && str_contains($mk->nama_mk, '(Teori)')) {
+        if ($mk && (stripos($mk->nama_mk, '(Teori)') !== false || str_ends_with($mk->kode_mk, 'T'))) {
             // Find the paired Praktikum course
-            $praktikumName = str_replace('(Teori)', '(Praktikum)', $mk->nama_mk);
-            $praktikumMk = MataKuliah::where('nama_mk', $praktikumName)
+            $baseName = trim(str_ireplace(['(Teori)', 'Teori'], '', $mk->nama_mk));
+            $praktikumMk = MataKuliah::where(function($query) use ($baseName, $mk) {
+                    $query->where('nama_mk', 'LIKE', $baseName . '%Praktikum%')
+                          ->orWhere('kode_mk', 'LIKE', substr($mk->kode_mk, 0, -1) . 'P');
+                })
                 ->where('jurusan', $mk->jurusan)
                 ->first();
 
@@ -109,9 +128,18 @@ class PerkuliahanController extends Controller
                 // Calculate Praktikum schedule: 30 minutes after Teori ends
                 $teoriEnd = \Carbon\Carbon::parse($request->jam_berakhir);
                 $praktikumStart = $teoriEnd->copy()->addMinutes(30);
-                $praktikumEnd = $praktikumStart->copy()->addMinutes($praktikumMk->sks * 50);
+                $praktikumEnd = $praktikumStart->copy()->addMinutes(120); // 2 hours for auto-created Praktikum
 
                 // Create Praktikum class automatically
+                // Ensure Room Exists for auto-created practicum too
+                Ruangan::firstOrCreate(
+                    ['kode_ruangan' => $request->kode_ruangan],
+                    [
+                        'nama_ruangan' => 'Ruang ' . $request->kode_ruangan,
+                        'kapasitas' => 40
+                    ]
+                );
+
                 Perkuliahan::create([
                     'kode_mk' => $praktikumMk->kode_mk,
                     'nip_dosen' => $request->nip_dosen,
@@ -145,7 +173,14 @@ class PerkuliahanController extends Controller
         if ($request->has('kode_mk') && $request->has('jam_mulai')) {
              $mk = MataKuliah::where('kode_mk', $request->kode_mk)->first();
              if ($mk) {
-                 $minutes = $mk->sks * 50;
+                 // Check if it's a Praktikum class (case-insensitive + kode_mk suffix check)
+                 $isPraktikum = stripos($mk->nama_mk, 'Praktikum') !== false || str_ends_with($mk->kode_mk, 'P');
+                 
+                 if ($isPraktikum) {
+                     $minutes = 120; // 2 hours for Praktikum
+                 } else {
+                     $minutes = $mk->sks * 50;
+                 }
                  $endTime = \Carbon\Carbon::parse($request->jam_mulai)->addMinutes($minutes)->format('H:i');
                  $request->merge(['jam_berakhir' => $endTime]);
              }
@@ -154,7 +189,7 @@ class PerkuliahanController extends Controller
         $validated = $request->validate([
             'kode_mk' => 'required|string|exists:mata_kuliah,kode_mk',
             'nip_dosen' => 'required|string|exists:dosen,nip',
-            'kode_ruangan' => 'required|string|exists:ruangan,kode_ruangan',
+            'kode_ruangan' => 'required|string',
             'kelas' => 'required|string|max:10',
             'hari' => 'required|string',
             'jam_mulai' => 'required',
@@ -189,6 +224,15 @@ class PerkuliahanController extends Controller
         if ($dosenCollision) {
             return back()->withInput()->withErrors(['msg' => "Bentrok! Dosen tersebut sudah memiliki jadwal mengajar di jam tersebut."]);
         }
+        
+        // Ensure Room Exists (Foreign Key Requirement)
+        Ruangan::firstOrCreate(
+            ['kode_ruangan' => $validated['kode_ruangan']],
+            [
+                'nama_ruangan' => 'Ruang ' . $validated['kode_ruangan'],
+                'kapasitas' => 40
+            ]
+        );
         
         $perkuliahan->update($validated);
         return redirect('/admin/perkuliahan')->with('success', 'Jadwal perkuliahan berhasil diperbarui.');

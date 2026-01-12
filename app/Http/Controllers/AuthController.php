@@ -35,17 +35,21 @@ class AuthController extends Controller
         $request->validate([
             'nama' => 'required|string|max:100',
             'role' => 'required|in:mahasiswa,dosen,admin',
-            'nrp' => 'required_if:role,mahasiswa',
-            'nip' => 'required_if:role,dosen',
-            'password' => 'required|confirmed|min:6',
+            'nrp' => 'required|string|max:50',
+            'password' => 'required|min:6',
             'email' => 'nullable|email|unique:users,email',
-            'jenis_kelamin' => 'required_if:role,mahasiswa,dosen,admin|string|max:20',
-            'tanggal_lahir' => 'required_if:role,mahasiswa',
-            'alamat' => 'required_if:role,mahasiswa',
-            'no_telepon' => 'required_if:role,mahasiswa,dosen',
+            'jenis_kelamin' => 'nullable|string|max:20',
+            'tanggal_lahir' => 'nullable|date',
+            'alamat' => 'nullable|string',
+            'no_telepon' => 'nullable|string',
         ]);
 
-        DB::transaction(function() use ($request) {
+        // Provide default values for required DB fields if missing
+        $tanggal_lahir = $request->tanggal_lahir ?? '2000-01-01';
+        $jenis_kelamin = $request->jenis_kelamin ?? 'Laki-laki';
+        $no_telepon = $request->no_telepon ?? '-';
+
+        DB::transaction(function() use ($request, $tanggal_lahir, $jenis_kelamin, $no_telepon) {
             // 1️⃣ Simpan ke users
             $user = User::create([
                 'nama' => $request->nama,
@@ -60,35 +64,35 @@ class AuthController extends Controller
                     'nrp'           => $request->nrp,
                     'user_id'       => $user->id,
                     'nama'          => $request->nama,
-                    'jenis_kelamin' => $request->jenis_kelamin,
-                    'tanggal_lahir' => $request->tanggal_lahir,
+                    'jenis_kelamin' => $jenis_kelamin,
+                    'tanggal_lahir' => $tanggal_lahir,
                     'alamat'        => $request->alamat,
-                    'no_telepon'    => $request->no_telepon,
+                    'no_telepon'    => $no_telepon,
                     'email'         => $request->email,
                     'jurusan'       => $request->jurusan ?? null,
                     'password'      => Hash::make($request->password),
                 ]);
             } elseif ($request->role === 'dosen') {
                 Dosen::create([
-                    'nip'           => $request->nip,
+                    'nip'           => $request->nrp,
                     'user_id'       => $user->id,
                     'nama'          => $request->nama,
-                    'jenis_kelamin' => $request->jenis_kelamin,
-                    'tanggal_lahir' => $request->tanggal_lahir,
+                    'jenis_kelamin' => $jenis_kelamin,
+                    'tanggal_lahir' => $tanggal_lahir,
                     'email'         => $request->email,
-                    'no_telepon'    => $request->no_telepon,
+                    'no_telepon'    => $no_telepon,
                     'password'      => Hash::make($request->password),
                 ]);
             } elseif ($request->role === 'admin') {
                 Admin::create([
-                    'kode_admin' => $request->kode_admin ?? $request->nip ?? str_replace(' ','',$request->nama),
+                    'kode_admin' => $request->nrp,
                     'user_id' => $user->id,
                     'nama'    => $request->nama,
                     'email'   => $request->email,
-                    'tanggal_lahir' => $request->tanggal_lahir,
-                    'no_telepon'    => $request->no_telepon,
+                    'tanggal_lahir' => $tanggal_lahir,
+                    'no_telepon'    => $no_telepon,
                     'password'=> Hash::make($request->password),
-                    'jenis_kelamin' => $request->jenis_kelamin,
+                    'jenis_kelamin' => $jenis_kelamin,
                 ]);
             }
         });
