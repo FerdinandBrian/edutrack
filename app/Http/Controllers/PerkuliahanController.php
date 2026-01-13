@@ -70,6 +70,7 @@ class PerkuliahanController extends Controller
             'jam_mulai' => 'required',
             'jam_berakhir' => 'required',
             'tahun_ajaran' => 'required|string',
+            'kapasitas' => 'required|numeric|min:1',
         ]);
 
         // Check for Room Collision
@@ -101,12 +102,12 @@ class PerkuliahanController extends Controller
         }
 
 
-        // Ensure Room Exists (Foreign Key Requirement)
-        Ruangan::firstOrCreate(
+        // Ensure Room Exists and Update Capacity
+        Ruangan::updateOrCreate(
             ['kode_ruangan' => $validated['kode_ruangan']],
             [
                 'nama_ruangan' => 'Ruang ' . $validated['kode_ruangan'],
-                'kapasitas' => 40 // Default capacity for manual entry
+                'kapasitas' => $validated['kapasitas']
             ]
         );
 
@@ -132,11 +133,11 @@ class PerkuliahanController extends Controller
 
                 // Create Praktikum class automatically
                 // Ensure Room Exists for auto-created practicum too
-                Ruangan::firstOrCreate(
+                Ruangan::updateOrCreate(
                     ['kode_ruangan' => $request->kode_ruangan],
                     [
                         'nama_ruangan' => 'Ruang ' . $request->kode_ruangan,
-                        'kapasitas' => 40
+                        'kapasitas' => $request->kapasitas
                     ]
                 );
 
@@ -195,6 +196,7 @@ class PerkuliahanController extends Controller
             'jam_mulai' => 'required',
             'jam_berakhir' => 'required',
             'tahun_ajaran' => 'required|string',
+            'kapasitas' => 'required|numeric|min:1',
         ]);
 
         // Check for Room Collision (excluding current record)
@@ -225,12 +227,12 @@ class PerkuliahanController extends Controller
             return back()->withInput()->withErrors(['msg' => "Bentrok! Dosen tersebut sudah memiliki jadwal mengajar di jam tersebut."]);
         }
         
-        // Ensure Room Exists (Foreign Key Requirement)
-        Ruangan::firstOrCreate(
+        // Ensure Room Exists and Update Capacity
+        Ruangan::updateOrCreate(
             ['kode_ruangan' => $validated['kode_ruangan']],
             [
                 'nama_ruangan' => 'Ruang ' . $validated['kode_ruangan'],
-                'kapasitas' => 40
+                'kapasitas' => $validated['kapasitas']
             ]
         );
         
@@ -262,6 +264,47 @@ class PerkuliahanController extends Controller
             // return response()->json(\App\Models\MataKuliah::where('jurusan', $jurusan)->orderBy('semester')->orderBy('nama_mk')->get());
             
             return response()->json(['error' => $e->getMessage()], 200);
+        }
+    }
+    public function statusKelas(Request $request)
+    {
+        $tahunAjaran = $request->query('tahun_ajaran', '2025/2026 - Ganjil'); // Default TA
+        
+        // Ambil semua TA yang unik untuk filter dropdown
+        $allTa = DB::table('perkuliahan')
+            ->select('tahun_ajaran')
+            ->distinct()
+            ->orderBy('tahun_ajaran', 'desc')
+            ->pluck('tahun_ajaran');
+
+        try {
+            $statusData = DB::select('CALL sp_cek_status_kelas(?)', [$tahunAjaran]);
+            
+            // Map the plain objects to include course details for grouping/sorting
+            // Since SP might not return jurusan, we fetch and merge or just sort in PHP
+            $data = collect($statusData)->map(function($item) {
+                $mk = DB::table('mata_kuliah')->where('kode_mk', $item->kode_mk)->first();
+                $item->jurusan = $mk->jurusan ?? 'Umum';
+                $item->sks = $mk->sks ?? 0;
+                
+                // Ambil kapasitas aslinya dari tabel ruangan jika SP belum me-return
+                if (!isset($item->kapasitas)) {
+                    $item->kapasitas = DB::table('perkuliahan')
+                        ->join('ruangan', 'perkuliahan.kode_ruangan', '=', 'ruangan.kode_ruangan')
+                        ->where('id_perkuliahan', $item->id_perkuliahan)
+                        ->value('ruangan.kapasitas') ?? 0;
+                }
+                
+                return $item;
+            })->sortBy(function($item) {
+                $baseName = trim(str_replace(['(Teori)', '(Praktikum)'], '', $item->nama_mk));
+                $typeRank = stripos($item->nama_mk, 'Praktikum') !== false ? 1 : 0;
+                return sprintf('%s|%s|%s|%d', $item->jurusan, $baseName, $item->kelas, $typeRank);
+            });
+
+            return view('admin.perkuliahan.status', compact('data', 'tahunAjaran', 'allTa'));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal memanggil stored procedure: ' . $e->getMessage());
         }
     }
 }

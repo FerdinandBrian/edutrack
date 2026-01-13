@@ -76,12 +76,18 @@
                     <!-- Ruangan -->
                     <div>
                         <label class="block text-sm font-medium text-slate-600 mb-2">Ruangan</label>
-                        <input type="text" name="kode_ruangan" id="ruanganInput" list="ruanganList" required placeholder="Ketik Kode Ruangan (Contoh: L8001)" value="{{ old('kode_ruangan') }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50 uppercase">
+                        <input type="text" name="kode_ruangan" id="ruanganInput" list="ruanganList" required placeholder="Ketik Kode Ruangan" value="{{ old('kode_ruangan') }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50 uppercase">
                         <datalist id="ruanganList">
                             @foreach($ruangans as $r)
                                 <option value="{{ $r->kode_ruangan }}">{{ $r->nama_ruangan }}</option>
                             @endforeach
                         </datalist>
+                    </div>
+
+                    <!-- Kapasitas Ruangan -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-2">Kapasitas Maksimal</label>
+                        <input type="number" name="kapasitas" required min="1" placeholder="Maks. Mahasiswa" value="{{ old('kapasitas', 40) }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition outline-none bg-slate-50">
                     </div>
 
                     <!-- Tahun Ajaran -->

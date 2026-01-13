@@ -68,6 +68,27 @@ CREATE DEFINER=`` PROCEDURE `sp_get_perkuliahan_by_ta_and_jurusan` (IN `p_ta` VA
                 ORDER BY m.nama_mk ASC, p.kelas ASC;
             END$$
 
+CREATE DEFINER=`` PROCEDURE `sp_cek_status_kelas` (IN `p_ta` VARCHAR(255))   BEGIN
+                SELECT 
+                    p.id_perkuliahan,
+                    p.kode_mk,
+                    mk.nama_mk,
+                    p.kelas,
+                    r.kapasitas,
+                    COUNT(d.id) AS jumlah_mahasiswa,
+                    CASE 
+                        WHEN COUNT(d.id) >= 5 THEN 'Dibuka'
+                        ELSE 'Ditutup (Kurang Quota)'
+                    END AS status_kelas
+                FROM perkuliahan p
+                JOIN mata_kuliah mk ON p.kode_mk = mk.kode_mk
+                JOIN ruangan r ON p.kode_ruangan = r.kode_ruangan
+                LEFT JOIN dkbs d ON p.id_perkuliahan = d.id_perkuliahan
+                WHERE p.tahun_ajaran = p_ta COLLATE utf8mb4_unicode_ci
+                GROUP BY p.id_perkuliahan
+                ORDER BY mk.nama_mk ASC, p.kelas ASC;
+            END$$
+
 CREATE DEFINER=`` PROCEDURE `sp_get_va` (IN `student_nrp` VARCHAR(50))   BEGIN
                 SELECT CONCAT('2911', student_nrp) AS va;
             END$$

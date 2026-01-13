@@ -78,6 +78,12 @@
                         </datalist>
                     </div>
 
+                    <!-- Kapasitas Ruangan -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-2">Kapasitas Maksimal</label>
+                        <input type="number" name="kapasitas" required min="1" placeholder="Maks. Mahasiswa" value="{{ old('kapasitas', $perkuliahan->ruangan->kapasitas) }}" class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-amber-500 transition outline-none bg-slate-50">
+                    </div>
+
                     <!-- Tahun Ajaran -->
                     <div>
                         <label class="block text-sm font-medium text-slate-600 mb-2">Tahun Ajaran</label>

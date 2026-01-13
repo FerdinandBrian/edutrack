@@ -72,6 +72,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/dkbs/{dkbs}', [DkbsController::class, 'destroy']);
         
         // Perkuliahan (Jadwal Kelas)
+        Route::get('/perkuliahan/status', [PerkuliahanController::class, 'statusKelas']);
         Route::resource('perkuliahan', PerkuliahanController::class);
 
         // API
