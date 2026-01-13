@@ -9,7 +9,17 @@ class MataKuliahController extends Controller
 {
     public function index()
     {
-        $data = MataKuliah::orderBy('jurusan', 'asc')->orderBy('nama_mk', 'asc')->get();
+        $data = MataKuliah::orderBy('jurusan', 'asc')
+            ->orderByRaw("
+                CASE 
+                    WHEN semester REGEXP '^[0-9]+$' THEN CAST(semester AS UNSIGNED)
+                    WHEN semester = 'Ganjil' THEN 9
+                    WHEN semester = 'Genap' THEN 10
+                    ELSE 11
+                END ASC
+            ")
+            ->orderBy('nama_mk', 'asc')
+            ->get();
         return view('admin.mata_kuliah.index', compact('data'));
     }
 
@@ -29,7 +39,7 @@ class MataKuliahController extends Controller
         ]);
 
         MataKuliah::create($validated);
-        return redirect('/admin/mata-kuliah')->with('success','Mata kuliah berhasil ditambahkan.');
+        return redirect('/admin/mata-kuliah')->with('success', 'Mata kuliah berhasil ditambahkan.');
     }
 
     public function edit(string $id)
@@ -41,7 +51,7 @@ class MataKuliahController extends Controller
     public function update(Request $request, string $id)
     {
         $mk = MataKuliah::findOrFail($id);
-        
+
         $validated = $request->validate([
             'nama_mk' => 'required|string',
             'jurusan' => 'required|string',
@@ -50,12 +60,12 @@ class MataKuliahController extends Controller
         ]);
 
         $mk->update($validated);
-        return redirect('/admin/mata-kuliah')->with('success','Mata kuliah berhasil diperbarui.');
+        return redirect('/admin/mata-kuliah')->with('success', 'Mata kuliah berhasil diperbarui.');
     }
 
     public function destroy(string $id)
     {
         MataKuliah::where('kode_mk', $id)->delete();
-        return back()->with('success','Mata kuliah berhasil dihapus.');
+        return back()->with('success', 'Mata kuliah berhasil dihapus.');
     }
 }
