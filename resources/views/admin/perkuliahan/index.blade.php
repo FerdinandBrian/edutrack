@@ -26,6 +26,24 @@
         </div>
     </div>
 
+    <!-- Filters -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-6">
+        <form action="/admin/perkuliahan" method="GET" class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                <span class="font-semibold text-slate-600">Filter:</span>
+            </div>
+            <select name="jurusan" onchange="this.form.submit()" class="border-slate-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-slate-50 min-w-[200px]">
+                <option value="">Semua Jurusan</option>
+                @foreach($jurusans as $j)
+                    <option value="{{ $j }}" {{ request('jurusan') == $j ? 'selected' : '' }}>{{ $j }}</option>
+                @endforeach
+            </select>
+        </form>
+    </div>
+
     @if(session('success'))
         <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-xl flex items-center gap-3 shadow-sm animate-fade-in-down">
             <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
@@ -46,6 +64,7 @@
                         <th class="px-8 py-5">Tipe</th>
                         <th class="px-6 py-5 text-center">Kelas</th>
                         <th class="px-6 py-5">Dosen Pengampu</th>
+                        <th class="px-6 py-5 text-center">Mahasiswa</th>
                         <th class="px-6 py-5">Jadwal & Ruang</th>
                         <th class="px-6 py-5 text-center">Aksi</th>
                     </tr>
@@ -65,7 +84,7 @@
                         {{-- Jurusan Header --}}
                         @if($lastJurusan !== $currentJurusan)
                             <tr>
-                                <td colspan="5" class="bg-indigo-900 px-8 py-3 sticky top-0 z-20">
+                                <td colspan="6" class="bg-indigo-900 px-8 py-3 sticky top-0 z-20">
                                     <div class="flex items-center gap-3">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -80,7 +99,7 @@
                         {{-- Group Header (Mata Kuliah) --}}
                         @if($lastBase !== $currentBase)
                             <tr>
-                                <td colspan="5" class="bg-slate-50/90 px-8 py-3 border-y border-slate-200 backdrop-blur-sm sticky top-12 z-10">
+                                <td colspan="6" class="bg-slate-50/90 px-8 py-3 border-y border-slate-200 backdrop-blur-sm sticky top-12 z-10">
                                     <div class="flex items-center gap-3">
                                         <div class="h-6 w-1 bg-blue-500 rounded-full"></div>
                                         <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wide">{{ $currentBase }}</h3>
@@ -120,8 +139,6 @@
                                 </div>
                             </td>
 
-
-
                             {{-- Dosen --}}
                             <td class="px-6 py-5">
                                 <div class="flex items-center gap-3">
@@ -136,6 +153,14 @@
                                             {{ $p->nip_dosen }}
                                         </span>
                                     </div>
+                                </div>
+                            </td>
+
+                            {{-- Mahasiswa Count --}}
+                            <td class="px-6 py-5 text-center">
+                                <div class="flex flex-col items-center gap-1">
+                                    <span class="text-lg font-bold text-slate-700">{{ $p->dkbs_count }}</span>
+                                    <span class="text-[10px] text-slate-400 uppercase tracking-wide">MHS</span>
                                 </div>
                             </td>
 

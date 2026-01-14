@@ -177,12 +177,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/pembayaran/{id}/checkout', [TagihanController::class, 'checkout']);
         Route::post('/pembayaran/{id}/checkout', [TagihanController::class, 'processCheckout']);
         Route::get('/pembayaran/{id}/instruction', [TagihanController::class, 'instruction']);
+        Route::get('/pembayaran/{id}/simulation', [TagihanController::class, 'simulation']);
         Route::post('/pembayaran/{id}/confirm', [TagihanController::class, 'confirmPayment']);
         
         Route::post('/pembayaran/{id}/pilih-tipe', [TagihanController::class, 'pilihTipePembayaran']);
         Route::post('/pembayaran/{id}/bayar', [TagihanController::class, 'bayar']); // Legacy/Quick Pay if needed
         
         Route::get('/dokumen', [DokumenController::class, 'index']);
+        Route::get('/bantuan', function() {
+            return view('mahasiswa.bantuan.index');
+        });
         
         Route::get('/mata-kuliah', function(){
             $user = auth()->user();

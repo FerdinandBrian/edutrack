@@ -73,7 +73,7 @@
                      <span class="text-xl font-bold text-indigo-700">Rp {{ number_format($tagihan->jumlah, 0, ',', '.') }}</span>
                 </div>
                 <button type="submit" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200">
-                    Lanjut ke Instruksi Pembayaran
+                    Lanjut ke Pembayaran
                 </button>
             </div>
         </form>

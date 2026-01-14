@@ -16,7 +16,8 @@ class MataKuliah extends Model
         'nama_mk',
         'jurusan',
         'sks',
-        'semester'
+        'semester',
+        'sifat'
     ];
 
     public function perkuliahan()

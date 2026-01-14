@@ -46,7 +46,31 @@
                         <option value="Teknik Informatika" {{ old('jurusan') == 'Teknik Informatika' ? 'selected' : '' }}>Teknik Informatika</option>
                         <option value="Sistem Komputer" {{ old('jurusan') == 'Sistem Komputer' ? 'selected' : '' }}>Sistem Komputer</option>
                         <option value="Psikologi" {{ old('jurusan') == 'Psikologi' ? 'selected' : '' }}>Psikologi</option>
+                        <option value="Desain Komunikasi Visual" {{ old('jurusan') == 'Desain Komunikasi Visual' ? 'selected' : '' }}>Desain Komunikasi Visual</option>
+                        <option value="Seni Rupa Murni" {{ old('jurusan') == 'Seni Rupa Murni' ? 'selected' : '' }}>Seni Rupa Murni</option>
+                        <option value="Arsitektur" {{ old('jurusan') == 'Arsitektur' ? 'selected' : '' }}>Arsitektur</option>
+                        <option value="Fashion Design" {{ old('jurusan') == 'Fashion Design' ? 'selected' : '' }}>Fashion Design</option>
                     </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-2">Sifat Mata Kuliah</label>
+                    <div class="flex items-center gap-6 mt-2">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <div class="relative flex items-center">
+                                <input type="radio" name="sifat" value="Wajib" class="peer sr-only" {{ old('sifat', 'Wajib') == 'Wajib' ? 'checked' : '' }}>
+                                <div class="w-5 h-5 border-2 border-slate-300 rounded-full peer-checked:border-blue-500 peer-checked:bg-blue-500 transition"></div>
+                            </div>
+                            <span class="text-slate-600 font-medium group-hover:text-blue-600 transition">Wajib</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <div class="relative flex items-center">
+                                <input type="radio" name="sifat" value="Pilihan" class="peer sr-only" {{ old('sifat') == 'Pilihan' ? 'checked' : '' }}>
+                                <div class="w-5 h-5 border-2 border-slate-300 rounded-full peer-checked:border-amber-500 peer-checked:bg-amber-500 transition"></div>
+                            </div>
+                            <span class="text-slate-600 font-medium group-hover:text-amber-600 transition">Pilihan</span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-6">

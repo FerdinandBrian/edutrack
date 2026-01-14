@@ -68,7 +68,7 @@ class TagihanController extends Controller
         // Store simulated payment data in session
         session([
             'payment_tagihan_id' => $id,
-            'payment_method' => 'Virtual Account Edutrack',
+            'payment_method' => 'BCA Virtual Account',
             'payment_va' => $va
         ]);
 
@@ -89,6 +89,19 @@ class TagihanController extends Controller
         ];
 
         return view('mahasiswa.pembayaran.instruction', compact('tagihan', 'paymentData'));
+    }
+
+    public function simulation($id)
+    {
+        $tagihan = Tagihan::findOrFail($id);
+        if (auth()->user()->role !== 'mahasiswa' || $tagihan->nrp !== auth()->user()->identifier) abort(403);
+        
+        $paymentData = [
+            'method' => session('payment_method') ?? 'Virtual Account',
+            'va' => session('payment_va') ?? ('2911' . $tagihan->nrp)
+        ];
+        
+        return view('mahasiswa.pembayaran.simulation', compact('tagihan', 'paymentData'));
     }
 
     public function confirmPayment($id)

@@ -4,18 +4,35 @@
 
 @section('content')
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-    <!-- Header -->
+    <!-- Filter & Actions -->
     <div class="px-8 py-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h2 class="text-xl font-bold text-slate-800">Daftar Mata Kuliah (Master Data)</h2>
             <p class="text-sm text-slate-500 mt-1">Data master mata kuliah yang tersedia di kurikulum</p>
         </div>
-        <a href="/admin/mata-kuliah/create" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg shadow-blue-100 transition duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Tambah Mata Kuliah
-        </a>
+        
+        <div class="flex flex-col md:flex-row gap-3">
+             <form method="GET" action="/admin/mata-kuliah" class="flex flex-col md:flex-row gap-3">
+                <select name="jurusan" class="px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 outline-none" onchange="this.form.submit()">
+                    <option value="">Semua Jurusan</option>
+                    @foreach($jurusans as $j)
+                        <option value="{{ $j }}" {{ request('jurusan') == $j ? 'selected' : '' }}>{{ $j }}</option>
+                    @endforeach
+                </select>
+                <select name="sifat" class="px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 outline-none" onchange="this.form.submit()">
+                    <option value="">Semua Sifat</option>
+                    <option value="Wajib" {{ request('sifat') == 'Wajib' ? 'selected' : '' }}>Wajib</option>
+                    <option value="Pilihan" {{ request('sifat') == 'Pilihan' ? 'selected' : '' }}>Pilihan</option>
+                </select>
+            </form>
+
+            <a href="/admin/mata-kuliah/create" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg shadow-blue-100 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Tambah
+            </a>
+        </div>
     </div>
 
     <!-- Table -->
@@ -24,7 +41,7 @@
             <thead>
                 <tr class="bg-slate-50/50 text-slate-500 text-[11px] uppercase tracking-widest font-bold border-b border-slate-100">
                     <th class="px-8 py-4">Mata Kuliah</th>
-                    <th class="px-8 py-4">SKS</th>
+                    <th class="px-8 py-4">SKS / Sifat</th>
                     <th class="px-8 py-4 text-center">Semester</th>
                     <th class="px-8 py-4 text-center">Aksi</th>
                 </tr>
@@ -58,9 +75,14 @@
                         </div>
                     </td>
                     <td class="px-8 py-5">
-                        <span class="inline-flex items-center w-fit px-2.5 py-1 rounded-lg text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">
-                            {{ $mk->sks }} SKS
-                        </span>
+                        <div class="flex flex-col gap-1">
+                            <span class="inline-flex items-center w-fit px-2.5 py-1 rounded-lg text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">
+                                {{ $mk->sks }} SKS
+                            </span>
+                            <span class="inline-flex items-center w-fit px-2.5 py-0.5 rounded-full text-[10px] font-semibold {{ $mk->sifat == 'Pilihan' ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
+                                {{ $mk->sifat ?? 'Wajib' }}
+                            </span>
+                        </div>
                     </td>
                     <td class="px-8 py-5 text-center">
                         <span class="text-sm font-medium text-slate-600">{{ $mk->semester }}</span>

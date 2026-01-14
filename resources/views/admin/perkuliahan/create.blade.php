@@ -176,7 +176,7 @@
                         mkSelect.innerHTML += '<option value="" disabled>Tidak ada mata kuliah untuk prodi ini</option>';
                     }
                     data.forEach(mk => {
-                        mkSelect.innerHTML += `<option value="${mk.kode_mk}">[${mk.kode_mk}] ${mk.nama_mk} (${mk.sks} SKS) - Smst ${mk.semester}</option>`;
+                        mkSelect.innerHTML += `<option value="${mk.kode_mk}">[${mk.sifat ?? 'Wajib'}] [${mk.kode_mk}] ${mk.nama_mk} (${mk.sks} SKS) - Smst ${mk.semester}</option>`;
                     });
                 })
                 .catch(err => {

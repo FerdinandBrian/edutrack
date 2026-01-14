@@ -7,9 +7,21 @@ use Illuminate\Http\Request;
 
 class MataKuliahController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = MataKuliah::orderBy('jurusan', 'asc')
+        $query = MataKuliah::query();
+
+        // Filter by Jurusan
+        if ($request->filled('jurusan')) {
+            $query->where('jurusan', $request->jurusan);
+        }
+
+        // Filter by Sifat
+        if ($request->filled('sifat')) {
+            $query->where('sifat', $request->sifat);
+        }
+
+        $data = $query->orderBy('jurusan', 'asc')
             ->orderByRaw("
                 CASE 
                     WHEN semester REGEXP '^[0-9]+$' THEN CAST(semester AS UNSIGNED)
@@ -20,7 +32,11 @@ class MataKuliahController extends Controller
             ")
             ->orderBy('nama_mk', 'asc')
             ->get();
-        return view('admin.mata_kuliah.index', compact('data'));
+            
+        // Get unique Jurusan for filter dropdown
+        $jurusans = MataKuliah::select('jurusan')->distinct()->orderBy('jurusan')->pluck('jurusan');
+
+        return view('admin.mata_kuliah.index', compact('data', 'jurusans'));
     }
 
     public function create()
@@ -36,6 +52,7 @@ class MataKuliahController extends Controller
             'jurusan' => 'required|string',
             'sks' => 'required|integer|min:1|max:8',
             'semester' => 'required|integer|min:1|max:8',
+            'sifat' => 'required|in:Wajib,Pilihan',
         ]);
 
         MataKuliah::create($validated);
@@ -57,6 +74,7 @@ class MataKuliahController extends Controller
             'jurusan' => 'required|string',
             'sks' => 'required|integer|min:1|max:8',
             'semester' => 'required|integer|min:1|max:8',
+            'sifat' => 'required|in:Wajib,Pilihan',
         ]);
 
         $mk->update($validated);

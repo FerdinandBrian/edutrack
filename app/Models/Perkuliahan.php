@@ -34,4 +34,9 @@ class Perkuliahan extends Model
     {
         return $this->belongsTo(Ruangan::class, 'kode_ruangan', 'kode_ruangan');
     }
+
+    public function dkbs()
+    {
+        return $this->hasMany(Dkbs::class, 'id_perkuliahan', 'id_perkuliahan');
+    }
 }

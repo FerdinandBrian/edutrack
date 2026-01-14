@@ -11,10 +11,18 @@ use Illuminate\Support\Facades\DB;
 
 class PerkuliahanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = Perkuliahan::with(['mataKuliah', 'dosen', 'ruangan'])
-            ->get()
+        $query = Perkuliahan::with(['mataKuliah', 'dosen', 'ruangan'])
+            ->withCount('dkbs');
+
+        if ($request->has('jurusan') && $request->jurusan != '') {
+            $query->whereHas('mataKuliah', function($q) use ($request) {
+                $q->where('jurusan', $request->jurusan);
+            });
+        }
+
+        $data = $query->get()
             ->sortBy(function($item) {
                 // Sorting Logic:
                 // 1. Jurusan
@@ -30,7 +38,9 @@ class PerkuliahanController extends Controller
                 return sprintf('%s|%s|%s|%d', $jurusan, $baseName, $item->kelas, $typeRank);
             });
 
-        return view('admin.perkuliahan.index', compact('data'));
+        $jurusans = MataKuliah::select('jurusan')->distinct()->whereNotNull('jurusan')->orderBy('jurusan')->pluck('jurusan');
+
+        return view('admin.perkuliahan.index', compact('data', 'jurusans'));
     }
 
     public function create()
