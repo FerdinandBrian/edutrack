@@ -33,7 +33,7 @@
         }
 
         .input-group:focus-within label {
-            color: #2563eb;
+            color: #3b82f6;
             transform: translateY(-2px);
         }
 
@@ -44,7 +44,7 @@
 
         .custom-input:focus {
             background: white;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         }
 
         @keyframes float {
@@ -58,12 +58,12 @@
         }
 
         .btn-gradient {
-            background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
             transition: all 0.4s ease;
         }
 
         .btn-gradient:hover {
-            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
             transform: translateY(-2px);
             filter: brightness(1.1);
         }

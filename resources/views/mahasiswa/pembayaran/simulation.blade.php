@@ -35,7 +35,7 @@
             <div class="space-y-4 text-sm">
                 <div class="flex justify-between">
                     <span class="text-slate-500">Merchant</span>
-                    <span class="font-bold text-slate-700">UNIVERSITAS EDUTRACK</span>
+                    <span class="font-bold text-slate-700">UNIVERSITAS CLOUD</span>
                 </div>
                 <div class="flex justify-between">
                      <span class="text-slate-500">Nomor Virtual Account</span>

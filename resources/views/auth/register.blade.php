@@ -38,16 +38,16 @@
 
         .custom-input:focus {
             background: white;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         }
 
         .btn-gradient {
-            background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
             transition: all 0.4s ease;
         }
 
         .btn-gradient:hover {
-            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
             transform: translateY(-2px);
         }
 
@@ -66,7 +66,11 @@
     
     <!-- Background Layer -->
     <div class="absolute inset-0 bg-login z-0"></div>
-    <div class="absolute inset-0 bg-gradient-to-tr from-indigo-900/40 to-transparent z-0"></div>
+    <div class="absolute inset-0 bg-gradient-to-tr from-blue-900/40 to-transparent z-0"></div>
+
+    <!-- Decorative Elements -->
+    <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-500/20 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-500/20 rounded-full blur-[120px] pointer-events-none"></div>
 
     <!-- WRAPPER -->
     <div class="w-full max-w-lg z-10 animate-fade-in">
