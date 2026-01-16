@@ -6,8 +6,21 @@
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
     <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white">
         <div>
-            <h2 class="text-xl font-bold text-slate-800">Daftar Kelas & Beban Studi (DKBS)</h2>
-            <p class="text-sm text-slate-500 mt-1">Daftar mata kuliah yang Anda kontrak pada semester ini</p>
+            <h2 class="text-xl font-bold text-slate-800">Dokumen Kontrak Beban Studi (DKBS)</h2>
+            <div class="mt-2 flex items-center gap-4">
+                <p class="text-sm text-slate-500">Daftar mata kuliah yang Anda kontrak</p>
+                <div class="h-4 w-px bg-slate-200"></div>
+                <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Periode</span>
+                    <form method="GET" action="{{ url()->current() }}">
+                        <select name="tahun_ajaran" onchange="this.form.submit()" class="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer hover:text-blue-600 transition-colors pr-1">
+                            @foreach($tahun_ajarans as $ta)
+                                <option value="{{ $ta }}" {{ $ta == $selectedTa ? 'selected' : '' }}>{{ $ta }}</option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
+            </div>
         </div>
         <div class="flex items-center gap-4">
             @if(isset($totalSks))

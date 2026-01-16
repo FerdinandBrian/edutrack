@@ -6,7 +6,16 @@
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
     <div class="px-8 py-6 border-b border-slate-100 bg-white">
         <h2 class="text-xl font-bold text-slate-800">Daftar Nilai Akademik</h2>
-        <p class="text-sm text-slate-500 mt-1">Laporan nilai mata kuliah yang telah ditempuh</p>
+        <div class="mt-1 flex items-center gap-3">
+            <p class="text-sm text-slate-500">Laporan nilai mata kuliah yang telah ditempuh</p>
+            <form method="GET" action="{{ url()->current() }}">
+                <select name="tahun_ajaran" onchange="this.form.submit()" class="border-slate-200 rounded-lg px-3 py-1 text-xs font-semibold bg-slate-50 text-slate-600 focus:ring-blue-500 focus:border-blue-500 cursor-pointer hover:bg-slate-100 transition-colors">
+                    @foreach($tahun_ajarans as $ta)
+                        <option value="{{ $ta }}" {{ $ta == $selectedTa ? 'selected' : '' }}>{{ $ta }}</option>
+                    @endforeach
+                </select>
+            </form>
+        </div>
     </div>
 
     <div class="overflow-x-auto">

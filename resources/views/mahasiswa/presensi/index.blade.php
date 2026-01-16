@@ -5,12 +5,22 @@
 @section('content')
 
 <div class="bg-white rounded-xl shadow p-6">
-    <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold text-slate-800">Daftar Presensi</h2>
-        <div class="text-sm text-slate-500">
-             <select class="border rounded px-2 py-1 text-sm bg-gray-50">
-                 <option>Reguler Ganjil 2025/2026</option>
-             </select>
+    <div class="flex justify-between items-end mb-6">
+        <div>
+            <h2 class="text-xl font-bold text-slate-800">Daftar Presensi</h2>
+            <p class="text-sm text-slate-500 mt-1">Rekap kehadiran perkuliahan Anda</p>
+        </div>
+        <div>
+             <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-blue-300 transition-colors">
+                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Periode</span>
+                 <form method="GET" action="{{ url()->current() }}">
+                     <select name="tahun_ajaran" onchange="this.form.submit()" class="bg-transparent text-sm font-bold text-slate-700 focus:outline-none cursor-pointer hover:text-blue-600 transition-colors pr-1">
+                         @foreach($tahun_ajarans as $ta)
+                            <option value="{{ $ta }}" {{ $ta == $selectedTa ? 'selected' : '' }}>{{ $ta }}</option>
+                         @endforeach
+                     </select>
+                 </form>
+             </div>
         </div>
     </div>
 

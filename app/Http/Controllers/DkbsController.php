@@ -32,14 +32,22 @@ class DkbsController extends Controller
         }
 
         if ($user->role === 'mahasiswa') {
+            // Get available semesters for this student
+            $tahun_ajarans = Dkbs::where('nrp', $user->identifier)->distinct()->orderBy('tahun_ajaran', 'desc')->pluck('tahun_ajaran');
+            
+            // Determine selected semester (default to latest if not specified)
+            $selectedTa = $request->tahun_ajaran ?? $tahun_ajarans->first();
+
+            // Apply filter if not already applied by global filter (though global filter is only if request filled)
+            if (!$request->filled('tahun_ajaran') && $selectedTa) {
+                $query->where('tahun_ajaran', $selectedTa);
+            }
+
             $data = $query->where('nrp', $user->identifier)->get();
             
             // Menggunakan DATABASE FUNCTION untuk menghitung total SKS
-            $selectedTa = $request->tahun_ajaran ?? ($data->first()->tahun_ajaran ?? null);
             $totalSks = 0;
             if ($selectedTa) {
-                // Determine suffix based on TA (Ganjil/Genap)
-                // Assuming function signatures or logic exist, otherwise simplified fallback
                 try {
                     $totalSks = \Illuminate\Support\Facades\DB::select("SELECT get_total_sks(?, ?) AS total", [$user->identifier, $selectedTa])[0]->total;
                 } catch(\Exception $e) { $totalSks = 0; }
@@ -59,8 +67,8 @@ class DkbsController extends Controller
                 return $valA <=> $valB;
             });
 
-            $tahun_ajarans = Dkbs::distinct()->pluck('tahun_ajaran');
-            return view('mahasiswa.dkbs.index', compact('data', 'tahun_ajarans', 'totalSks'));
+            $tahun_ajarans = Dkbs::where('nrp', $user->identifier)->distinct()->orderBy('tahun_ajaran', 'desc')->pluck('tahun_ajaran');
+            return view('mahasiswa.dkbs.index', compact('data', 'tahun_ajarans', 'totalSks', 'selectedTa'));
         } else {
             // Admin View: List of Students
             $students = Mahasiswa::orderBy('jurusan', 'asc')

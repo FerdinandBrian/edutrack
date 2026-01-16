@@ -11,7 +11,7 @@ use App\Models\Dkbs;
 
 class PresensiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
 
@@ -39,8 +39,14 @@ class PresensiController extends Controller
             $nrp = $user->identifier;
             
             // Get enrolled courses via DKBS
+            $tahun_ajarans = \App\Models\Dkbs::where('nrp', $nrp)->distinct()->orderBy('tahun_ajaran', 'desc')->pluck('tahun_ajaran');
+            $selectedTa = $request->query('tahun_ajaran') ?? $tahun_ajarans->first();
+
             $enrolledCourses = \App\Models\Dkbs::with(['mataKuliah', 'perkuliahan'])
                 ->where('nrp', $nrp)
+                ->when($selectedTa, function($q) use ($selectedTa) {
+                    $q->where('tahun_ajaran', $selectedTa);
+                })
                 ->get();
             
             $summary = $enrolledCourses->map(function($dkbs) use ($nrp) {
@@ -71,7 +77,7 @@ class PresensiController extends Controller
                 ];
             });
 
-            return view('mahasiswa.presensi.index', compact('summary'));
+            return view('mahasiswa.presensi.index', compact('summary', 'tahun_ajarans', 'selectedTa'));
         } else {
             // Admin View
              $sessions = Presensi::with(['jadwal.mataKuliah'])

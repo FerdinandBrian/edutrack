@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Schema;
 
 class NilaiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
         try {
@@ -31,6 +31,15 @@ class NilaiController extends Controller
                     $item->nilai = $nilai; // Attach nilai object to dkbs item
                     return $item;
                 });
+
+                $tahun_ajarans = Dkbs::where('nrp', $user->identifier)->distinct()->orderBy('tahun_ajaran', 'desc')->pluck('tahun_ajaran');
+                $selectedTa = $request->tahun_ajaran ?? ($tahun_ajarans->first() ?? null);
+
+                if ($selectedTa) {
+                    $data = $data->filter(function($item) use ($selectedTa) {
+                        return $item->tahun_ajaran === $selectedTa;
+                    });
+                }
 
             } elseif ($user->role === 'dosen') {
                 $dosen = \App\Models\Dosen::where('user_id', $user->id)->first();
@@ -54,7 +63,7 @@ class NilaiController extends Controller
             $data = collect();
         }
 
-        return view($user->role . '.nilai.index', compact('data'));
+        return view($user->role . '.nilai.index', compact('data', 'tahun_ajarans', 'selectedTa'));
     }
 
     public function create()

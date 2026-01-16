@@ -9,14 +9,27 @@ use Illuminate\Support\Facades\Log;
 
 class JadwalController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
 
         if ($user->role === 'mahasiswa') {
             // Ambil data jadwal dari DKBS mahasiswa yang login
+            $nrp = $user->identifier;
+            
+            // Get available semesters
+            $tahun_ajarans = \App\Models\Dkbs::where('nrp', $nrp)
+                ->distinct()
+                ->orderBy('tahun_ajaran', 'desc')
+                ->pluck('tahun_ajaran');
+            
+            $selectedTa = $request->query('tahun_ajaran') ?? $tahun_ajarans->first();
+
             $data = \App\Models\Dkbs::with(['perkuliahan.mataKuliah', 'perkuliahan.dosen', 'perkuliahan.ruangan'])
-                ->where('nrp', $user->identifier)
+                ->where('nrp', $nrp)
+                ->when($selectedTa, function($q) use ($selectedTa) {
+                    $q->where('tahun_ajaran', $selectedTa);
+                })
                 ->get();
 
             // Custom sorting for Days
@@ -68,11 +81,13 @@ class JadwalController extends Controller
                     // if day same, sort by time
                     return strcmp($a->jam_mulai, $b->jam_mulai);
                 }
-                return $valA <=> $valB;
             });
+            
+            $tahun_ajarans = collect();
+            $selectedTa = null;
         }
 
-        return view($user->role . '.jadwal.index', compact('data'));
+        return view($user->role . '.jadwal.index', compact('data', 'tahun_ajarans', 'selectedTa'));
     }
 
     public function create()
