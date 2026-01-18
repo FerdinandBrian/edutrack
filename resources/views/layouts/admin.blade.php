@@ -78,6 +78,13 @@
                 <span class="font-medium text-sm">Users</span>
             </a>
 
+            <a href="/admin/dosen" class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ Request::is('admin/dosen*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30' : 'text-slate-400 hover:bg-slate-800 hover:text-blue-400' }}">
+                <svg class="w-5 h-5 {{ Request::is('admin/dosen*') ? 'text-white' : 'text-slate-500 group-hover:text-blue-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <span class="font-medium text-sm">Data Dosen</span>
+            </a>
+
             <a href="/admin/pembayaran" class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ Request::is('admin/pembayaran*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30' : 'text-slate-400 hover:bg-slate-800 hover:text-blue-400' }}">
                 <svg class="w-5 h-5 {{ Request::is('admin/pembayaran*') ? 'text-white' : 'text-slate-500 group-hover:text-blue-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                 <span class="font-medium text-sm">Pembayaran</span>
@@ -106,13 +113,13 @@
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                     Profile
                 </a>
-                <form method="POST" action="/logout">
+                <form id="logout-form" method="POST" action="/logout" class="hidden">
                     @csrf
-                    <button class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-xs text-red-400 hover:text-red-300 transition">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                        Logout
-                    </button>
                 </form>
+                <button type="button" onclick="showLogoutModal()" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-xs text-red-400 hover:text-red-300 transition">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    Logout
+                </button>
             </div>
         </div>
     </aside>
@@ -197,6 +204,38 @@
     </div>
 </div>
 
+<!-- Logout Confirmation Modal -->
+<div id="logout-modal" class="fixed inset-0 z-[100] hidden overflow-y-auto">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
+    
+    <!-- Modal Content -->
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative w-full max-w-sm transform overflow-hidden rounded-3xl bg-white p-8 shadow-2xl transition-all animate-fade-in-up">
+            <div class="text-center">
+                <!-- Icon -->
+                <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-500">
+                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                </div>
+                
+                <h3 class="text-xl font-bold text-slate-900">Konfirmasi Logout</h3>
+                <p class="mt-2 text-sm text-slate-500">Apakah Anda yakin ingin keluar dari sistem? Sesi Anda akan diakhiri.</p>
+                
+                <div class="mt-8 flex flex-col gap-3">
+                    <button type="button" onclick="confirmLogout()" class="w-full rounded-xl bg-red-500 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 transition-all hover:bg-red-600 active:scale-95">
+                        Ya, Logout Sekarang
+                    </button>
+                    <button type="button" onclick="hideLogoutModal()" class="w-full rounded-xl bg-slate-100 py-3 text-sm font-bold text-slate-600 transition-all hover:bg-slate-200 active:scale-95">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     const globalSearch = document.getElementById('global-search');
     const dropdown = document.getElementById('search-results-dropdown');
@@ -268,6 +307,23 @@
             dropdown?.classList.add('hidden');
         }
     });
+
+    // Logout Modal Functions
+    function showLogoutModal() {
+        const modal = document.getElementById('logout-modal');
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function hideLogoutModal() {
+        const modal = document.getElementById('logout-modal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    function confirmLogout() {
+        document.getElementById('logout-form').submit();
+    }
 </script>
 
 </body>

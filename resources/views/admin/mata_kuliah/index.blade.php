@@ -19,6 +19,12 @@
                         <option value="{{ $j }}" {{ request('jurusan') == $j ? 'selected' : '' }}>{{ $j }}</option>
                     @endforeach
                 </select>
+                <select name="semester" class="px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 outline-none" onchange="this.form.submit()">
+                    <option value="">Semua Semester</option>
+                    @foreach($semesters as $s)
+                        <option value="{{ $s }}" {{ request('semester') == $s ? 'selected' : '' }}>Semester {{ $s }}</option>
+                    @endforeach
+                </select>
                 <select name="sifat" class="px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 outline-none" onchange="this.form.submit()">
                     <option value="">Semua Sifat</option>
                     <option value="Wajib" {{ request('sifat') == 'Wajib' ? 'selected' : '' }}>Wajib</option>

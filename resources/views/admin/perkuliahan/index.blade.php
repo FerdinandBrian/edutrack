@@ -41,8 +41,28 @@
                     <option value="{{ $j }}" {{ request('jurusan') == $j ? 'selected' : '' }}>{{ $j }}</option>
                 @endforeach
             </select>
+            <select name="semester" onchange="this.form.submit()" class="border-slate-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-slate-50 min-w-[200px]">
+                <option value="">Semua Semester</option>
+                @foreach($semesters as $s)
+                    <option value="{{ $s }}" {{ request('semester') == $s ? 'selected' : '' }}>Semester {{ $s }}</option>
+                @endforeach
+            </select>
         </form>
     </div>
+
+    @if(request('semester'))
+        <div class="mb-6 p-4 bg-blue-50 border border-blue-100 text-blue-700 rounded-xl flex items-center gap-3 shadow-md animate-fade-in-down">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <div>
+                <h3 class="font-bold text-lg">Jadwal Perkuliahan Semester {{ request('semester') }}</h3>
+                <p class="text-sm text-blue-600/80">Menampilkan daftar kelas yang dibuka untuk semester {{ request('semester') }}.</p>
+            </div>
+        </div>
+    @endif
 
     @if(session('success'))
         <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-xl flex items-center gap-3 shadow-sm animate-fade-in-down">
@@ -73,11 +93,13 @@
                     @php 
                         $lastBase = null; 
                         $lastJurusan = null;
+                        $lastSemester = null;
                     @endphp
                     @forelse($data as $p)
                         @php
                             $currentBase = trim(str_replace(['(Teori)', '(Praktikum)'], '', $p->mataKuliah->nama_mk));
                             $currentJurusan = $p->mataKuliah->jurusan ?? 'Umum';
+                            $currentSemester = $p->mataKuliah->semester;
                             $isPraktikum = str_contains($p->mataKuliah->nama_mk, 'Praktikum');
                         @endphp
 
@@ -93,13 +115,28 @@
                                     </div>
                                 </td>
                             </tr>
-                            @php $lastBase = null; @endphp {{-- Reset Course Header trigger --}}
+                            @php 
+                                $lastBase = null; 
+                                $lastSemester = null; 
+                            @endphp 
+                        @endif
+
+                        {{-- Semester Header --}}
+                        @if($lastSemester !== $currentSemester)
+                            <tr>
+                                <td colspan="6" class="bg-indigo-50/80 px-8 py-2 sticky top-10 z-10 border-b border-indigo-100">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-indigo-500"></div>
+                                        <h4 class="font-bold text-indigo-800 text-xs uppercase tracking-wider">Semester {{ $currentSemester }}</h4>
+                                    </div>
+                                </td>
+                            </tr>
                         @endif
 
                         {{-- Group Header (Mata Kuliah) --}}
                         @if($lastBase !== $currentBase)
                             <tr>
-                                <td colspan="6" class="bg-slate-50/90 px-8 py-3 border-y border-slate-200 backdrop-blur-sm sticky top-12 z-10">
+                                <td colspan="6" class="bg-white/95 px-8 py-3 border-y border-slate-200 backdrop-blur-sm sticky top-[3.5rem] z-10">
                                     <div class="flex items-center gap-3">
                                         <div class="h-6 w-1 bg-blue-500 rounded-full"></div>
                                         <h3 class="font-bold text-slate-700 text-sm uppercase tracking-wide">{{ $currentBase }}</h3>
@@ -114,6 +151,7 @@
                         @php 
                             $lastBase = $currentBase; 
                             $lastJurusan = $currentJurusan;
+                            $lastSemester = $currentSemester;
                         @endphp
 
                         <tr class="hover:bg-blue-50/40 transition-colors group">

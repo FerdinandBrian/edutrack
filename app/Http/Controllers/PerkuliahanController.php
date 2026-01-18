@@ -23,25 +23,54 @@ class PerkuliahanController extends Controller
             });
         }
 
+        if ($request->filled('semester')) {
+            $query->whereHas('mataKuliah', function ($q) use ($request) {
+                $q->where('semester', $request->semester);
+            });
+        }
+
         $data = $query->get()
             ->sortBy(function ($item) {
                 // Sorting Logic:
                 // 1. Jurusan
-                // 2. Base Name (Algorithm name without Teori/Praktikum suffix)
-                // 3. Class (A, B, C...)
-                // 4. Type (Teori first, then Praktikum)
+                // 2. Semester (New!)
+                // 3. Base Name (Algorithm name without Teori/Praktikum suffix)
+                // 4. Class (A, B, C...)
+                // 5. Type (Teori first, then Praktikum)
     
                 $jurusan = $item->mataKuliah->jurusan ?? 'Umum';
+                $semester = $item->mataKuliah->semester ?? '0';
+                
+                // Normalize semester for sorting (numeric first, then string)
+                if (is_numeric($semester)) {
+                    $semesterRank = str_pad($semester, 2, '0', STR_PAD_LEFT);
+                } else {
+                    $semesterRank = '99' . $semester; // Put non-numeric semesters at the end
+                }
+
                 $name = $item->mataKuliah->nama_mk;
                 $baseName = trim(str_replace(['(Teori)', '(Praktikum)'], '', $name));
                 $typeRank = stripos($name, 'Praktikum') !== false ? 1 : 0; // 0 for Teori, 1 for Praktikum
     
-                return sprintf('%s|%s|%s|%d', $jurusan, $baseName, $item->kelas, $typeRank);
+                return sprintf('%s|%s|%s|%s|%d', $jurusan, $semesterRank, $baseName, $item->kelas, $typeRank);
             });
 
         $jurusans = MataKuliah::select('jurusan')->distinct()->whereNotNull('jurusan')->orderBy('jurusan')->pluck('jurusan');
+        
+        // Get unique Semester for filter dropdown
+        $semesters = MataKuliah::select('semester')
+            ->distinct()
+            ->orderByRaw("
+                CASE 
+                    WHEN semester REGEXP '^[0-9]+$' THEN CAST(semester AS UNSIGNED)
+                    WHEN semester = 'Ganjil' THEN 9
+                    WHEN semester = 'Genap' THEN 10
+                    ELSE 11
+                END ASC
+            ")
+            ->pluck('semester');
 
-        return view('admin.perkuliahan.index', compact('data', 'jurusans'));
+        return view('admin.perkuliahan.index', compact('data', 'jurusans', 'semesters'));
     }
 
     public function create()

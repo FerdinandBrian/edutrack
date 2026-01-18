@@ -21,6 +21,11 @@ class MataKuliahController extends Controller
             $query->where('sifat', $request->sifat);
         }
 
+        // Filter by Semester
+        if ($request->filled('semester')) {
+            $query->where('semester', $request->semester);
+        }
+
         $data = $query->orderBy('jurusan', 'asc')
             ->orderByRaw("
                 CASE 
@@ -35,8 +40,21 @@ class MataKuliahController extends Controller
             
         // Get unique Jurusan for filter dropdown
         $jurusans = MataKuliah::select('jurusan')->distinct()->orderBy('jurusan')->pluck('jurusan');
+        
+        // Get unique Semester for filter dropdown
+        $semesters = MataKuliah::select('semester')
+            ->distinct()
+            ->orderByRaw("
+                CASE 
+                    WHEN semester REGEXP '^[0-9]+$' THEN CAST(semester AS UNSIGNED)
+                    WHEN semester = 'Ganjil' THEN 9
+                    WHEN semester = 'Genap' THEN 10
+                    ELSE 11
+                END ASC
+            ")
+            ->pluck('semester');
 
-        return view('admin.mata_kuliah.index', compact('data', 'jurusans'));
+        return view('admin.mata_kuliah.index', compact('data', 'jurusans', 'semesters'));
     }
 
     public function create()

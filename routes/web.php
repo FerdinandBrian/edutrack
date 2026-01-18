@@ -17,6 +17,8 @@ use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\PerkuliahanController;
 use App\Http\Controllers\PengumumanController;
 
+use App\Http\Controllers\AdminDosenController;
+
 Route::get('/', function () {
     if (auth()->check()) {
         return redirect('/dashboard');
@@ -61,6 +63,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/users/{id}/edit', [UserController::class, 'edit']);
         Route::put('/users/{id}', [UserController::class, 'update']);
         Route::delete('/users/{user}', [UserController::class, 'destroy']);
+        
+        // Dosen Management
+        Route::get('/dosen', [AdminDosenController::class, 'index']);
         
         // DKBS Admin
         Route::get('/dkbs', [DkbsController::class, 'index']);

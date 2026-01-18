@@ -172,6 +172,25 @@
             </span>
         </a>
 
+        <!-- DATA DOSEN -->
+        <a href="/admin/dosen" class="group bg-white rounded-3xl shadow-sm border border-slate-100 p-8 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-start relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity transform scale-150">
+                <svg class="w-32 h-32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+            </div>
+            <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm group-hover:shadow-blue-200">
+                <svg class="w-7 h-7 text-blue-600 group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+            </div>
+            <h3 class="font-bold text-slate-800 text-lg mb-2">Data Dosen</h3>
+            <p class="text-slate-500 text-sm leading-relaxed mb-6">Kelola daftar dosen pengampu dan detail jurusan mereka.</p>
+            <span class="mt-auto text-blue-600 font-semibold text-sm group-hover:translate-x-1 transition-transform flex items-center gap-2">
+                Akses Menu <span class="text-lg">→</span>
+            </span>
+        </a>
+
     </div>
 </div>
 @endsection

@@ -111,13 +111,13 @@
             </a>
 
             <div class="mt-8 px-4">
-                 <form method="POST" action="/logout">
+                 <form id="logout-form" method="POST" action="/logout" class="hidden">
                     @csrf
-                    <button class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-red-100 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition font-semibold text-sm">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                        Sign Out
-                    </button>
                 </form>
+                <button type="button" onclick="showLogoutModal()" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-red-100 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition font-semibold text-sm">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    Sign Out
+                </button>
             </div>
         </nav>
     </aside>
@@ -180,6 +180,38 @@
             </div>
         </main>
 
+    </div>
+</div>
+
+<!-- Logout Confirmation Modal -->
+<div id="logout-modal" class="fixed inset-0 z-[100] hidden overflow-y-auto">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
+    
+    <!-- Modal Content -->
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative w-full max-w-sm transform overflow-hidden rounded-3xl bg-white p-8 shadow-2xl transition-all animate-fade-in-up">
+            <div class="text-center">
+                <!-- Icon -->
+                <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-500">
+                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                </div>
+                
+                <h3 class="text-xl font-bold text-slate-900">Konfirmasi Keluar</h3>
+                <p class="mt-2 text-sm text-slate-500">Apakah Anda yakin ingin mengakhiri sesi belajar Anda?</p>
+                
+                <div class="mt-8 flex flex-col gap-3">
+                    <button type="button" onclick="confirmLogout()" class="w-full rounded-xl bg-red-500 py-3 text-sm font-bold text-white shadow-lg shadow-red-200 transition-all hover:bg-red-600 active:scale-95">
+                        Ya, Keluar Sekarang
+                    </button>
+                    <button type="button" onclick="hideLogoutModal()" class="w-full rounded-xl bg-slate-100 py-3 text-sm font-bold text-slate-600 transition-all hover:bg-slate-200 active:scale-95">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -259,6 +291,23 @@
             dropdown?.classList.add('hidden');
         }
     });
+
+    // Logout Modal Functions
+    function showLogoutModal() {
+        const modal = document.getElementById('logout-modal');
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function hideLogoutModal() {
+        const modal = document.getElementById('logout-modal');
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    function confirmLogout() {
+        document.getElementById('logout-form').submit();
+    }
 </script>
 
 </body>
