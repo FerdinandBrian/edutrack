@@ -91,6 +91,7 @@ Route::middleware('auth')->group(function () {
         
         // Pembayaran Admin
         Route::get('/pembayaran', [TagihanController::class, 'index']);
+        Route::get('/pembayaran/student/{nrp}', [TagihanController::class, 'showStudent']);
         Route::get('/pembayaran/create', [TagihanController::class, 'create']);
         Route::post('/pembayaran', [TagihanController::class, 'store']);
         Route::get('/pembayaran/{id}', [TagihanController::class, 'show']);

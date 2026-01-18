@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class TagihanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
         
@@ -17,11 +17,46 @@ class TagihanController extends Controller
             $data = Tagihan::where('nrp', $user->identifier)->get();
             return view('mahasiswa.pembayaran.index', compact('data'));
         } elseif ($user->role === 'admin') {
-            $data = Tagihan::all();
-            return view('admin.pembayaran.index', compact('data'));
+            // Admin View: List of Students
+            $students = \App\Models\Mahasiswa::query();
+            
+            if ($request->filled('search')) {
+                $students->where(function($q) use ($request) {
+                    $q->where('nama', 'like', '%' . $request->search . '%')
+                      ->orWhere('nrp', 'like', '%' . $request->search . '%');
+                });
+            }
+
+            if ($request->filled('jurusan')) {
+                $students->where('jurusan', $request->jurusan);
+            }
+
+            $students = $students->orderBy('jurusan', 'asc')
+                                 ->orderBy('nrp', 'asc')
+                                 ->get();
+            
+            $jurusans = \App\Models\Mahasiswa::distinct()->whereNotNull('jurusan')->pluck('jurusan');
+            
+            return view('admin.pembayaran.index', compact('students', 'jurusans'));
         }
 
         abort(403);
+    }
+
+    public function showStudent($nrp)
+    {
+        if (auth()->user()->role !== 'admin') abort(403);
+        
+        $mahasiswa = \App\Models\Mahasiswa::where('nrp', $nrp)->firstOrFail();
+        
+        // Get all payments and sort them properly
+        $data = Tagihan::where('nrp', $nrp)
+            ->orderByRaw('CASE WHEN tipe_pembayaran IS NULL THEN 0 ELSE tipe_pembayaran END DESC')
+            ->orderBy('batas_pembayaran', 'asc')
+            ->orderByRaw('CASE WHEN cicilan_ke IS NULL THEN 0 ELSE cicilan_ke END ASC')
+            ->get();
+        
+        return view('admin.pembayaran.show_student', compact('mahasiswa', 'data'));
     }
 
     public function show($id)
@@ -203,12 +238,13 @@ class TagihanController extends Controller
         ]);
     }
 
-    // Admin Methods (Stubs/Basic Implementation)
-    public function create()
+    // Admin Methods
+    public function create(Request $request)
     {
         if (auth()->user()->role !== 'admin') abort(403);
-        $mahasiswas = \App\Models\Mahasiswa::all();
-        return view('admin.pembayaran.create', compact('mahasiswas'));
+        $mahasiswas = \App\Models\Mahasiswa::orderBy('nama')->get();
+        $selectedNrp = $request->nrp;
+        return view('admin.pembayaran.create', compact('mahasiswas', 'selectedNrp'));
     }
 
     public function store(Request $request)
@@ -226,7 +262,7 @@ class TagihanController extends Controller
         $data['status'] = 'Belum Lunas';
         
         Tagihan::create($data);
-        return redirect('/admin/pembayaran')->with('success', 'Tagihan created');
+        return redirect('/admin/pembayaran/student/' . $request->nrp)->with('success', 'Tagihan berhasil dibuat.');
     }
 
     public function edit($id)
@@ -242,13 +278,15 @@ class TagihanController extends Controller
         if (auth()->user()->role !== 'admin') abort(403);
         $tagihan = Tagihan::findOrFail($id);
         $tagihan->update($request->all());
-        return redirect('/admin/pembayaran')->with('success', 'Tagihan updated');
+        return redirect('/admin/pembayaran/student/' . $tagihan->nrp)->with('success', 'Tagihan berhasil diperbarui.');
     }
 
     public function destroy($id)
     {
         if (auth()->user()->role !== 'admin') abort(403);
-        Tagihan::destroy($id);
-        return redirect('/admin/pembayaran')->with('success', 'Tagihan deleted');
+        $tagihan = Tagihan::findOrFail($id);
+        $nrp = $tagihan->nrp;
+        $tagihan->delete();
+        return redirect('/admin/pembayaran/student/' . $nrp)->with('success', 'Tagihan berhasil dihapus.');
     }
 }
