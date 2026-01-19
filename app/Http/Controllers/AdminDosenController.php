@@ -15,6 +15,14 @@ class AdminDosenController extends Controller
             $query->where('jurusan', $request->jurusan);
         }
 
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('nip', 'like', "%{$search}%");
+            });
+        }
+
         $dosens = $query->orderBy('jurusan', 'asc')
             ->orderBy('nama', 'asc')
             ->get();

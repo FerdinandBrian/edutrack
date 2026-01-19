@@ -83,18 +83,18 @@
         </span>
     </a>
 
-    <!-- RENCANA STUDI -->
-    <a href="/mahasiswa/dkbs" class="group relative overflow-hidden bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+    <!-- PENDAFTARAN KELAS -->
+    <a href="/mahasiswa/enrollment" class="group relative overflow-hidden bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
         <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-transform group-hover:scale-110">
             <svg class="w-24 h-24 text-emerald-600" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
         </div>
         <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors shadow-sm">
-            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
-        <h4 class="font-bold text-slate-800 text-xl mb-2">DKBS</h4>
-        <p class="text-slate-500 text-sm leading-relaxed mb-6">Isi rencana studi semester baru dan cetak kartu ujian.</p>
+        <h4 class="font-bold text-slate-800 text-xl mb-2">Pendaftaran Kelas</h4>
+        <p class="text-slate-500 text-sm leading-relaxed mb-6">Pilih kelas kuliah untuk semester baru dan atur jadwal belajarmu.</p>
         <span class="text-emerald-600 font-semibold text-sm flex items-center gap-2 group-hover:gap-3 transition-all">
-            Isi Rencana Studi <span class="text-lg">→</span>
+            Daftar Sekarang <span class="text-lg">→</span>
         </span>
     </a>
 

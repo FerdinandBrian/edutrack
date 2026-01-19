@@ -19,6 +19,7 @@ use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\AdminDosenController;
 use App\Http\Controllers\AdminMahasiswaController;
 use App\Http\Controllers\AdminAdminController;
+use App\Http\Controllers\MahasiswaEnrollmentController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -29,7 +30,6 @@ Route::get('/', function () {
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
-// ... other routes (keeping logic)
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 Route::get('/register', [AuthController::class, 'showRegister'])->middleware('guest');
 Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
@@ -181,6 +181,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/presensi', [PresensiController::class, 'index']);
         Route::get('/presensi/{presensi}', [PresensiController::class, 'show']);
         
+        // Enrollment (Self-service DKBS)
+        Route::get('/enrollment', [MahasiswaEnrollmentController::class, 'index']);
+        Route::post('/enrollment', [MahasiswaEnrollmentController::class, 'store']);
+
         // Payment Flow
         Route::get('/pembayaran/{id}/checkout', [TagihanController::class, 'checkout']);
         Route::post('/pembayaran/{id}/checkout', [TagihanController::class, 'processCheckout']);

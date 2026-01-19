@@ -20,21 +20,38 @@
         </div>
     </div>
 
-    <!-- Filters -->
     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-6">
-        <form action="/admin/dosen" method="GET" class="flex items-center gap-4">
-            <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                </svg>
-                <span class="font-semibold text-slate-600">Filter Jurusan:</span>
+        <form action="/admin/dosen" method="GET" class="flex flex-col md:flex-row items-center gap-4">
+            <!-- Jurusan Filter -->
+            <div class="flex items-center gap-2 flex-1 w-full">
+                <div class="flex items-center gap-2 text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                    </svg>
+                    <span class="font-semibold text-slate-600">Filter:</span>
+                </div>
+                <select name="jurusan" onchange="this.form.submit()" class="border-slate-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-slate-50 min-w-[200px] flex-1">
+                    <option value="">Semua Jurusan</option>
+                    @foreach($jurusans as $j)
+                        <option value="{{ $j }}" {{ request('jurusan') == $j ? 'selected' : '' }}>{{ $j }}</option>
+                    @endforeach
+                </select>
             </div>
-            <select name="jurusan" onchange="this.form.submit()" class="border-slate-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-slate-50 min-w-[250px]">
-                <option value="">Semua Jurusan</option>
-                @foreach($jurusans as $j)
-                    <option value="{{ $j }}" {{ request('jurusan') == $j ? 'selected' : '' }}>{{ $j }}</option>
-                @endforeach
-            </select>
+
+            <!-- Search Input -->
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <div class="relative w-full md:w-80">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Nama atau NIP..." class="w-full border-slate-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 p-2.5 bg-slate-50 pl-10" autocomplete="off">
+                    <div class="absolute left-3 top-2.5 text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                    Cari
+                </button>
+            </div>
         </form>
     </div>
 
@@ -136,8 +153,8 @@
                                         </svg>
                                     </div>
                                     <p class="text-slate-500 font-medium">Data dosen tidak ditemukan</p>
-                                    @if(request('jurusan'))
-                                        <p class="text-slate-400 text-sm mt-1">Coba ubah filter jurusan atau <a href="/admin/dosen" class="text-blue-500 hover:underline">reset filter</a></p>
+                                    @if(request('jurusan') || request('search'))
+                                        <p class="text-slate-400 text-sm mt-1">Coba ubah filter atau <a href="/admin/dosen" class="text-blue-500 hover:underline">reset filter</a></p>
                                     @endif
                                 </div>
                             </td>
