@@ -6,7 +6,15 @@
 <div class="max-w-2xl mx-auto">
     <div class="bg-white rounded-2xl shadow p-8">
         <div class="flex items-center gap-4 mb-8">
-            <a href="/admin/users" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+            @php
+                $backLink = match(request('role')) {
+                    'admin' => '/admin/admin-data',
+                    'dosen' => '/admin/dosen',
+                    'mahasiswa' => '/admin/mahasiswa',
+                    default => '/admin/dashboard',
+                };
+            @endphp
+            <a href="{{ $backLink }}" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
                 ←
             </a>
             <h2 class="text-xl font-bold text-slate-800">Tambah User Baru</h2>
@@ -25,9 +33,9 @@
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Role</label>
                     <select name="role" id="roleSelect" required class="w-full border border-slate-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 transition">
-                        <option value="mahasiswa">Mahasiswa</option>
-                        <option value="dosen">Dosen</option>
-                        <option value="admin">Admin</option>
+                        <option value="mahasiswa" {{ request('role') === 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
+                        <option value="dosen" {{ request('role') === 'dosen' ? 'selected' : '' }}>Dosen</option>
+                        <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                     </select>
                 </div>
                 <div>

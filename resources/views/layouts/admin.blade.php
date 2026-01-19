@@ -73,9 +73,9 @@
 
             <p class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-6 mb-2">Management</p>
 
-            <a href="/admin/users" class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ Request::is('admin/users*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30' : 'text-slate-400 hover:bg-slate-800 hover:text-blue-400' }}">
-                <svg class="w-5 h-5 {{ Request::is('admin/users*') ? 'text-white' : 'text-slate-500 group-hover:text-blue-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                <span class="font-medium text-sm">Users</span>
+            <a href="/admin/admin-data" class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ Request::is('admin/admin-data*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30' : 'text-slate-400 hover:bg-slate-800 hover:text-blue-400' }}">
+                <svg class="w-5 h-5 {{ Request::is('admin/admin-data*') ? 'text-white' : 'text-slate-500 group-hover:text-blue-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04M12 3V2m0 18v1m0-1c-4.418 0-8-3.582-8-8 0-4.418 3.582-8 8-8s8 3.582 8 8c0 4.418-3.582 8-8 8z" /></svg>
+                <span class="font-medium text-sm">Data Admin</span>
             </a>
 
             <a href="/admin/dosen" class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ Request::is('admin/dosen*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30' : 'text-slate-400 hover:bg-slate-800 hover:text-blue-400' }}">
@@ -83,6 +83,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 <span class="font-medium text-sm">Data Dosen</span>
+            </a>
+
+            <a href="/admin/mahasiswa" class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ Request::is('admin/mahasiswa*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30' : 'text-slate-400 hover:bg-slate-800 hover:text-blue-400' }}">
+                <svg class="w-5 h-5 {{ Request::is('admin/mahasiswa*') ? 'text-white' : 'text-slate-500 group-hover:text-blue-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <span class="font-medium text-sm">Data Mahasiswa</span>
             </a>
 
             <a href="/admin/pembayaran" class="group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ Request::is('admin/pembayaran*') ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30' : 'text-slate-400 hover:bg-slate-800 hover:text-blue-400' }}">

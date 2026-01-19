@@ -14,19 +14,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        // Urutan role: admin -> dosen -> mahasiswa
-        $roleOrder = ['admin' => 1, 'dosen' => 2, 'mahasiswa' => 3];
-
-        $users = User::all()->sort(function($a, $b) use ($roleOrder) {
-            // Pertama urutkan berdasarkan role
-            if ($roleOrder[$a->role] !== $roleOrder[$b->role]) {
-                return $roleOrder[$a->role] <=> $roleOrder[$b->role];
-            }
-            // Kedua urutkan berdasarkan identifier secara alfabetis/numerik (asc)
-            return strcmp($a->identifier, $b->identifier);
-        });
-
-        return view('admin.users.index', compact('users'));
+        return redirect('/admin/admin-data');
     }
 
     public function create()
@@ -104,7 +92,14 @@ class UserController extends Controller
                 }
             });
 
-            return redirect('/admin/users')->with('success', 'User berhasil ditambahkan');
+            $redirectPath = match($request->role) {
+                'admin' => '/admin/admin-data',
+                'dosen' => '/admin/dosen',
+                'mahasiswa' => '/admin/mahasiswa',
+                default => '/admin/dashboard',
+            };
+
+            return redirect($redirectPath)->with('success', 'User berhasil ditambahkan');
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['error' => 'Gagal: ' . $e->getMessage()]);
         }
@@ -118,8 +113,14 @@ class UserController extends Controller
         $currentAdmin = \App\Models\Admin::where('user_id', auth()->id())->first();
         if ($currentAdmin && $currentAdmin->admin_level === 'second' && $user->role === 'admin') {
             $targetAdmin = \App\Models\Admin::where('user_id', $user->id)->first();
+            $redirectPath = match($user->role) {
+                'admin' => '/admin/admin-data',
+                'dosen' => '/admin/dosen',
+                'mahasiswa' => '/admin/mahasiswa',
+                default => '/admin/dashboard',
+            };
             if ($targetAdmin && $targetAdmin->admin_level === 'super') {
-                return redirect('/admin/users')->withErrors(['msg' => 'Anda tidak memiliki akses untuk mengedit Super Admin.']);
+                return redirect($redirectPath)->withErrors(['msg' => 'Anda tidak memiliki akses untuk mengedit Super Admin.']);
             }
         }
 
@@ -208,7 +209,14 @@ class UserController extends Controller
                 }
             });
 
-            return redirect('/admin/users')->with('success', 'User berhasil diperbarui');
+            $redirectPath = match($user->role) {
+                'admin' => '/admin/admin-data',
+                'dosen' => '/admin/dosen',
+                'mahasiswa' => '/admin/mahasiswa',
+                default => '/admin/dashboard',
+            };
+
+            return redirect($redirectPath)->with('success', 'User berhasil diperbarui');
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['error' => 'Gagal: ' . $e->getMessage()]);
         }
@@ -243,7 +251,14 @@ class UserController extends Controller
                 $user->delete();
             });
 
-            return redirect('/admin/users')->with('success', 'User berhasil dihapus');
+            $redirectPath = match($user->role) {
+                'admin' => '/admin/admin-data',
+                'dosen' => '/admin/dosen',
+                'mahasiswa' => '/admin/mahasiswa',
+                default => '/admin/dashboard',
+            };
+
+            return redirect($redirectPath)->with('success', 'User berhasil dihapus');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Gagal menghapus: ' . $e->getMessage()]);
         }

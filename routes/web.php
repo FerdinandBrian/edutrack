@@ -16,8 +16,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\MataKuliahController;
 use App\Http\Controllers\PerkuliahanController;
 use App\Http\Controllers\PengumumanController;
-
 use App\Http\Controllers\AdminDosenController;
+use App\Http\Controllers\AdminMahasiswaController;
+use App\Http\Controllers\AdminAdminController;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -56,16 +57,17 @@ Route::middleware('auth')->group(function () {
         Route::put('/profile', [ProfileController::class, 'update']);
         Route::get('/dashboard', [DashboardAdminController::class, 'index']);
         
-        // User Management
-        Route::get('/users', [UserController::class, 'index']);
+        // User & Role Detail Management
+        Route::get('/admin-data', [AdminAdminController::class, 'index']);
+        Route::get('/mahasiswa', [AdminMahasiswaController::class, 'index']);
+        Route::get('/dosen', [AdminDosenController::class, 'index']);
+
+        // Unified User CRUD (Still needed for Create/Edit/Update/Delete)
         Route::get('/users/create', [UserController::class, 'create']);
         Route::post('/users', [UserController::class, 'store']);
         Route::get('/users/{id}/edit', [UserController::class, 'edit']);
         Route::put('/users/{id}', [UserController::class, 'update']);
         Route::delete('/users/{user}', [UserController::class, 'destroy']);
-        
-        // Dosen Management
-        Route::get('/dosen', [AdminDosenController::class, 'index']);
         
         // DKBS Admin
         Route::get('/dkbs', [DkbsController::class, 'index']);

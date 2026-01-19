@@ -8,7 +8,15 @@
         <!-- Header -->
         <div class="bg-amber-600 px-8 py-8 text-white">
             <div class="flex items-center gap-4">
-                <a href="/admin/users" class="hover:bg-white/20 p-2 rounded-full transition">
+                @php
+                    $backLink = match($user->role) {
+                        'admin' => '/admin/admin-data',
+                        'dosen' => '/admin/dosen',
+                        'mahasiswa' => '/admin/mahasiswa',
+                        default => '/admin/dashboard',
+                    };
+                @endphp
+                <a href="{{ $backLink }}" class="hover:bg-white/20 p-2 rounded-full transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
@@ -129,7 +137,7 @@
 
                 <!-- Action Buttons -->
                 <div class="pt-8 flex items-center justify-end gap-4 border-t border-slate-50">
-                    <a href="/admin/users" class="px-6 py-3 text-slate-500 hover:text-slate-700 font-medium transition">Batal</a>
+                    <a href="{{ $backLink }}" class="px-6 py-3 text-slate-500 hover:text-slate-700 font-medium transition">Batal</a>
                     <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-10 py-3 rounded-xl shadow-lg shadow-amber-200 transition transform hover:-translate-y-0.5 active:translate-y-0">
                         Simpan Perubahan
                     </button>
