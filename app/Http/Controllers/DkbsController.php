@@ -13,37 +13,26 @@ class DkbsController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        $query = Dkbs::with(['mahasiswa', 'mataKuliah', 'perkuliahan.ruangan', 'perkuliahan.dosen']);
-
-        // Filtering by tahun_ajaran
-        if ($request->filled('tahun_ajaran')) {
-            $query->where('tahun_ajaran', $request->tahun_ajaran);
-        }
-
-        // Searching by NRP or Student Name
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('nrp', 'like', "%$search%")
-                  ->orWhereHas('mahasiswa', function($sq) use ($search) {
-                      $sq->where('nama', 'like', "%$search%");
-                  });
-            });
-        }
 
         if ($user->role === 'mahasiswa') {
-            // Get available semesters for this student
-            $tahun_ajarans = Dkbs::where('nrp', $user->identifier)->distinct()->orderBy('tahun_ajaran', 'desc')->pluck('tahun_ajaran');
+            // 1. Dapatkan daftar tahun ajaran yang pernah diambil mhs ini
+            $tahun_ajarans = Dkbs::where('nrp', $user->identifier)
+                ->distinct()
+                ->orderBy('tahun_ajaran', 'desc')
+                ->pluck('tahun_ajaran');
             
-            // Determine selected semester (default to latest if not specified)
+            // 2. Tentukan TA yang dipilih (default ke yang terbaru jika tidak ada di request)
             $selectedTa = $request->tahun_ajaran ?? $tahun_ajarans->first();
 
-            // Apply filter if not already applied by global filter (though global filter is only if request filled)
-            if (!$request->filled('tahun_ajaran') && $selectedTa) {
+            // 3. Ambil data dengan filter NRP dan TA yang ketat
+            $query = Dkbs::with(['mahasiswa', 'mataKuliah', 'perkuliahan.ruangan', 'perkuliahan.dosen'])
+                ->where('nrp', $user->identifier);
+
+            if ($selectedTa) {
                 $query->where('tahun_ajaran', $selectedTa);
             }
 
-            $data = $query->where('nrp', $user->identifier)->get();
+            $data = $query->get();
             
             // Menggunakan DATABASE FUNCTION untuk menghitung total SKS
             $totalSks = 0;
@@ -53,9 +42,8 @@ class DkbsController extends Controller
                 } catch(\Exception $e) { $totalSks = 0; }
             }
 
-            // Custom sorting for Days
+            // Custom sorting berdasarkan Hari (Senin -> Minggu)
             $dayOrder = ['Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4, 'Jumat' => 5, 'Sabtu' => 6, 'Minggu' => 7];
-
             $data = $data->sort(function($a, $b) use ($dayOrder) {
                 $dayA = $a->perkuliahan->hari ?? '';
                 $dayB = $b->perkuliahan->hari ?? '';
@@ -67,18 +55,21 @@ class DkbsController extends Controller
                 return $valA <=> $valB;
             });
 
-            $tahun_ajarans = Dkbs::where('nrp', $user->identifier)->distinct()->orderBy('tahun_ajaran', 'desc')->pluck('tahun_ajaran');
             return view('mahasiswa.dkbs.index', compact('data', 'tahun_ajarans', 'totalSks', 'selectedTa'));
+
         } else {
-            // Admin View: List of Students
+            // LOGIKA ADMIN: Menampilkan daftar Mahasiswa untuk dikelola
             $students = Mahasiswa::orderBy('jurusan', 'asc')
                                  ->orderBy('nrp', 'asc');
+
             if ($request->filled('search')) {
-                $students->where(function($q) use ($request) {
-                    $q->where('nama', 'like', '%' . $request->search . '%')
-                      ->orWhere('nrp', 'like', '%' . $request->search . '%');
+                $search = $request->search;
+                $students->where(function($q) use ($search) {
+                    $q->where('nama', 'like', "%$search%")
+                      ->orWhere('nrp', 'like', "%$search%");
                 });
             }
+
             $students = $students->get();
             return view('admin.dkbs.index', compact('students'));
         }

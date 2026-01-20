@@ -9,22 +9,28 @@ class DashboardMahasiswaController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $mahasiswa = $user->mahasiswa; // relasi
+        $mahasiswa = $user->mahasiswa;
 
-        // Calculate total SKS from DKBS (Specifically Semester 3)
-        $totalSks = \App\Models\Dkbs::where('nrp', $mahasiswa->nrp)
-            ->where('dkbs.semester', 3)
-            ->join('mata_kuliah', 'dkbs.kode_mk', '=', 'mata_kuliah.kode_mk')
-            ->sum('mata_kuliah.sks');
+        // 1. Dapatkan Tahun Ajaran terbaru dari DKBS mahasiswa ini
+        $latestDkbs = \App\Models\Dkbs::where('nrp', $mahasiswa->nrp)
+            ->orderBy('tahun_ajaran', 'desc')
+            ->first();
 
-        // Menggunakan DATABASE FUNCTION untuk menghitung IPK secara Real-time
+        $selectedTa = $latestDkbs ? $latestDkbs->tahun_ajaran : null;
+
+        // 2. Hitung total SKS berdasarkan Tahun Ajaran TERBARU (bukan hardcode semester 3)
+        $totalSks = 0;
+        if ($selectedTa) {
+            $totalSks = \App\Models\Dkbs::where('nrp', $mahasiswa->nrp)
+                ->where('dkbs.tahun_ajaran', $selectedTa)
+                ->join('mata_kuliah', 'dkbs.kode_mk', '=', 'mata_kuliah.kode_mk')
+                ->sum('mata_kuliah.sks');
+        }
+
+        // 3. Menggunakan DATABASE FUNCTION untuk hitung IPK Real-time
         $ipk = DB::select("SELECT get_ipk(?) as ipk", [$user->identifier])[0]->ipk;
 
-        // Fetch status akademik from latest DKBS
-        $latestDkbs = \App\Models\Dkbs::where('nrp', $mahasiswa->nrp)
-            ->orderBy('id', 'desc')
-            ->first();
-        $statusAkademik = $latestDkbs ? "Aktif - " . $latestDkbs->tahun_ajaran : "N/A";
+        $statusAkademik = $selectedTa ? "Aktif - " . $selectedTa : "N/A";
 
         return view('mahasiswa.dashboard', [
             'user' => $user,
